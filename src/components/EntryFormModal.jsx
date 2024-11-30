@@ -1,8 +1,22 @@
-import { useState } from "react";
-import { Modal, Box, TextField, Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Modal,
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
 
 const EntryFormModal = ({ isOpen, row, onClose, onSave }) => {
   const [formData, setFormData] = useState(row);
+
+  // Update formData when the row prop changes
+  useEffect(() => {
+    setFormData(row);
+  }, [row]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -11,6 +25,7 @@ const EntryFormModal = ({ isOpen, row, onClose, onSave }) => {
 
   const handleSubmit = () => {
     onSave(formData);
+    setFormData(null);
   };
 
   return (
@@ -27,6 +42,14 @@ const EntryFormModal = ({ isOpen, row, onClose, onSave }) => {
         }}
       >
         <TextField
+          label="Room No"
+          name="roomNo"
+          fullWidth
+          margin="normal"
+          value={formData?.roomNo || ""}
+          disabled
+        />
+        <TextField
           label="Rate"
           name="rate"
           fullWidth
@@ -42,22 +65,39 @@ const EntryFormModal = ({ isOpen, row, onClose, onSave }) => {
           value={formData?.noOfPeople || ""}
           onChange={handleChange}
         />
-        <TextField
-          label="Type"
-          name="type"
-          fullWidth
-          margin="normal"
-          value={formData?.type || ""}
-          onChange={handleChange}
-        />
-        <TextField
-          label="Mode of Payment"
-          name="modeOfPayment"
-          fullWidth
-          margin="normal"
-          value={formData?.modeOfPayment || ""}
-          onChange={handleChange}
-        />
+
+        {/* Type Selection List */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Type</InputLabel>
+          <Select
+            label="Type"
+            name="type"
+            value={formData?.type || ""}
+            onChange={handleChange}
+          >
+            <MenuItem value="Employee">Employee</MenuItem>
+            <MenuItem value="Tourist">Tourist</MenuItem>
+            <MenuItem value="Family">Family</MenuItem>
+            <MenuItem value="NRI">NRI</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Mode of Payment Selection List */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Mode of Payment</InputLabel>
+          <Select
+            label="Mode of Payment"
+            name="modeOfPayment"
+            value={formData?.modeOfPayment || ""}
+            onChange={handleChange}
+          >
+            <MenuItem value="Card">Card</MenuItem>
+            <MenuItem value="Online">Online</MenuItem>
+            <MenuItem value="Cash">Cash</MenuItem>
+            <MenuItem value="UnPaid">UnPaid</MenuItem>
+          </Select>
+        </FormControl>
+
         <Button
           variant="contained"
           color="primary"
@@ -65,6 +105,14 @@ const EntryFormModal = ({ isOpen, row, onClose, onSave }) => {
           style={{ marginTop: "16px" }}
         >
           Save
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={onClose}
+          style={{ marginTop: "16px", marginLeft: "16px" }}
+        >
+          Cancel
         </Button>
       </Box>
     </Modal>
