@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button, FormControl, Select } from "@mui/material";
+import { Refresh } from "@mui/icons-material";
 
 const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
   const [rows, setRows] = useState(
@@ -13,6 +14,7 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
       totalAmount: 0,
       type: "",
       modeOfPayment: "",
+      fullname: "", // Add fullname field
     }))
   );
 
@@ -43,6 +45,7 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
     totalAmount: totalAmount, // Calculate totalAmount
     type: "", // Not editable
     modeOfPayment: "", // Not editable
+    fullname: "", // Not editable
   };
 
   // Include the totals row in the rows
@@ -50,7 +53,24 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
 
   return (
     <div style={{ marginBottom: "32px" }}>
-      <h3>{title}</h3>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "90%",
+        }}
+      >
+        <h3>{title}</h3>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => window.location.reload()}
+          style={{ marginBottom: "16px" }}
+        >
+          Reset Table <Refresh />
+        </Button>
+      </div>
+      {/* DataGrid */}
       <div style={{ height: "100%", width: "100%" }}>
         <DataGrid
           rows={rowsWithTotals}
@@ -58,35 +78,35 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
             {
               field: "roomNo",
               headerName: "Room No",
-              width: 120,
+              width: 100,
               editable: false, // Read-only column
               type: "number",
             },
             {
               field: "cost",
               headerName: "Cost",
-              width: 120,
+              width: 100,
               editable: false, // Read-only column
               type: "number",
             },
             {
               field: "rate",
               headerName: "Rate",
-              width: 120,
+              width: 100,
               editable: true, // Editable column
               type: "number",
             },
             {
               field: "noOfPeople",
               headerName: "People",
-              width: 120,
+              width: 100,
               editable: true, // Editable column
               type: "number",
             },
             {
               field: "totalAmount",
               headerName: "Total Amount",
-              width: 150,
+              width: 100,
               editable: false, // Read-only column
               type: "number",
             },
@@ -144,6 +164,12 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
                   </Select>
                 </FormControl>
               ),
+            },
+            {
+              field: "fullname",
+              headerName: "Full Name",
+              width: 150,
+              editable: true, // Editable column
             },
           ]}
           pageSize={5}
