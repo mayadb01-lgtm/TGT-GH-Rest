@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Typography,
   Box,
@@ -12,55 +12,120 @@ import TableComponent from "../components/TableComponent";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DataGrid } from "@mui/x-data-grid";
 
+// Utility function to process entries by payment mode
+const processEntriesByPaymentMode = (data, mode) => {
+  const filteredEntries = data.filter((row) => row.modeOfPayment === mode);
+  const totalAmount = filteredEntries.reduce(
+    (total, row) => total + row.totalAmount,
+    0
+  );
+  if (totalAmount === 0) return [];
+  return [
+    ...filteredEntries,
+    {
+      id: "",
+      roomNo: "",
+      fullname: `Total ${mode} Amount`,
+      totalAmount,
+    },
+  ];
+};
+
+// Utility function to determine title color
+const getTitleColor = (title) => {
+  if (title.includes("Cash")) return "primary";
+  if (title.includes("Card")) return "secondary";
+  if (title.includes("Online")) return "success";
+  return "error";
+};
+
+// Reusable SummaryTable component
+const SummaryTable = ({ title, rows, columns }) => (
+  <div>
+    <Typography
+      variant="h6"
+      gutterBottom
+      color={getTitleColor(title)}
+      fontSize={18}
+      fontWeight={600}
+      margin="16px 0"
+    >
+      {title}
+    </Typography>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      pageSize={5}
+      rowsPerPageOptions={[5, 10, 20]}
+      autoHeight
+    />
+    {title.includes("Night") && (
+      <Divider
+        style={{
+          margin: "16px 0",
+          backgroundColor: "#000",
+        }}
+      />
+    )}
+  </div>
+);
+
 const EntryPage = () => {
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
 
-  const handleDaySubmit = (data) => {
-    setDayData(data);
-    console.log("Day Data Submitted:", data);
-  };
+  const handleDaySubmit = (data) => setDayData(data);
+  const handleNightSubmit = (data) => setNightData(data);
 
-  const handleNightSubmit = (data) => {
-    setNightData(data);
-    console.log("Night Data Submitted:", data);
-  };
+  // Columns for DataGrid
+  const columns = [
+    { field: "roomNo", headerName: "Room No", width: 120 },
+    { field: "fullname", headerName: "Full Name", width: 200 },
+    { field: "noOfPeople", headerName: "No. of People", width: 150 },
+    { field: "rate", headerName: "Rate", width: 150 },
+    { field: "totalAmount", headerName: "Amount", width: 150 },
+  ];
 
-  console.log("Day Data:", dayData);
-  console.log("Night Data:", nightData);
-
-  // Day - Calculations
-  // 1. Total rate by Payment Mode
-  const dayTotalRateByPaymentMode = dayData.reduce((acc, row) => {
-    acc[row.modeOfPayment] =
-      acc[row.modeOfPayment] + row.totalAmount || row.totalAmount;
-    return acc;
-  }, {});
-
-  // Total Amount by Payment Mode
-  const dayTotalAmountByPaymentMode = Object.values(
-    dayTotalRateByPaymentMode
-  ).reduce((sum, rate) => sum + rate, 0);
-
-  // Night - Calculations
-  // 1. Total rate by Payment Mode
-  const nightTotalRateByPaymentMode = nightData.reduce((acc, row) => {
-    acc[row.modeOfPayment] =
-      acc[row.modeOfPayment] + row.totalAmount || row.totalAmount;
-    return acc;
-  }, {});
-
-  // Total Amount by Payment Mode
-  const nightTotalAmountByPaymentMode = Object.values(
-    nightTotalRateByPaymentMode
-  ).reduce((sum, rate) => sum + rate, 0);
+  // Processed data by payment mode using memoization for performance
+  const dayCashEntries = useMemo(
+    () => processEntriesByPaymentMode(dayData, "Cash"),
+    [dayData]
+  );
+  const nightCashEntries = useMemo(
+    () => processEntriesByPaymentMode(nightData, "Cash"),
+    [nightData]
+  );
+  const dayCardEntries = useMemo(
+    () => processEntriesByPaymentMode(dayData, "Card"),
+    [dayData]
+  );
+  const nightCardEntries = useMemo(
+    () => processEntriesByPaymentMode(nightData, "Card"),
+    [nightData]
+  );
+  const dayOnlineEntries = useMemo(
+    () => processEntriesByPaymentMode(dayData, "Online"),
+    [dayData]
+  );
+  const nightOnlineEntries = useMemo(
+    () => processEntriesByPaymentMode(nightData, "Online"),
+    [nightData]
+  );
+  const dayUnPaidEntries = useMemo(
+    () => processEntriesByPaymentMode(dayData, "UnPaid"),
+    [dayData]
+  );
+  const nightUnPaidEntries = useMemo(
+    () => processEntriesByPaymentMode(nightData, "UnPaid"),
+    [nightData]
+  );
 
   return (
-    <Grid container spacing={2} style={{ margin: "auto", width: "95%" }}>
+    <Grid container spacing={2} sx={{ margin: "auto", width: "100%" }}>
       {/* Left Side: Day and Night Entry Tables */}
       <Grid item xs={12} md={7}>
         <Box sx={{ padding: "24px" }}>
-          {/* Day Entries Section with Accordion */}
+          {/* Day Entries */}
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -93,7 +158,7 @@ const EntryPage = () => {
 
           <Divider sx={{ my: 4 }} />
 
-          {/* Night Entries Section with Accordion */}
+          {/* Night Entries */}
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -125,91 +190,52 @@ const EntryPage = () => {
           </Accordion>
         </Box>
       </Grid>
+
+      {/* Right Side: Summary Tables */}
+      {/* Right Side: Summary Tables */}
       <Grid item xs={12} md={5}>
-        <div style={{ marginBottom: "32px" }}>
-          <h3>Summary of Day Entries</h3>
-          <div style={{ height: "100%", width: "50%" }}>
-            <DataGrid
-              rows={[
-                {
-                  id: 1,
-                  modeOfPayment: "Cash",
-                  totalAmount: dayTotalAmountByPaymentMode["Cash"] || 0,
-                },
-                {
-                  id: 2,
-                  modeOfPayment: "Card",
-                  totalAmount: dayTotalAmountByPaymentMode["Card"] || 0,
-                },
-                {
-                  id: 3,
-                  modeOfPayment: "UPI",
-                  totalAmount: dayTotalAmountByPaymentMode["Online"] || 0,
-                },
-                {
-                  id: 4,
-                  modeOfPayment: "Others",
-                  totalAmount: dayTotalAmountByPaymentMode["UnPaid"] || 0,
-                },
-              ]}
-              columns={[
-                {
-                  field: "modeOfPayment",
-                  headerName: "Payment Mode",
-                  width: 200,
-                },
-                {
-                  field: "totalAmount",
-                  headerName: "Total Amount",
-                  width: 200,
-                },
-              ]}
-              pageSize={4}
-            />
-          </div>
-        </div>
-        <div style={{ marginBottom: "32px" }}>
-          <h3>Summary of Night Entries</h3>
-          <div style={{ height: "100%", width: "50%" }}>
-            <DataGrid
-              rows={[
-                {
-                  id: 1,
-                  modeOfPayment: "Cash",
-                  totalAmount: nightTotalAmountByPaymentMode["Cash"] || 0,
-                },
-                {
-                  id: 2,
-                  modeOfPayment: "Card",
-                  totalAmount: nightTotalAmountByPaymentMode["Card"] || 0,
-                },
-                {
-                  id: 3,
-                  modeOfPayment: "UPI",
-                  totalAmount: nightTotalAmountByPaymentMode["Online"] || 0,
-                },
-                {
-                  id: 4,
-                  modeOfPayment: "Others",
-                  totalAmount: nightTotalAmountByPaymentMode["UnPaid"] || 0,
-                },
-              ]}
-              columns={[
-                {
-                  field: "modeOfPayment",
-                  headerName: "Payment Mode",
-                  width: 200,
-                },
-                {
-                  field: "totalAmount",
-                  headerName: "Total Amount",
-                  width: 200,
-                },
-              ]}
-              pageSize={4}
-            />
-          </div>
-        </div>
+        <Box sx={{ padding: "16px" }}>
+          <SummaryTable
+            title="Day Cash Entries Summary"
+            rows={dayCashEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Night Cash Entries Summary"
+            rows={nightCashEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Day Card Entries Summary"
+            rows={dayCardEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Night Card Entries Summary"
+            rows={nightCardEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Day Online Entries Summary"
+            rows={dayOnlineEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Night Online Entries Summary"
+            rows={nightOnlineEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Day UnPaid Entries Summary"
+            rows={dayUnPaidEntries}
+            columns={columns}
+          />
+          <SummaryTable
+            title="Night UnPaid Entries Summary"
+            rows={nightUnPaidEntries}
+            columns={columns}
+          />
+        </Box>
       </Grid>
     </Grid>
   );
