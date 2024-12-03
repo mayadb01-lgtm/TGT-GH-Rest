@@ -2,12 +2,12 @@ import { useState, useMemo } from "react";
 import {
   Typography,
   Box,
-  Divider,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
+  Stack,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import TableComponent from "../components/TableComponent";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DataGrid } from "@mui/x-data-grid";
@@ -15,20 +15,19 @@ import { DataGrid } from "@mui/x-data-grid";
 // Utility function to process entries by payment mode
 const processEntriesByPaymentMode = (data, mode) => {
   const filteredEntries = data.filter((row) => row.modeOfPayment === mode);
-  const totalAmount = filteredEntries.reduce(
-    (total, row) => total + row.totalAmount,
-    0
-  );
-  if (totalAmount === 0) return [];
-  return [
-    ...filteredEntries,
-    {
-      id: "",
-      roomNo: "",
-      fullname: `Total ${mode} Amount`,
-      totalAmount,
-    },
-  ];
+
+  if (filteredEntries.length > 0) {
+    return [
+      ...filteredEntries,
+      {
+        id: "",
+        roomNo: "",
+        fullname: `Total ${mode} Amount`,
+      },
+    ];
+  }
+
+  return [];
 };
 
 // Utility function to determine title color
@@ -48,7 +47,6 @@ const SummaryTable = ({ title, rows, columns }) => (
       color={getTitleColor(title)}
       fontSize={18}
       fontWeight={600}
-      margin="16px 0"
     >
       {title}
     </Typography>
@@ -57,16 +55,7 @@ const SummaryTable = ({ title, rows, columns }) => (
       columns={columns}
       pageSize={5}
       rowsPerPageOptions={[5, 10, 20]}
-      autoHeight
     />
-    {title.includes("Night") && (
-      <Divider
-        style={{
-          margin: "16px 0",
-          backgroundColor: "#000",
-        }}
-      />
-    )}
   </div>
 );
 
@@ -79,11 +68,10 @@ const EntryPage = () => {
 
   // Columns for DataGrid
   const columns = [
-    { field: "roomNo", headerName: "Room No", width: 120 },
-    { field: "fullname", headerName: "Full Name", width: 200 },
-    { field: "noOfPeople", headerName: "No. of People", width: 150 },
-    { field: "rate", headerName: "Rate", width: 150 },
-    { field: "totalAmount", headerName: "Amount", width: 150 },
+    { field: "roomNo", headerName: "Room No", width: 80 },
+    { field: "fullname", headerName: "Full Name", width: 120 },
+    { field: "noOfPeople", headerName: "No. of People", width: 100 },
+    { field: "rate", headerName: "Rate", width: 80 },
   ];
 
   // Processed data by payment mode using memoization for performance
@@ -121,10 +109,17 @@ const EntryPage = () => {
   );
 
   return (
-    <Grid container spacing={2} sx={{ margin: "auto", width: "100%" }}>
+    <Grid
+      container
+      spacing={2}
+      columns={{ xs: 12 }}
+      direction="row"
+      justifyContent="center"
+      alignItems="start"
+    >
       {/* Left Side: Day and Night Entry Tables */}
-      <Grid item xs={12} md={7}>
-        <Box sx={{ padding: "24px" }}>
+      <Grid item xs={12} sm={7} md={7} lg={7} xl={7}>
+        <Box sx={{ padding: "8px" }}>
           {/* Day Entries */}
           <Accordion defaultExpanded>
             <AccordionSummary
@@ -132,7 +127,7 @@ const EntryPage = () => {
               aria-controls="day-entries-content"
               id="day-entries-header"
             >
-              <Typography variant="h4">Day Entries</Typography>
+              <Typography variant="h5">Day Entries</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <TableComponent
@@ -155,9 +150,6 @@ const EntryPage = () => {
               />
             </AccordionDetails>
           </Accordion>
-
-          <Divider sx={{ my: 4 }} />
-
           {/* Night Entries */}
           <Accordion defaultExpanded>
             <AccordionSummary
@@ -165,7 +157,7 @@ const EntryPage = () => {
               aria-controls="night-entries-content"
               id="night-entries-header"
             >
-              <Typography variant="h4">Night Entries</Typography>
+              <Typography variant="h5">Night Entries</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <TableComponent
@@ -191,50 +183,56 @@ const EntryPage = () => {
         </Box>
       </Grid>
 
-      {/* Right Side: Summary Tables */}
-      {/* Right Side: Summary Tables */}
-      <Grid item xs={12} md={5}>
-        <Box sx={{ padding: "16px" }}>
-          <SummaryTable
-            title="Day Cash Entries Summary"
-            rows={dayCashEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Night Cash Entries Summary"
-            rows={nightCashEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Day Card Entries Summary"
-            rows={dayCardEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Night Card Entries Summary"
-            rows={nightCardEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Day Online Entries Summary"
-            rows={dayOnlineEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Night Online Entries Summary"
-            rows={nightOnlineEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Day UnPaid Entries Summary"
-            rows={dayUnPaidEntries}
-            columns={columns}
-          />
-          <SummaryTable
-            title="Night UnPaid Entries Summary"
-            rows={nightUnPaidEntries}
-            columns={columns}
-          />
+      <Grid item xs={12} sm={5} md={5} lg={5} xl={5}>
+        <Box>
+          <Stack direction="row" spacing={2} sx={{ padding: "24px" }}>
+            <SummaryTable
+              title="Day Cash Entries Summary"
+              rows={dayCashEntries}
+              columns={columns}
+            />
+            <SummaryTable
+              title="Night Cash Entries Summary"
+              rows={nightCashEntries}
+              columns={columns}
+            />
+          </Stack>
+          <Stack direction="row" spacing={2} sx={{ padding: "24px" }}>
+            <SummaryTable
+              title="Day Card Entries Summary"
+              rows={dayCardEntries}
+              columns={columns}
+            />
+            <SummaryTable
+              title="Night Card Entries Summary"
+              rows={nightCardEntries}
+              columns={columns}
+            />
+          </Stack>
+          <Stack direction="row" spacing={2} sx={{ padding: "24px" }}>
+            <SummaryTable
+              title="Day Online Entries Summary"
+              rows={dayOnlineEntries}
+              columns={columns}
+            />
+            <SummaryTable
+              title="Night Online Entries Summary"
+              rows={nightOnlineEntries}
+              columns={columns}
+            />
+          </Stack>
+          <Stack direction="row" spacing={2} sx={{ padding: "24px" }}>
+            <SummaryTable
+              title="Day UnPaid Entries Summary"
+              rows={dayUnPaidEntries}
+              columns={columns}
+            />
+            <SummaryTable
+              title="Night UnPaid Entries Summary"
+              rows={nightUnPaidEntries}
+              columns={columns}
+            />
+          </Stack>
         </Box>
       </Grid>
     </Grid>

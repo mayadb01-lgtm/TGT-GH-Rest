@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button, FormControl, Select } from "@mui/material";
 import { Refresh } from "@mui/icons-material";
@@ -11,7 +11,6 @@ const initializeRows = (rowsLength, roomCosts) => {
     cost: roomCosts[i + 1] || 0,
     rate: 0,
     noOfPeople: 0,
-    totalAmount: 0,
     type: "",
     modeOfPayment: "",
     fullname: "",
@@ -47,7 +46,6 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
           ? {
               ...row,
               ...updatedRow,
-              totalAmount: updatedRow.rate * updatedRow.noOfPeople,
             }
           : row
       )
@@ -66,22 +64,15 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
     cost: "",
     rate: "",
     noOfPeople: rows.reduce((sum, row) => sum + row.noOfPeople, 0),
-    totalAmount: rows.reduce((sum, row) => sum + row.totalAmount, 0),
     type: "",
     modeOfPayment: "",
     fullname: "",
   };
 
   return (
-    <div style={{ marginBottom: "32px" }}>
+    <div>
       <div className="table-header">
-        <h3>{title}</h3>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleReset}
-          style={{ marginBottom: "16px" }}
-        >
+        <Button variant="contained" color="primary" onClick={handleReset}>
           Reset Table <Refresh />
         </Button>
       </div>
@@ -110,12 +101,6 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
               width: 100,
               editable: true,
               type: "number",
-            },
-            {
-              field: "totalAmount",
-              headerName: "Total Amount",
-              width: 100,
-              editable: false,
             },
             {
               field: "type",
@@ -170,7 +155,6 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
         variant="contained"
         color="success"
         onClick={() => onSubmit(rows)}
-        style={{ marginTop: "16px" }}
       >
         Submit Table
       </Button>
