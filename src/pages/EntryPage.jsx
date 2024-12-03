@@ -192,7 +192,16 @@ const EntryPage = () => {
               aria-controls="night-entries-content"
               id="night-entries-header"
             >
-              <Typography variant="h6">Night Entries</Typography>
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                flex={1}
+                justifyContent={"space-between"}
+              >
+                <Typography variant="h6">Night Entries</Typography>
+                <Typography variant="h6">Aashirvad Guest House</Typography>
+              </Stack>
             </AccordionSummary>
             <AccordionDetails>
               <TableComponent
