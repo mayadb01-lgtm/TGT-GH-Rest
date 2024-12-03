@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, FormControl, Select } from "@mui/material";
-import { Refresh } from "@mui/icons-material";
+import { FormControl, Select } from "@mui/material";
 
 // Utility function to initialize rows
 const initializeRows = (rowsLength, roomCosts) => {
@@ -52,11 +51,6 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
     );
   };
 
-  // Reset rows
-  const handleReset = () => {
-    setRows(initializeRows(rowsLength, roomCosts));
-  };
-
   // Calculate totals
   const totalsRow = {
     id: "totals",
@@ -71,12 +65,6 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
 
   return (
     <div>
-      <div className="table-header">
-        <Button variant="contained" color="primary" onClick={handleReset}>
-          Reset Table <Refresh />
-        </Button>
-      </div>
-
       <div style={{ height: 500, width: "100%" }}>
         <DataGrid
           rows={[...rows, totalsRow]}
@@ -94,6 +82,12 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
               width: 100,
               editable: true,
               type: "number",
+            },
+            {
+              field: "fullname",
+              headerName: "Full Name",
+              width: 200,
+              editable: true,
             },
             {
               field: "noOfPeople",
@@ -138,26 +132,18 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
                 />
               ),
             },
-            {
-              field: "fullname",
-              headerName: "Full Name",
-              width: 200,
-              editable: true,
-            },
           ]}
           pageSize={5}
           processRowUpdate={handleRowEdit}
           disableSelectionOnClick
+          handleRowEdit={onSubmit(rows)}
+          style={{
+            fontSize: "12px",
+            height: "calc(100% - 16px)",
+            width: "100%",
+          }}
         />
       </div>
-
-      <Button
-        variant="contained"
-        color="success"
-        onClick={() => onSubmit(rows)}
-      >
-        Submit Table
-      </Button>
     </div>
   );
 };
