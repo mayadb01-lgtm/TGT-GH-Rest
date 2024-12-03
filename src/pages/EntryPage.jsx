@@ -145,13 +145,20 @@ const EntryPage = () => {
     >
       {/* Left Side: Day and Night Entry Tables */}
       <Grid item xs={12} sm={7} md={7} lg={7} xl={7} flex={0.55}>
-        <Box sx={{ padding: "8px" }}>
+        <Box>
           {/* Day Entries */}
-          <Accordion defaultExpanded>
+          <Accordion defaultExpanded style={{ margin: "0", paddingBlock: "0" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="day-entries-content"
               id="day-entries-header"
+              style={{
+                backgroundColor: "#f6f6f6",
+                borderBottom: "1px solid #e0e0e0",
+                height: "50px",
+                margin: "0",
+                paddingBlock: "0",
+              }}
             >
               <Stack
                 direction="row"
@@ -164,7 +171,7 @@ const EntryPage = () => {
                 <Typography variant="h6">Aashirvad Guest House</Typography>
               </Stack>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
               <TableComponent
                 title="Day Entry Table"
                 rowsLength={11}
@@ -186,11 +193,18 @@ const EntryPage = () => {
             </AccordionDetails>
           </Accordion>
           {/* Night Entries */}
-          <Accordion defaultExpanded>
+          <Accordion defaultExpanded style={{ margin: "0", paddingBlock: "0" }}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="night-entries-content"
               id="night-entries-header"
+              style={{
+                backgroundColor: "#f6f6f6",
+                borderBottom: "1px solid #e0e0e0",
+                height: "50px",
+                margin: "0",
+                paddingBlock: "0",
+              }}
             >
               <Stack
                 direction="row"
@@ -203,7 +217,7 @@ const EntryPage = () => {
                 <Typography variant="h6">Aashirvad Guest House</Typography>
               </Stack>
             </AccordionSummary>
-            <AccordionDetails>
+            <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
               <TableComponent
                 title="Night Entry Table"
                 rowsLength={11}
