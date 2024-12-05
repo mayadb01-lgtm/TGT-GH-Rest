@@ -3,13 +3,15 @@ import { AppBar, Toolbar, Button, Typography } from "@mui/material";
 
 const Navbar = () => {
   return (
-    <AppBar position="static" color="primary">
-      <Toolbar style={{ justifyContent: "space-between" }}>
-        <Typography
-          variant="h6"
-          component="div"
-          style={{ textAlign: "center" }}
-        >
+    <AppBar position="static">
+      <Toolbar
+        style={{
+          justifyContent: "space-between",
+          minHeight: "auto",
+          padding: "0 8px",
+        }}
+      >
+        <Typography variant="h6" component="div">
           Guest House
         </Typography>
         <div>

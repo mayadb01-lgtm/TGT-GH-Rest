@@ -18,12 +18,24 @@ const initializeRows = (rowsLength, roomCosts) => {
 
 // Dropdown Cell Renderer
 const DropdownCell = ({ value, options, onChange }) => (
-  <FormControl size="small" fullWidth>
+  <FormControl
+    size="small"
+    style={{
+      height: "100%",
+      justifyContent: "center",
+    }}
+  >
     <Select
       native
       value={value}
       onChange={(e) => onChange(e.target.value)}
       variant="outlined"
+      style={{
+        fontSize: "12px",
+        padding: "2px 8px",
+        height: "80%",
+        lineHeight: "normal",
+      }}
     >
       {options.map((option) => (
         <option key={option} value={option}>
@@ -64,86 +76,86 @@ const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
   };
 
   return (
-    <div>
-      <div style={{ height: 500, width: "100%" }}>
-        <DataGrid
-          rows={[...rows, totalsRow]}
-          columns={[
-            {
-              field: "roomNo",
-              headerName: "Room No",
-              width: 100,
-              editable: false,
-            },
-            { field: "cost", headerName: "Cost", width: 100, editable: false },
-            {
-              field: "rate",
-              headerName: "Rate",
-              width: 100,
-              editable: true,
-              type: "number",
-            },
-            {
-              field: "fullname",
-              headerName: "Full Name",
-              width: 200,
-              editable: true,
-            },
-            {
-              field: "noOfPeople",
-              headerName: "People",
-              width: 100,
-              editable: true,
-              type: "number",
-            },
-            {
-              field: "type",
-              headerName: "Type",
-              width: 150,
-              renderCell: (params) => (
-                <DropdownCell
-                  value={params.row.type}
-                  options={[
-                    "Single",
-                    "Couple",
-                    "Family",
-                    "Employee",
-                    "NRI",
-                    "Foreigner",
-                    "Other",
-                  ]}
-                  onChange={(value) =>
-                    handleRowEdit({ ...params.row, type: value })
-                  }
-                />
-              ),
-            },
-            {
-              field: "modeOfPayment",
-              headerName: "Payment",
-              width: 150,
-              renderCell: (params) => (
-                <DropdownCell
-                  value={params.row.modeOfPayment}
-                  options={["Card", "Online", "Cash", "UnPaid"]}
-                  onChange={(value) =>
-                    handleRowEdit({ ...params.row, modeOfPayment: value })
-                  }
-                />
-              ),
-            },
-          ]}
-          pageSize={5}
-          processRowUpdate={handleRowEdit}
-          disableSelectionOnClick
-          handleRowEdit={onSubmit(rows)}
-          style={{
-            fontSize: "12px",
-            height: "calc(100% - 16px)",
-            width: "100%",
-          }}
-        />
-      </div>
+    <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>
+      <DataGrid
+        rows={[...rows, totalsRow]}
+        columns={[
+          { field: "roomNo", headerName: "Room No", width: 100 },
+          { field: "cost", headerName: "Cost", width: 100 },
+          {
+            field: "rate",
+            headerName: "Rate",
+            width: 100,
+            editable: true,
+            type: "number",
+          },
+          {
+            field: "fullname",
+            headerName: "Full Name",
+            width: 120,
+            editable: true,
+          },
+          {
+            field: "noOfPeople",
+            headerName: "People",
+            width: 100,
+            editable: true,
+            type: "number",
+          },
+          {
+            field: "type",
+            headerName: "Type",
+            width: 120,
+            renderCell: (params) => (
+              <DropdownCell
+                value={params.row.type}
+                options={[
+                  "Single",
+                  "Couple",
+                  "Family",
+                  "Employee",
+                  "NRI",
+                  "Foreigner",
+                  "Other",
+                ]}
+                onChange={(value) =>
+                  handleRowEdit({ ...params.row, type: value })
+                }
+              />
+            ),
+          },
+          {
+            field: "modeOfPayment",
+            headerName: "Payment",
+            width: 120,
+            renderCell: (params) => (
+              <DropdownCell
+                value={params.row.modeOfPayment}
+                options={["Card", "Online", "Cash", "UnPaid"]}
+                onChange={(value) =>
+                  handleRowEdit({ ...params.row, modeOfPayment: value })
+                }
+              />
+            ),
+          },
+        ]}
+        disableColumnMenu
+        disableColumnSorting
+        pageSize={5}
+        rowsPerPageOptions={[5, 10, 20]}
+        processRowUpdate={handleRowEdit}
+        disableSelectionOnClick
+        handleRowEdit={onSubmit(rows)}
+        rowHeight={30}
+        sx={{
+          "& .MuiDataGrid-columnHeader": {
+            maxHeight: "25px",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            display: "none",
+          },
+        }}
+      />
     </div>
   );
 };
