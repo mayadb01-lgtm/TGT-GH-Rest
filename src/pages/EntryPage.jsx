@@ -17,38 +17,36 @@ const processEntriesByPaymentMode = (data, mode) => {
   const filteredEntries = data.filter((row) => row.modeOfPayment === mode);
 
   if (filteredEntries.length > 0) {
-    return [
-      ...filteredEntries,
-      {
-        id: "",
-        roomNo: "",
-        fullname: `Total ${mode} Amount`,
-      },
-    ];
+    return filteredEntries;
   }
 
   return [];
 };
 
-// Utility function to determine title color
-const getTitleColor = (title) => {
-  if (title.includes("Cash")) return "primary";
-  if (title.includes("Card")) return "secondary";
-  if (title.includes("Online")) return "success";
-  return "error";
-};
-
 // Reusable SummaryTable component
-const SummaryTable = ({ title, dayRows, nightRows, columns }) => (
-  <Box
-    fullWidth
-    style={{
-      margin: 0,
-      padding: 0,
-      fontSize: "12px",
-    }}
-  >
-    {/* <Typography
+const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
+  const finalRows = [...dayRows, ...nightRows];
+
+  if (finalRows.length > 0) {
+    finalRows[finalRows.length] = {
+      id: "Total",
+      roomNo: "",
+      rate: finalRows.reduce((sum, row) => sum + row.rate, 0),
+      fullname: "",
+      noOfPeople: "",
+    };
+  }
+
+  return (
+    <Box
+      fullWidth
+      style={{
+        margin: 0,
+        padding: 0,
+        fontSize: "12px",
+      }}
+    >
+      {/* <Typography
       variant="h6"
       color={getTitleColor(title)}
       fontSize={14}
@@ -57,76 +55,46 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => (
     >
       {title}
     </Typography> */}
-    <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
-      {" "}
-      {/* Compact spacing */}
-      <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
+      <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
         {" "}
-        {/* Width 50% for side-by-side layout */}
-        {/* <Typography
+        {/* Compact spacing */}
+        <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
+          {" "}
+          {/* Width 50% for side-by-side layout */}
+          {/* <Typography
           variant="subtitle2"
           fontWeight={500}
           // style={{ marginBottom: "4px" }} // Compact spacing
         >
           Day Entries
         </Typography> */}
-        <DataGrid
-          rows={dayRows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          style={{
-            fontSize: "12px",
-            height: "180px",
-            width: "100%",
-          }}
-          rowHeight={25}
-          disableColumnMenu
-          disableColumnSorting
-          sx={{
-            "& .MuiDataGrid-columnHeader": {
-              maxHeight: "20px",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              display: "none",
-            },
-          }}
-        />
-      </Box>
-      <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
-        {/* <Typography
-          variant="subtitle2"
-          fontWeight={500}
-          // style={{ marginBottom: "4px" }} // Compact spacing
-        >
-          Night Entries
-        </Typography> */}
-        <DataGrid
-          rows={nightRows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          style={{
-            fontSize: "12px",
-            height: "180px",
-            width: "100%",
-          }}
-          rowHeight={25}
-          disableColumnMenu
-          disableColumnSorting
-          sx={{
-            "& .MuiDataGrid-columnHeader": {
-              maxHeight: "20px",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              display: "none",
-            },
-          }}
-        />
-      </Box>
-    </Stack>
-  </Box>
-);
+          <DataGrid
+            rows={finalRows}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5, 10, 20]}
+            style={{
+              fontSize: "12px",
+              height: "180px",
+              width: "100%",
+            }}
+            rowHeight={25}
+            disableColumnMenu
+            disableColumnSorting
+            sx={{
+              "& .MuiDataGrid-columnHeader": {
+                maxHeight: "20px",
+              },
+              "& .MuiDataGrid-footerContainer": {
+                display: "none",
+              },
+            }}
+          />
+        </Box>
+      </Stack>
+    </Box>
+  );
+};
 
 const EntryPage = () => {
   const [dayData, setDayData] = useState([]);
@@ -137,6 +105,7 @@ const EntryPage = () => {
 
   // Columns for DataGrid
   const columns = [
+    { field: "id", headerName: "Day/Night", width: 100 },
     { field: "roomNo", headerName: "Room No", width: 100 },
     { field: "rate", headerName: "Rate", width: 100 },
     { field: "fullname", headerName: "Full Name", width: 120 },
@@ -231,6 +200,7 @@ const EntryPage = () => {
             </AccordionSummary>
             <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
               <TableComponent
+                dayOrNight="Day"
                 title="Day Entry Table"
                 rowsLength={11}
                 roomCosts={{
@@ -294,6 +264,7 @@ const EntryPage = () => {
             </AccordionSummary>
             <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
               <TableComponent
+                dayOrNight="Night"
                 title="Night Entry Table"
                 rowsLength={11}
                 roomCosts={{

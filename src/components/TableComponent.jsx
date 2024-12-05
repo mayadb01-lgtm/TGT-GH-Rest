@@ -3,9 +3,9 @@ import { DataGrid } from "@mui/x-data-grid";
 import { FormControl, Select } from "@mui/material";
 
 // Utility function to initialize rows
-const initializeRows = (rowsLength, roomCosts) => {
+const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
   return Array.from({ length: rowsLength }, (_, i) => ({
-    id: i + 1,
+    id: `${dayOrNight} - ${i + 1}`,
     roomNo: i + 1,
     cost: roomCosts[i + 1] || 0,
     rate: 0,
@@ -46,8 +46,16 @@ const DropdownCell = ({ value, options, onChange }) => (
   </FormControl>
 );
 
-const TableComponent = ({ title, rowsLength, roomCosts, onSubmit }) => {
-  const [rows, setRows] = useState(initializeRows(rowsLength, roomCosts));
+const TableComponent = ({
+  title,
+  dayOrNight,
+  rowsLength,
+  roomCosts,
+  onSubmit,
+}) => {
+  const [rows, setRows] = useState(
+    initializeRows(dayOrNight, rowsLength, roomCosts)
+  );
 
   // Handle row update logic
   const handleRowEdit = (updatedRow) => {
