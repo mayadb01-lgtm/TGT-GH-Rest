@@ -118,6 +118,7 @@ const TableComponent = ({
               <DropdownCell
                 value={params.row.type}
                 options={[
+                  "Select",
                   "Single",
                   "Couple",
                   "Family",
@@ -139,7 +140,7 @@ const TableComponent = ({
             renderCell: (params) => (
               <DropdownCell
                 value={params.row.modeOfPayment}
-                options={["Card", "Online", "Cash", "UnPaid"]}
+                options={["Select", "Card", "Online", "Cash", "UnPaid"]}
                 onChange={(value) =>
                   handleRowEdit({ ...params.row, modeOfPayment: value })
                 }
@@ -147,6 +148,7 @@ const TableComponent = ({
             ),
           },
         ]}
+        editMode="row"
         disableColumnMenu
         disableColumnSorting
         pageSize={5}

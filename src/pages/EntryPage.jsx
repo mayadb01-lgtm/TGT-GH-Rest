@@ -146,6 +146,39 @@ const EntryPage = () => {
     [dayData, nightData]
   );
 
+  // Columns for Total DataGrid
+  const modeColumns = [
+    { field: "id", headerName: "Ashirvad", width: 80 },
+    { field: "totals", headerName: "Total", width: 60 },
+  ];
+
+  const modeRows = [
+    { id: "Cash", totals: 0 },
+    { id: "Card", totals: 0 },
+    { id: "Online", totals: 0 },
+    { id: "UnPaid", totals: 0 },
+    { id: "Total", totals: 0 },
+  ];
+
+  // Calculate totals for each payment mode
+  modeRows[0].totals =
+    cashEntries.day.reduce((sum, row) => sum + row.rate, 0) +
+    cashEntries.night.reduce((sum, row) => sum + row.rate, 0);
+  modeRows[1].totals =
+    cardEntries.day.reduce((sum, row) => sum + row.rate, 0) +
+    cardEntries.night.reduce((sum, row) => sum + row.rate, 0);
+  modeRows[2].totals =
+    onlineEntries.day.reduce((sum, row) => sum + row.rate, 0) +
+    onlineEntries.night.reduce((sum, row) => sum + row.rate, 0);
+  modeRows[3].totals =
+    unpaidEntries.day.reduce((sum, row) => sum + row.rate, 0) +
+    unpaidEntries.night.reduce((sum, row) => sum + row.rate, 0);
+  modeRows[4].totals =
+    modeRows[0].totals +
+    modeRows[1].totals +
+    modeRows[2].totals +
+    modeRows[3].totals;
+
   return (
     <Grid
       container
@@ -342,8 +375,8 @@ const EntryPage = () => {
                 Day Entries
               </Typography>
               <DataGrid
-                rows={dayData}
-                columns={columns}
+                rows={modeRows}
+                columns={modeColumns}
                 pageSize={5}
                 rowsPerPageOptions={[5]}
                 style={{
