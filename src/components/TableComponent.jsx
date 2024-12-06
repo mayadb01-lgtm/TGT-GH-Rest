@@ -88,12 +88,12 @@ const TableComponent = ({
       <DataGrid
         rows={[...rows, totalsRow]}
         columns={[
-          { field: "roomNo", headerName: "Room No", width: 100 },
-          { field: "cost", headerName: "Cost", width: 100 },
+          { field: "roomNo", headerName: "Room", width: 60 },
+          { field: "cost", headerName: "Cost", width: 60 },
           {
             field: "rate",
             headerName: "Rate",
-            width: 100,
+            width: 80,
             editable: true,
             type: "number",
           },
@@ -106,7 +106,7 @@ const TableComponent = ({
           {
             field: "noOfPeople",
             headerName: "People",
-            width: 100,
+            width: 60,
             editable: true,
             type: "number",
           },
@@ -154,13 +154,20 @@ const TableComponent = ({
         processRowUpdate={handleRowEdit}
         disableSelectionOnClick
         handleRowEdit={onSubmit(rows)}
-        rowHeight={30}
+        rowHeight={25}
         sx={{
           "& .MuiDataGrid-columnHeader": {
-            maxHeight: "25px",
+            maxHeight: "20px",
           },
           "& .MuiDataGrid-footerContainer": {
             display: "none",
+          },
+          fontSize: "10px",
+          "& .MuiDataGrid-scrollbar": {
+            display: "none",
+          },
+          "& .MuiInputBase-input": {
+            fontSize: "10px",
           },
         }}
       />

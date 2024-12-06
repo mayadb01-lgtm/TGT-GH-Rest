@@ -105,10 +105,11 @@ const EntryPage = () => {
 
   // Columns for DataGrid
   const columns = [
-    { field: "id", headerName: "Day/Night", width: 100 },
-    { field: "roomNo", headerName: "Room No", width: 100 },
-    { field: "rate", headerName: "Rate", width: 100 },
-    { field: "fullname", headerName: "Full Name", width: 120 },
+    { field: "id", headerName: "Day/Night", width: 80 },
+    { field: "modeOfPayment", headerName: "Mode", width: 60 },
+    { field: "roomNo", headerName: "Room No", width: 80 },
+    { field: "rate", headerName: "Rate", width: 60 },
+    { field: "fullname", headerName: "Full Name", width: 100 },
     { field: "noOfPeople", headerName: "No. of People", width: 100 },
   ];
 
@@ -154,7 +155,7 @@ const EntryPage = () => {
       alignItems="start"
     >
       {/* Left Side: Day and Night Entry Tables */}
-      <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+      <Grid size={{ xs: 12, sm: 4.8, md: 4.8, lg: 4.8, xl: 4.8 }}>
         <Box>
           {/* Day Entries */}
           <Accordion defaultExpanded style={{ margin: "0", paddingBlock: "0" }}>
@@ -320,7 +321,7 @@ const EntryPage = () => {
       </Grid>
 
       {/* Right - Totals Calculations DataGrids */}
-      {/* <Grid size={{ xs: 12, sm: 2, md: 2, lg: 2, xl: 2 }}>
+      <Grid size={{ xs: 12, sm: 3.2, md: 3.2, lg: 3.2, xl: 3.2 }}>
         <Box>
           <Typography
             variant="h6"
@@ -365,7 +366,7 @@ const EntryPage = () => {
             </Box>
           </Stack>
         </Box>
-      </Grid> */}
+      </Grid>
     </Grid>
   );
 };
