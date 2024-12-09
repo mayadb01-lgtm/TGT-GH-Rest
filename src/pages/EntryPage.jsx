@@ -6,6 +6,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
+  Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import TableComponent from "../components/TableComponent";
@@ -46,28 +47,19 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
         fontSize: "12px",
       }}
     >
-      {/* <Typography
-      variant="h6"
-      color={getTitleColor(title)}
-      fontSize={14}
-      fontWeight={500}
-      style={{ marginBottom: "8px" }} // Reduce margin below the title
-    >
-      {title}
-    </Typography> */}
       <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
         {" "}
         {/* Compact spacing */}
         <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
           {" "}
           {/* Width 50% for side-by-side layout */}
-          {/* <Typography
-          variant="subtitle2"
-          fontWeight={500}
-          // style={{ marginBottom: "4px" }} // Compact spacing
-        >
-          Day Entries
-        </Typography> */}
+          <Typography
+            variant="subtitle2"
+            fontWeight={500}
+            style={{ marginBottom: "4px" }} // Compact spacing
+          >
+            {title}
+          </Typography>
           <DataGrid
             rows={finalRows}
             columns={columns}
@@ -75,7 +67,7 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
             rowsPerPageOptions={[5, 10, 20]}
             style={{
               fontSize: "12px",
-              height: "180px",
+              height: "220px",
               width: "100%",
             }}
             rowHeight={25}
@@ -83,7 +75,7 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
             disableColumnSorting
             sx={{
               "& .MuiDataGrid-columnHeader": {
-                maxHeight: "20px",
+                maxHeight: "25px",
               },
               "& .MuiDataGrid-footerContainer": {
                 display: "none",
@@ -106,10 +98,8 @@ const EntryPage = () => {
   // Columns for DataGrid
   const columns = [
     { field: "id", headerName: "Day/Night", width: 80 },
-    { field: "modeOfPayment", headerName: "Mode", width: 60 },
-    { field: "roomNo", headerName: "Room No", width: 80 },
     { field: "rate", headerName: "Rate", width: 60 },
-    { field: "fullname", headerName: "Full Name", width: 100 },
+    { field: "fullname", headerName: "Full Name", width: 120 },
     { field: "noOfPeople", headerName: "No. of People", width: 100 },
   ];
 
@@ -148,8 +138,8 @@ const EntryPage = () => {
 
   // Columns for Total DataGrid
   const modeColumns = [
-    { field: "id", headerName: "Ashirvad", width: 80 },
-    { field: "totals", headerName: "Total", width: 60 },
+    { field: "id", headerName: "Revenue", width: 150 },
+    { field: "totals", headerName: "Total", width: 100 },
   ];
 
   const modeRows = [
@@ -188,7 +178,7 @@ const EntryPage = () => {
       alignItems="start"
     >
       {/* Left Side: Day and Night Entry Tables */}
-      <Grid size={{ xs: 12, sm: 4.8, md: 4.8, lg: 4.8, xl: 4.8 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
         <Box>
           {/* Day Entries */}
           <Accordion defaultExpanded style={{ margin: "0", paddingBlock: "0" }}>
@@ -322,57 +312,75 @@ const EntryPage = () => {
       </Grid>
 
       {/* Middle Side: Summaries */}
-      <Grid size={{ xs: 12, sm: 4, md: 4, lg: 4, xl: 4 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+        <Grid
+          size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
+          display={"flex"}
+        >
+          <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+            <Box>
+              <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
+                <SummaryTable
+                  title="Cash Entries Summary"
+                  dayRows={cashEntries.day}
+                  nightRows={cashEntries.night}
+                  columns={columns}
+                />
+                <SummaryTable
+                  title="Card Entries Summary"
+                  dayRows={cardEntries.day}
+                  nightRows={cardEntries.night}
+                  columns={columns}
+                />
+              </Stack>
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+            <Box>
+              <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
+                <SummaryTable
+                  title="Online Entries Summary"
+                  dayRows={onlineEntries.day}
+                  nightRows={onlineEntries.night}
+                  columns={columns}
+                />
+                <SummaryTable
+                  title="UnPaid Entries Summary"
+                  dayRows={unpaidEntries.day}
+                  nightRows={unpaidEntries.night}
+                  columns={columns}
+                />
+              </Stack>
+            </Box>
+          </Grid>
+        </Grid>
         <Box>
-          <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
-            <SummaryTable
-              title="Cash Entries Summary"
-              dayRows={cashEntries.day}
-              nightRows={cashEntries.night}
-              columns={columns}
-            />
-            <SummaryTable
-              title="Card Entries Summary"
-              dayRows={cardEntries.day}
-              nightRows={cardEntries.night}
-              columns={columns}
-            />
-            <SummaryTable
-              title="Online Entries Summary"
-              dayRows={onlineEntries.day}
-              nightRows={onlineEntries.night}
-              columns={columns}
-            />
-            <SummaryTable
-              title="UnPaid Entries Summary"
-              dayRows={unpaidEntries.day}
-              nightRows={unpaidEntries.night}
-              columns={columns}
-            />
-          </Stack>
-        </Box>
-      </Grid>
-
-      {/* Right - Totals Calculations DataGrids */}
-      <Grid size={{ xs: 12, sm: 3.2, md: 3.2, lg: 3.2, xl: 3.2 }}>
-        <Box>
-          <Typography
-            variant="h6"
-            color="primary"
-            fontSize={14}
-            fontWeight={500}
-            style={{ marginBottom: "8px" }}
+          <Stack
+            direction="row"
+            spacing={1}
+            display={"flex"}
+            sx={{
+              margin: "0",
+              width: "100%",
+              flex: 1,
+            }}
           >
-            Totals
-          </Typography>
-          <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
-            <Box style={{ margin: 0, padding: 0, width: "100%" }}>
+            <Box
+              style={{
+                margin: "2px 0",
+                padding: "0",
+                width: "100%",
+                flex: 0.35,
+              }}
+            >
               <Typography
-                variant="subtitle2"
+                variant="h6"
+                color="primary"
+                fontSize={14}
                 fontWeight={500}
-                style={{ marginBottom: "4px" }}
+                style={{ marginInline: "8px" }}
               >
-                Day Entries
+                Revenue Summary
               </Typography>
               <DataGrid
                 rows={modeRows}
@@ -381,21 +389,90 @@ const EntryPage = () => {
                 rowsPerPageOptions={[5]}
                 style={{
                   fontSize: "12px",
-                  height: "250px",
-                  width: "100%",
+                  marginInline: "8px",
                 }}
-                rowHeight={25}
+                rowHeight={30}
                 disableColumnMenu
                 disableColumnSorting
                 sx={{
                   "& .MuiDataGrid-columnHeader": {
-                    maxHeight: "20px",
+                    maxHeight: "30px",
                   },
                   "& .MuiDataGrid-footerContainer": {
                     display: "none",
                   },
                 }}
               />
+            </Box>
+            <Box
+              style={{
+                margin: "2px 0",
+                padding: "0",
+                width: "100%",
+                flex: 0.35,
+              }}
+            >
+              <Typography
+                variant="h6"
+                color="primary"
+                fontSize={14}
+                fontWeight={500}
+                style={{ marginInline: "8px" }}
+              >
+                Revenue Summary
+              </Typography>
+              <DataGrid
+                rows={modeRows}
+                columns={modeColumns}
+                pageSize={5}
+                rowsPerPageOptions={[5]}
+                style={{
+                  fontSize: "12px",
+                  marginInline: "8px",
+                }}
+                rowHeight={30}
+                disableColumnMenu
+                disableColumnSorting
+                sx={{
+                  "& .MuiDataGrid-columnHeader": {
+                    maxHeight: "30px",
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    display: "none",
+                  },
+                }}
+              />
+            </Box>
+            <Box
+              style={{
+                margin: "2px 0",
+                padding: "0",
+                width: "100%",
+                flex: 0.3,
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="subtitle2"
+                fontWeight={500}
+                style={{ margin: "4px" }}
+              >
+                Save and Submit Entries for Date
+              </Typography>
+              <Button
+                variant="outlined"
+                color="primary"
+                style={{ margin: "2px" }}
+              >
+                Save and Submit
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                style={{ margin: "2px" }}
+              >
+                Cancel
+              </Button>
             </Box>
           </Stack>
         </Box>

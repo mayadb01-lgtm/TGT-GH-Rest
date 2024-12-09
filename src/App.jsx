@@ -9,7 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 const App = () => {
   return (
     <Router>
-      {/* <Navbar /> */}
+      <Navbar />
       <Routes>
         <Route path="/" element={<EntryPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

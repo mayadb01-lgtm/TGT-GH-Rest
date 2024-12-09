@@ -13,6 +13,8 @@ const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
     type: "",
     modeOfPayment: "",
     fullname: "",
+    checkInTime: "",
+    checkOutTime: "",
   }));
 };
 
@@ -81,6 +83,8 @@ const TableComponent = ({
     type: "",
     modeOfPayment: "",
     fullname: "",
+    checkInTime: "",
+    checkOutTime: "",
   };
 
   return (
@@ -88,20 +92,42 @@ const TableComponent = ({
       <DataGrid
         rows={[...rows, totalsRow]}
         columns={[
-          { field: "roomNo", headerName: "Room", width: 60 },
-          { field: "cost", headerName: "Cost", width: 60 },
+          {
+            field: "roomNo",
+            headerName: "Room",
+            width: 60,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+            editable: false,
+          },
+          {
+            field: "cost",
+            headerName: "Cost",
+            width: 60,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+            editable: false,
+          },
           {
             field: "rate",
             headerName: "Rate",
             width: 80,
             editable: true,
             type: "number",
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
           },
           {
             field: "fullname",
             headerName: "Full Name",
             width: 120,
             editable: true,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
           },
           {
             field: "noOfPeople",
@@ -109,6 +135,27 @@ const TableComponent = ({
             width: 60,
             editable: true,
             type: "number",
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+          },
+          {
+            field: "checkInTime",
+            headerName: "Check In",
+            width: 80,
+            editable: true,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+          },
+          {
+            field: "checkOutTime",
+            headerName: "Check Out",
+            width: 80,
+            editable: true,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
           },
           {
             field: "type",
@@ -159,17 +206,17 @@ const TableComponent = ({
         rowHeight={25}
         sx={{
           "& .MuiDataGrid-columnHeader": {
-            maxHeight: "20px",
+            maxHeight: "25px",
           },
           "& .MuiDataGrid-footerContainer": {
             display: "none",
           },
-          fontSize: "10px",
+          fontSize: "12px",
           "& .MuiDataGrid-scrollbar": {
             display: "none",
           },
           "& .MuiInputBase-input": {
-            fontSize: "10px",
+            fontSize: "12px",
           },
         }}
       />
