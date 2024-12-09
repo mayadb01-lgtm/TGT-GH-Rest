@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { FormControl, Select } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import { MobileTimePicker } from "@mui/x-date-pickers";
 
 // Utility function to initialize rows
 const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
@@ -123,7 +127,7 @@ const TableComponent = ({
           {
             field: "fullname",
             headerName: "Full Name",
-            width: 120,
+            width: 130,
             editable: true,
             handleRowEdit: (params) => {
               handleRowEdit(params.row);
@@ -141,21 +145,111 @@ const TableComponent = ({
           },
           {
             field: "checkInTime",
-            headerName: "Check In",
-            width: 80,
+            headerName: "Check Out",
+            width: 120,
             editable: true,
             handleRowEdit: (params) => {
               handleRowEdit(params.row);
             },
+            renderCell: (params) => (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  value={dayjs(params.row.checkInTime, "hh:mm A")} // Correct property for checkInTime
+                  onChange={(newValue) => {
+                    const formattedTime = dayjs(newValue).format("hh:mm A");
+                    handleRowEdit({
+                      ...params.row,
+                      checkInTime: formattedTime, // Update checkInTime properly
+                    });
+                  }}
+                  renderInput={(props) => (
+                    <input
+                      {...props}
+                      style={{
+                        fontSize: "14px",
+                        height: "24px",
+                        width: "100%",
+                        border: "1px solid #ccc",
+                        borderRadius: "6px",
+                        padding: "4px",
+                        outline: "none",
+                        backgroundColor: "#fff",
+                      }}
+                    />
+                  )}
+                  ampm
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      height: "24px", // Fixed height
+                      fontSize: "14px",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5", // Highlight on hover
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5", // Consistent focus color
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            ),
           },
           {
             field: "checkOutTime",
             headerName: "Check Out",
-            width: 80,
+            width: 120,
             editable: true,
             handleRowEdit: (params) => {
               handleRowEdit(params.row);
             },
+            renderCell: (params) => (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  value={dayjs(params.row.checkOutTime, "hh:mm A")}
+                  onChange={(newValue) => {
+                    const formattedTime = dayjs(newValue).format("hh:mm A");
+                    handleRowEdit({
+                      ...params.row,
+                      checkOutTime: formattedTime,
+                    });
+                  }}
+                  renderInput={(props) => (
+                    <input
+                      {...props}
+                      style={{
+                        fontSize: "14px",
+                        height: "24px",
+                        width: "100%",
+                        border: "1px solid #ccc",
+                        borderRadius: "6px",
+                        padding: "4px",
+                        outline: "none",
+                        backgroundColor: "#fff",
+                      }}
+                    />
+                  )}
+                  ampm
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      height: "24px",
+                      fontSize: "14px",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            ),
           },
           {
             field: "type",

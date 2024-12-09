@@ -178,7 +178,7 @@ const EntryPage = () => {
       alignItems="start"
     >
       {/* Left Side: Day and Night Entry Tables */}
-      <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+      <Grid size={{ xs: 12, sm: 6.5, md: 6.5, lg: 6.5, xl: 6.5 }}>
         <Box>
           {/* Day Entries */}
           <Accordion defaultExpanded style={{ margin: "0", paddingBlock: "0" }}>
@@ -222,7 +222,7 @@ const EntryPage = () => {
                 </Typography>
               </Stack>
             </AccordionSummary>
-            <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
+            <AccordionDetails style={{ margin: "0", padding: "0" }}>
               <TableComponent
                 dayOrNight="Day"
                 title="Day Entry Table"
@@ -286,7 +286,7 @@ const EntryPage = () => {
                 </Typography>
               </Stack>
             </AccordionSummary>
-            <AccordionDetails style={{ margin: "0", paddingBlock: "0" }}>
+            <AccordionDetails style={{ margin: "0", padding: "0" }}>
               <TableComponent
                 dayOrNight="Night"
                 title="Night Entry Table"
@@ -312,7 +312,7 @@ const EntryPage = () => {
       </Grid>
 
       {/* Middle Side: Summaries */}
-      <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+      <Grid size={{ xs: 12, sm: 5.5, md: 5.5, lg: 5.5, xl: 5.5 }}>
         <Grid
           size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
           display={"flex"}
@@ -456,6 +456,7 @@ const EntryPage = () => {
                 variant="subtitle2"
                 fontWeight={500}
                 style={{ margin: "4px" }}
+                color="primary"
               >
                 Save and Submit Entries for Date
               </Typography>
@@ -464,7 +465,7 @@ const EntryPage = () => {
                 color="primary"
                 style={{ margin: "2px" }}
               >
-                Save and Submit
+                Submit
               </Button>
               <Button
                 variant="outlined"
