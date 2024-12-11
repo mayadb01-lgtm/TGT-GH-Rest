@@ -145,21 +145,21 @@ const TableComponent = ({
           },
           {
             field: "checkInTime",
-            headerName: "Check Out",
+            headerName: "Check In",
             width: 120,
             editable: true,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
-            renderCell: (params) => (
+            renderEditCell: (params) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
-                  value={dayjs(params.row.checkInTime, "hh:mm A")} // Correct property for checkInTime
+                  value={params.value ? dayjs(params.value, "hh:mm A") : null}
                   onChange={(newValue) => {
-                    const formattedTime = dayjs(newValue).format("hh:mm A");
-                    handleRowEdit({
-                      ...params.row,
-                      checkInTime: formattedTime, // Update checkInTime properly
+                    const formattedTime = newValue
+                      ? dayjs(newValue).format("hh:mm A")
+                      : null;
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "checkInTime",
+                      value: formattedTime,
                     });
                   }}
                   renderInput={(props) => (
@@ -175,60 +175,7 @@ const TableComponent = ({
                         outline: "none",
                         backgroundColor: "#fff",
                       }}
-                    />
-                  )}
-                  ampm
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: "24px", // Fixed height
-                      fontSize: "14px",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5", // Highlight on hover
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5", // Consistent focus color
-                    },
-                  }}
-                />
-              </LocalizationProvider>
-            ),
-          },
-          {
-            field: "checkOutTime",
-            headerName: "Check Out",
-            width: 120,
-            editable: true,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
-            renderCell: (params) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                  value={dayjs(params.row.checkOutTime, "hh:mm A")}
-                  onChange={(newValue) => {
-                    const formattedTime = dayjs(newValue).format("hh:mm A");
-                    handleRowEdit({
-                      ...params.row,
-                      checkOutTime: formattedTime,
-                    });
-                  }}
-                  renderInput={(props) => (
-                    <input
-                      {...props}
-                      style={{
-                        fontSize: "14px",
-                        height: "24px",
-                        width: "100%",
-                        border: "1px solid #ccc",
-                        borderRadius: "6px",
-                        padding: "4px",
-                        outline: "none",
-                        backgroundColor: "#fff",
-                      }}
+                      placeholder="Select Time" // Placeholder text
                     />
                   )}
                   ampm
@@ -249,6 +196,83 @@ const TableComponent = ({
                   }}
                 />
               </LocalizationProvider>
+            ),
+            renderCell: (params) => (
+              <div
+                style={{
+                  fontSize: "12px",
+                  textAlign: "start",
+                  lineHeight: "24px",
+                }}
+              >
+                {params.value || "Check In Time"}
+              </div>
+            ),
+          },
+          {
+            field: "checkOutTime",
+            headerName: "Check Out",
+            width: 120,
+            editable: true,
+            renderEditCell: (params) => (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  value={params.value ? dayjs(params.value, "hh:mm A") : null}
+                  onChange={(newValue) => {
+                    const formattedTime = newValue
+                      ? dayjs(newValue).format("hh:mm A")
+                      : null;
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "checkOutTime",
+                      value: formattedTime,
+                    });
+                  }}
+                  renderInput={(props) => (
+                    <input
+                      {...props}
+                      style={{
+                        fontSize: "14px",
+                        height: "24px",
+                        width: "100%",
+                        border: "1px solid #ccc",
+                        borderRadius: "6px",
+                        padding: "4px",
+                        outline: "none",
+                        backgroundColor: "#fff",
+                      }}
+                      placeholder="Select Time" // Placeholder text
+                    />
+                  )}
+                  ampm
+                  sx={{
+                    "& .MuiInputBase-root": {
+                      height: "24px",
+                      fontSize: "14px",
+                    },
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#3f51b5",
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            ),
+            renderCell: (params) => (
+              <div
+                style={{
+                  fontSize: "12px",
+                  textAlign: "start",
+                  lineHeight: "24px",
+                }}
+              >
+                {params.value || "Check Out Time"}
+              </div>
             ),
           },
           {
@@ -301,6 +325,8 @@ const TableComponent = ({
         sx={{
           "& .MuiDataGrid-columnHeader": {
             maxHeight: "25px",
+            fontStyle: "normal",
+            fontWeight: "bold",
           },
           "& .MuiDataGrid-footerContainer": {
             display: "none",
@@ -312,7 +338,21 @@ const TableComponent = ({
           "& .MuiInputBase-input": {
             fontSize: "12px",
           },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+            display: "flex",
+            justifyContent: "center",
+          },
+          "& .MuiDataGrid-cell": {
+            display: "flex",
+            justifyContent: "center",
+          },
+          "& .MuiDataGrid-columnHeaderTitleContainer": {
+            display: "flex",
+            justifyContent: "center",
+          },
         }}
+        column
       />
     </div>
   );
