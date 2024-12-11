@@ -375,7 +375,7 @@ const EntryPage = () => {
                 margin: "2px 0",
                 padding: "0",
                 width: "100%",
-                flex: 0.35,
+                flex: 0.55,
               }}
             >
               <Typography
@@ -414,46 +414,7 @@ const EntryPage = () => {
                 margin: "2px 0",
                 padding: "0",
                 width: "100%",
-                flex: 0.35,
-              }}
-            >
-              <Typography
-                variant="h6"
-                color="primary"
-                fontSize={14}
-                fontWeight={500}
-                style={{ marginInline: "8px" }}
-              >
-                Revenue Summary
-              </Typography>
-              <DataGrid
-                rows={modeRows}
-                columns={modeColumns}
-                pageSize={5}
-                rowsPerPageOptions={[5]}
-                style={{
-                  fontSize: "12px",
-                  marginInline: "8px",
-                }}
-                rowHeight={30}
-                disableColumnMenu
-                disableColumnSorting
-                sx={{
-                  "& .MuiDataGrid-columnHeader": {
-                    maxHeight: "30px",
-                  },
-                  "& .MuiDataGrid-footerContainer": {
-                    display: "none",
-                  },
-                }}
-              />
-            </Box>
-            <Box
-              style={{
-                margin: "2px 0",
-                padding: "0",
-                width: "100%",
-                flex: 0.3,
+                flex: 0.5,
                 flexDirection: "column",
               }}
             >
