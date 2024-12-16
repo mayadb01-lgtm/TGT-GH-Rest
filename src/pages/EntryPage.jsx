@@ -26,12 +26,12 @@ const processEntriesByPaymentMode = (data, mode) => {
 
 // Reusable SummaryTable component
 const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
-  // const finalRows = [...dayRows, ...nightRows];
+  const finalRows = [...dayRows, ...nightRows];
 
   // In row if rate and noOfPeople is 0 then remove that row from finalRows
-  const finalRows = [...dayRows, ...nightRows].filter(
-    (row) => row.rate !== 0 && row.noOfPeople !== 0
-  );
+  // const finalRows = [...dayRows, ...nightRows].filter(
+  //   (row) => row.rate !== 0 && row.noOfPeople !== 0
+  // );
 
   if (finalRows.length > 0) {
     finalRows[finalRows.length] = {
