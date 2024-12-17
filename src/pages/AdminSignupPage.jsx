@@ -9,12 +9,17 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
+import { createAdmin } from "../redux/actions/adminAction";
 
-const LoginPage = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
+const AdminSignupPage = () => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    referralCode: "",
+  });
+  const { loading, isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -23,24 +28,43 @@ const LoginPage = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = async (e) => {
+  useEffect(() => {
+    if (isAdminAuthenticated) {
+      navigate("/admin");
+    }
+  }, [isAdminAuthenticated, navigate]);
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      if (!form.email || !form.password) {
+      if (!form.name || !form.email || !form.password || !form.referralCode) {
         return toast.error("Please fill in all fields");
       }
-      dispatch(loginUser(form));
-      setForm({ email: "", password: "" });
-    } catch (error) {
-      toast.error(error.response.data.message);
+      dispatch(createAdmin(form));
+
+      navigate("/dashboard");
+      setForm({ name: "", email: "", password: "", referralCode: "" });
+    } catch (err) {
+      toast.error(err.response.data.message);
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          backgroundColor: "#f4f6f8",
+          padding: 2,
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -66,9 +90,9 @@ const LoginPage = () => {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ fontWeight: 600, color: "#1976d2" }}
+          sx={{ fontWeight: 600, color: "#d32f2f" }}
         >
-          Login
+          Admin Signup
         </Typography>
 
         <Typography
@@ -77,14 +101,24 @@ const LoginPage = () => {
           gutterBottom
           sx={{ color: "#666" }}
         >
-          Welcome back! Please log in to continue.
+          Create your admin account to get started
         </Typography>
 
         <Box
           component="form"
-          onSubmit={handleLogin}
+          onSubmit={handleSignup}
           sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 2 }}
         >
+          <TextField
+            name="name"
+            label="Name"
+            variant="outlined"
+            fullWidth
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+
           <TextField
             name="email"
             label="Email"
@@ -107,6 +141,16 @@ const LoginPage = () => {
             required
           />
 
+          <TextField
+            name="referralCode"
+            label="Referral Code"
+            variant="outlined"
+            fullWidth
+            value={form.referralCode}
+            onChange={handleChange}
+            required
+          />
+
           <Button
             type="submit"
             variant="contained"
@@ -119,8 +163,34 @@ const LoginPage = () => {
               fontSize: "16px",
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Signup"
+            )}
           </Button>
+        </Box>
+        <Box container justifyContent="center">
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Login?{" "}
+            <Button
+              onClick={() => navigate("/admin-login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to Admin Login
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center">
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            User Login?{" "}
+            <Button
+              onClick={() => navigate("/login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to User Login
+            </Button>
+          </Typography>
         </Box>
         <Box container justifyContent="center">
           <Typography variant="body2" sx={{ color: "#666" }}>
@@ -129,29 +199,7 @@ const LoginPage = () => {
               onClick={() => navigate("/signup")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Sign Up
-            </Button>
-          </Typography>
-        </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Login?{" "}
-            <Button
-              onClick={() => navigate("/admin-login")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              Admin Login
-            </Button>
-          </Typography>
-        </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Sign Up?{" "}
-            <Button
-              onClick={() => navigate("/admin-signup")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              Admin Sign Up
+              Go to User Signup
             </Button>
           </Typography>
         </Box>
@@ -160,4 +208,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default AdminSignupPage;

@@ -2,13 +2,16 @@ import { Link } from "react-router-dom";
 import { AppBar, Toolbar, Button, Typography, Stack } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/userAction";
+import { logoutAdmin } from "../redux/actions/adminAction";
 
 const Navbar = () => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { isAdminAuthenticated, admin } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    dispatch(logoutUser());
+    if (isAuthenticated) dispatch(logoutUser());
+    if (isAdminAuthenticated) dispatch(logoutAdmin());
   };
 
   return (
@@ -24,10 +27,10 @@ const Navbar = () => {
           Guest House
         </Typography>
         <div>
-          {isAuthenticated ? (
+          {isAuthenticated || isAdminAuthenticated ? (
             <Stack direction="row" spacing={2}>
               <Typography variant="h6" component="div">
-                Role = {user?.role === "Admin" ? "Admin" : "Employee"}
+                Role = {user?.role.toUpperCase() || admin?.role.toUpperCase()}
               </Typography>
               <Button
                 color="inherit"

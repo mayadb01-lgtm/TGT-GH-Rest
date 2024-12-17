@@ -5,10 +5,9 @@ import {
   Button,
   Typography,
   Paper,
-  Grid,
   CircularProgress,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
@@ -156,14 +155,39 @@ const SignupPage = () => {
           </Button>
         </Box>
 
-        <Grid container justifyContent="center" sx={{ mt: 2 }}>
+        <Box container justifyContent="center">
           <Typography variant="body2" sx={{ color: "#666" }}>
-            Already have an account?{" "}
-            <Link to="/login" style={{ textDecoration: "none" }}>
-              <span style={{ color: "#1976d2", cursor: "pointer" }}>Login</span>
-            </Link>
+            User Login?{" "}
+            <Button
+              onClick={() => navigate("/login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to User Login
+            </Button>
           </Typography>
-        </Grid>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Login?{" "}
+            <Button
+              onClick={() => navigate("/admin-login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to Admin Login
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Sign Up?{" "}
+            <Button
+              onClick={() => navigate("/admin-signup")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to Admin Signup
+            </Button>
+          </Typography>
+        </Box>
       </Paper>
     </Box>
   );

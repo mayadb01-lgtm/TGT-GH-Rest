@@ -12,11 +12,15 @@ import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Box, CircularProgress } from "@mui/material";
+import AdminLoginPage from "./pages/AdminLoginPage.jsx";
+import AdminSignupPage from "./pages/AdminSignupPage.jsx";
+import { loadAdmin } from "./redux/actions/adminAction.js";
 
 const App = () => {
   const { loading } = useSelector((state) => state.user);
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
+    Store.dispatch(loadAdmin());
   }, []);
 
   if (loading) {
@@ -37,35 +41,58 @@ const App = () => {
   }
   return (
     <Router>
-      <Navbar />
       <Routes>
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <>
+              <Navbar />
+              <EntryPage />
+            </>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute requiredRole="User">
+              <Navbar />
               <EntryPage />
             </ProtectedRoute>
           }
         />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRole="Admin">
+              <Navbar />
+              <EntryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute requiredRole="User">
+              <Navbar />
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/admin-signup" element={<AdminSignupPage />} />
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="User">
+              <Navbar />
               <ProfilePage />
             </ProtectedRoute>
           }
         />
       </Routes>
-      <Toaster
-        position="right-bottom"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 3000,
-        }}
-      />
+      <Toaster position="top-center" />
     </Router>
   );
 };

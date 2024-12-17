@@ -15,7 +15,7 @@ router.post("/create-user", async (req, res, next) => {
     if (userEmail) {
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "User already exists with this email",
       });
     }
 

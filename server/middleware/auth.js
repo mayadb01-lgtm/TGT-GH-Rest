@@ -5,36 +5,26 @@ import process from "process";
 
 export const isAuthenticated = async (req, res, next) => {
   const { token } = req.cookies;
+  const { admin_token } = req.cookies;
 
-  if (!token) {
+  if (!admin_token && !token) {
     return res.status(401).json({
       success: false,
-      message: "Please login to continue",
+      message: "Please login as user or admin",
     });
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-  req.user = await User.findById(decoded.id);
-
-  next();
-};
-
-export const isAdminAuthenticated = async (req, res, next) => {
-  const { token } = req.cookies;
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: "Please login to continue",
-    });
+  if (admin_token) {
+    const decoded = jwt.verify(admin_token, process.env.JWT_SECRET_KEY);
+    req.user = await Admin.findById(decoded.id);
+    return next();
   }
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-  req.user = await Admin.findById(decoded.id);
-
-  next();
+  if (token) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.user = await User.findById(decoded.id);
+    next();
+  }
 };
 
 export const isAdmin = async (req, res, next) => {
@@ -50,6 +40,5 @@ export const isAdmin = async (req, res, next) => {
 
 export default {
   isAuthenticated,
-  isAdminAuthenticated,
   isAdmin,
 };

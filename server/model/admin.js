@@ -21,6 +21,9 @@ const adminSchema = new mongoose.Schema({
   phoneNumber: {
     type: Number,
   },
+  referralCode: {
+    type: String,
+  },
   addresses: [
     {
       country: {

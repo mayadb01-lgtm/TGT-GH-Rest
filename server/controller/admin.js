@@ -1,21 +1,35 @@
 import { Router } from "express";
 const router = Router();
-import sendToken from "../utils/jwtToken.js";
 import Admin from "../model/admin.js";
-import { isAdminAuthenticated } from "../middleware/auth.js";
+import { isAuthenticated } from "../middleware/auth.js";
+import sendAdminToken from "../utils/adminToken.js";
+import process from "process";
 
 // Sign Up Admin
-router.post("/create-admin", isAdminAuthenticated, async (req, res, next) => {
+router.post("/create-admin", async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-    console.log(req.body);
+    const { name, email, password, referralCode } = req.body;
+
+    if (!referralCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter referral code",
+      });
+    }
+
+    if (referralCode !== process.env.REFERRAL_CODE) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid referral code",
+      });
+    }
 
     // Check if the admin already exists
     const adminEmail = await Admin.findOne({ email: email });
     if (adminEmail) {
       return res.status(400).json({
         success: false,
-        message: "Admin already exists",
+        message: "Admin already exists with this email",
       });
     }
 
@@ -27,7 +41,7 @@ router.post("/create-admin", isAdminAuthenticated, async (req, res, next) => {
     });
 
     // Send success response with token
-    sendToken(admin, 201, res);
+    sendAdminToken(admin, 201, res);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -37,7 +51,7 @@ router.post("/create-admin", isAdminAuthenticated, async (req, res, next) => {
 });
 
 // Login Admin
-router.post("/login-admin", isAdminAuthenticated, async (req, res, next) => {
+router.post("/login-admin", async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -51,6 +65,7 @@ router.post("/login-admin", isAdminAuthenticated, async (req, res, next) => {
 
     // Find the admin
     const admin = await Admin.findOne({ email }).select("+password");
+
     if (!admin) {
       return res.status(404).json({
         success: false,
@@ -69,7 +84,7 @@ router.post("/login-admin", isAdminAuthenticated, async (req, res, next) => {
     }
 
     // Send success response with token
-    sendToken(admin, 200, res);
+    sendAdminToken(admin, 200, res);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -79,7 +94,7 @@ router.post("/login-admin", isAdminAuthenticated, async (req, res, next) => {
 });
 
 // Load Admin
-router.get("/getadmin", isAdminAuthenticated, async (req, res, next) => {
+router.get("/getadmin", isAuthenticated, async (req, res, next) => {
   try {
     const admin = await Admin.findById(req.user.id);
 
@@ -102,9 +117,9 @@ router.get("/getadmin", isAdminAuthenticated, async (req, res, next) => {
 });
 
 // Logout Admin
-router.get("/logout-admin", isAdminAuthenticated, async (req, res, next) => {
+router.get("/logout-admin", isAuthenticated, async (req, res, next) => {
   try {
-    res.cookie("token", null, {
+    res.cookie("admin_token", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
       sameSite: "none",

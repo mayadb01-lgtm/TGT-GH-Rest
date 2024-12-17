@@ -1,5 +1,5 @@
 // create token and saving that in cookies
-const sendShopToken = (user, statusCode, res) => {
+const sendAdminToken = (user, statusCode, res) => {
   const token = user.getJwtToken();
 
   // Options for cookies
@@ -17,4 +17,4 @@ const sendShopToken = (user, statusCode, res) => {
   });
 };
 
-export default sendShopToken;
+export default sendAdminToken;

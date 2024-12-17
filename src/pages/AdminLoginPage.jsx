@@ -5,16 +5,15 @@ import {
   Button,
   Typography,
   Paper,
-  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/actions/userAction";
+import { loginAdmin } from "../redux/actions/adminAction"; // Action for admin login
 import toast from "react-hot-toast";
 
-const LoginPage = () => {
+const AdminLoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
+  const { loading, isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -29,18 +28,19 @@ const LoginPage = () => {
       if (!form.email || !form.password) {
         return toast.error("Please fill in all fields");
       }
-      dispatch(loginUser(form));
+      dispatch(loginAdmin(form));
       setForm({ email: "", password: "" });
     } catch (error) {
-      toast.error(error.response.data.message);
+      console.error(error);
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
+    if (isAdminAuthenticated) {
+      navigate("/admin");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAdminAuthenticated, navigate]);
 
   return (
     <Box
@@ -66,9 +66,9 @@ const LoginPage = () => {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ fontWeight: 600, color: "#1976d2" }}
+          sx={{ fontWeight: 600, color: "#d32f2f" }} // Red color for admin
         >
-          Login
+          Admin Login
         </Typography>
 
         <Typography
@@ -77,7 +77,7 @@ const LoginPage = () => {
           gutterBottom
           sx={{ color: "#666" }}
         >
-          Welcome back! Please log in to continue.
+          Welcome back, Admin! Please log in to manage the platform.
         </Typography>
 
         <Box
@@ -110,7 +110,7 @@ const LoginPage = () => {
           <Button
             type="submit"
             variant="contained"
-            color="primary"
+            color="error" // Red theme for admin
             fullWidth
             disabled={loading}
             sx={{
@@ -119,30 +119,8 @@ const LoginPage = () => {
               fontSize: "16px",
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+            Login
           </Button>
-        </Box>
-        <Box container justifyContent="center">
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            User Sign Up?{" "}
-            <Button
-              onClick={() => navigate("/signup")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              Sign Up
-            </Button>
-          </Typography>
-        </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Login?{" "}
-            <Button
-              onClick={() => navigate("/admin-login")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              Admin Login
-            </Button>
-          </Typography>
         </Box>
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
@@ -151,7 +129,29 @@ const LoginPage = () => {
               onClick={() => navigate("/admin-signup")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Admin Sign Up
+              Go to Admin Signup
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center">
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            User Login?{" "}
+            <Button
+              onClick={() => navigate("/login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to User Login
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center">
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            User Sign Up?{" "}
+            <Button
+              onClick={() => navigate("/signup")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Go to User Signup
             </Button>
           </Typography>
         </Box>
@@ -160,4 +160,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default AdminLoginPage;
