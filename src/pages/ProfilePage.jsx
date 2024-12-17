@@ -1,11 +1,12 @@
 import { Box, Typography, Button } from "@mui/material";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
   const user = JSON.parse(localStorage.getItem("currentUser"));
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
-    alert("Logged out successfully!");
+    toast.success("Logged out successfully!");
   };
 
   if (!user) {

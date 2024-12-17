@@ -1,57 +1,141 @@
-import { useState } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Grid,
+  CircularProgress,
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/actions/userAction";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const { loading, isAuthenticated } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = () => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(
-      (u) => u.email === form.email && u.password === form.password
-    );
-
-    if (user) {
-      alert("Login successful!");
-      localStorage.setItem("currentUser", JSON.stringify(user));
-    } else {
-      alert("Invalid credentials!");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      if (!form.email || !form.password) {
+        return toast.error("Please fill in all fields");
+      }
+      dispatch(loginUser(form));
+      navigate("/");
+      setForm({ email: "", password: "" });
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
   return (
-    <Box p={4} maxWidth={400} mx="auto">
-      <Typography variant="h4" gutterBottom>
-        Login
-      </Typography>
-      <TextField
-        name="email"
-        label="Email"
-        type="email"
-        fullWidth
-        margin="normal"
-        onChange={handleChange}
-      />
-      <TextField
-        name="password"
-        label="Password"
-        type="password"
-        fullWidth
-        margin="normal"
-        onChange={handleChange}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={handleLogin}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#f4f6f8",
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          maxWidth: 450,
+          width: "100%",
+          padding: 4,
+          borderRadius: 2,
+        }}
       >
-        Login
-      </Button>
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: 600, color: "#1976d2" }}
+        >
+          Login
+        </Typography>
+
+        <Typography
+          variant="body2"
+          align="center"
+          gutterBottom
+          sx={{ color: "#666" }}
+        >
+          Welcome back! Please log in to continue.
+        </Typography>
+
+        <Box
+          component="form"
+          onSubmit={handleLogin}
+          sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          <TextField
+            name="email"
+            label="Email"
+            type="email"
+            variant="outlined"
+            fullWidth
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+
+          <TextField
+            name="password"
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={loading}
+            sx={{
+              padding: "10px 0",
+              fontWeight: 600,
+              fontSize: "16px",
+            }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+          </Button>
+        </Box>
+
+        <Grid container justifyContent="center" sx={{ mt: 2 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Don’t have an account?{" "}
+            <Link to="/signup" style={{ textDecoration: "none" }}>
+              <span style={{ color: "#1976d2", cursor: "pointer" }}>
+                Signup
+              </span>
+            </Link>
+          </Typography>
+        </Grid>
+      </Paper>
     </Box>
   );
 };

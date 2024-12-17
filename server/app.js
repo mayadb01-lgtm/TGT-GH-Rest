@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:8080"],
+    origin: [process.env.CLIENT_URL, "http://localhost:5173"],
     credentials: true,
   })
 );
