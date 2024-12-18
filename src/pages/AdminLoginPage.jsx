@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-} from "@mui/material";
+import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdmin } from "../redux/actions/adminAction"; // Action for admin login
@@ -133,7 +127,7 @@ const AdminLoginPage = () => {
             </Button>
           </Typography>
         </Box>
-        <Box container justifyContent="center">
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
             User Login?{" "}
             <Button
@@ -144,7 +138,7 @@ const AdminLoginPage = () => {
             </Button>
           </Typography>
         </Box>
-        <Box container justifyContent="center">
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
             User Sign Up?{" "}
             <Button

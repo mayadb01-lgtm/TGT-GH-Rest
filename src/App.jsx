@@ -17,13 +17,14 @@ import AdminSignupPage from "./pages/AdminSignupPage.jsx";
 import { loadAdmin } from "./redux/actions/adminAction.js";
 
 const App = () => {
-  const { loading } = useSelector((state) => state.user);
+  const { loading: userLoading } = useSelector((state) => state.user);
+  const { loading: adminLoading } = useSelector((state) => state.admin);
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadAdmin());
   }, []);
 
-  if (loading) {
+  if (userLoading || adminLoading) {
     return (
       <Box
         sx={{

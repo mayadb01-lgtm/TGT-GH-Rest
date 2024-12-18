@@ -21,6 +21,7 @@ const Navbar = () => {
           justifyContent: "space-between",
           minHeight: "auto",
           padding: "0 8px",
+          backgroundColor: isAdminAuthenticated ? "#f44336" : "#1976d2",
         }}
       >
         <Typography variant="h6" component="div">
@@ -29,9 +30,6 @@ const Navbar = () => {
         <div>
           {isAuthenticated || isAdminAuthenticated ? (
             <Stack direction="row" spacing={2}>
-              <Typography variant="h6" component="div">
-                Role = {user?.role.toUpperCase() || admin?.role.toUpperCase()}
-              </Typography>
               <Button
                 color="inherit"
                 component={Link}

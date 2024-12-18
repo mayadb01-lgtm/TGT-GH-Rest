@@ -155,7 +155,7 @@ const SignupPage = () => {
           </Button>
         </Box>
 
-        <Box container justifyContent="center">
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
             User Login?{" "}
             <Button

@@ -122,7 +122,7 @@ const LoginPage = () => {
             {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
           </Button>
         </Box>
-        <Box container justifyContent="center">
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
             User Sign Up?{" "}
             <Button
