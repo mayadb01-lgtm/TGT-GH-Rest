@@ -15,6 +15,8 @@ import { Box, CircularProgress } from "@mui/material";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminSignupPage from "./pages/AdminSignupPage.jsx";
 import { loadAdmin } from "./redux/actions/adminAction.js";
+import AdminResetPasswordPage from "./pages/AdminResetPasswordPage.jsx";
+import UserResetPasswordPage from "./pages/UserResetPasswordPage.jsx";
 
 const App = () => {
   const { loading: userLoading } = useSelector((state) => state.user);
@@ -73,16 +75,23 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute requiredRole="User">
+            <ProtectedRoute requiredRole="Admin">
               <Navbar />
               <DashboardPage />
             </ProtectedRoute>
           }
         />
+        {/* User */}
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/reset-password" element={<UserResetPasswordPage />} />
+        {/* Admin */}
         <Route path="/admin-login" element={<AdminLoginPage />} />
         <Route path="/admin-signup" element={<AdminSignupPage />} />
+        <Route
+          path="/admin-reset-password"
+          element={<AdminResetPasswordPage />}
+        />
         <Route
           path="/profile"
           element={

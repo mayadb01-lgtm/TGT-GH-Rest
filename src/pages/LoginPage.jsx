@@ -129,7 +129,29 @@ const LoginPage = () => {
               onClick={() => navigate("/signup")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Sign Up
+              User Sign Up
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            User Forgot Password?{" "}
+            <Button
+              onClick={() => navigate("/reset-password")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Reset Password
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Sign Up?{" "}
+            <Button
+              onClick={() => navigate("/admin-signup")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Admin Sign Up
             </Button>
           </Typography>
         </Box>
@@ -146,12 +168,12 @@ const LoginPage = () => {
         </Box>
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Sign Up?{" "}
+            Admin Forgot Password?{" "}
             <Button
-              onClick={() => navigate("/admin-signup")}
+              onClick={() => navigate("/admin-reset-password")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Admin Sign Up
+              Admin Reset Password
             </Button>
           </Typography>
         </Box>

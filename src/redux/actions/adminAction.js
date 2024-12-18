@@ -92,3 +92,26 @@ export const logoutAdmin = () => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Reset Password
+export const resetAdminPassword = (adminData) => async (dispatch) => {
+  try {
+    dispatch({ type: "ResetAdminPasswordRequest" });
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/admin/reset-password`,
+      adminData,
+      {
+        withCredentials: true,
+      }
+    );
+    dispatch({ type: "ResetAdminPasswordSuccess", payload: data.admin });
+    toast.success("Password updated successfully");
+  } catch (error) {
+    dispatch({
+      type: "ResetAdminPasswordFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};

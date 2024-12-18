@@ -162,18 +162,19 @@ const SignupPage = () => {
               onClick={() => navigate("/login")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to User Login
+              User Login
             </Button>
           </Typography>
         </Box>
+
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Login?{" "}
+            User Forgot Password?{" "}
             <Button
-              onClick={() => navigate("/admin-login")}
+              onClick={() => navigate("/reset-password")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to Admin Login
+              User Reset Password
             </Button>
           </Typography>
         </Box>
@@ -184,7 +185,29 @@ const SignupPage = () => {
               onClick={() => navigate("/admin-signup")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to Admin Signup
+              Admin Sign Up
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Login?{" "}
+            <Button
+              onClick={() => navigate("/admin-login")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Admin Login
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Forgot Password?{" "}
+            <Button
+              onClick={() => navigate("/admin-reset-password")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Admin Reset Password
             </Button>
           </Typography>
         </Box>

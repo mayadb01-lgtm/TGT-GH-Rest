@@ -104,7 +104,7 @@ const AdminLoginPage = () => {
           <Button
             type="submit"
             variant="contained"
-            color="error" // Red theme for admin
+            color="error"
             fullWidth
             disabled={loading}
             sx={{
@@ -118,12 +118,12 @@ const AdminLoginPage = () => {
         </Box>
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Sign Up?{" "}
+            User Sign Up?{" "}
             <Button
-              onClick={() => navigate("/admin-signup")}
+              onClick={() => navigate("/signup")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to Admin Signup
+              User Sign Up
             </Button>
           </Typography>
         </Box>
@@ -134,18 +134,40 @@ const AdminLoginPage = () => {
               onClick={() => navigate("/login")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to User Login
+              User Login
             </Button>
           </Typography>
         </Box>
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
-            User Sign Up?{" "}
+            User Forgot Password?{" "}
             <Button
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/reset-password")}
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
-              Go to User Signup
+              User Reset Password
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Sign Up?{" "}
+            <Button
+              onClick={() => navigate("/admin-signup")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Admin Sign Up
+            </Button>
+          </Typography>
+        </Box>
+        <Box container justifyContent="center" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ color: "#666" }}>
+            Admin Forgot Password?{" "}
+            <Button
+              onClick={() => navigate("/admin-reset-password")}
+              sx={{ color: "#1976d2", cursor: "pointer" }}
+            >
+              Reset Admin Password
             </Button>
           </Typography>
         </Box>

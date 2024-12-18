@@ -62,6 +62,20 @@ const userReducer = createReducer(initialState, (builder) => {
     .addCase("LogoutUserFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    })
+    // Reset Password
+    .addCase("ResetPasswordRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("ResetPasswordSuccess", (state, action) => {
+      state.loading = false;
+      state.isAuthenticated = false;
+      state.user = action.payload;
+    })
+    .addCase("ResetPasswordFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.isAuthenticated = false;
     });
 });
 

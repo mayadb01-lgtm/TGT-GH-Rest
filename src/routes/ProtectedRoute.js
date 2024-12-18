@@ -3,16 +3,12 @@ import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
-  const {
-    loading: userLoading,
-    isAuthenticated,
-    user,
-  } = useSelector((state) => state.user);
-  const {
-    loading: adminLoading,
-    isAdminAuthenticated,
-    admin,
-  } = useSelector((state) => state.admin);
+  const { loading: userLoading, isAuthenticated } = useSelector(
+    (state) => state.user
+  );
+  const { loading: adminLoading, isAdminAuthenticated } = useSelector(
+    (state) => state.admin
+  );
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,7 +29,6 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }, [
     loading,
     requiredRole,
-    admin,
     navigate,
     location,
     isAuthenticated,

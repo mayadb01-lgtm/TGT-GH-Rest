@@ -137,4 +137,43 @@ router.get("/logout-admin", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// Reset Password
+router.post("/reset-password", async (req, res, next) => {
+  try {
+    const { email, password, referralCode } = req.body;
+
+    // Check if the admin exists
+    const admin = await Admin.findOne({ email });
+
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
+    }
+
+    // Check if the referral code is correct
+    if (referralCode !== process.env.REFERRAL_CODE) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid referral code",
+      });
+    }
+
+    // Update the password
+    admin.password = password;
+    await admin.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export default router;

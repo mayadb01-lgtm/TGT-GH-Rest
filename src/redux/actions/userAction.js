@@ -92,3 +92,28 @@ export const logoutUser = () => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Reset Password
+export const resetPassword = (userData) => async (dispatch) => {
+  try {
+    dispatch({ type: "ResetPasswordRequest" });
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/user/reset-password`,
+      userData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({ type: "ResetPasswordSuccess", payload: data.user });
+    toast.success("Password reset successfully");
+  } catch (error) {
+    dispatch({
+      type: "ResetPasswordFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};

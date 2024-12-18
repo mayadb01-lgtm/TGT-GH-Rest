@@ -3,6 +3,7 @@ const router = Router();
 import sendToken from "../utils/jwtToken.js";
 import User from "../model/user.js";
 import { isAuthenticated } from "../middleware/auth.js";
+import process from "process";
 
 // Sign Up User
 router.post("/create-user", async (req, res, next) => {
@@ -114,6 +115,44 @@ router.get("/logout-user", async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Logged out",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Reset Password - Using one Referral Code Directly - POST
+router.post("/reset-password", async (req, res, next) => {
+  try {
+    const { email, password, referralCode } = req.body;
+
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Check if the referral code is correct
+    if (referralCode !== process.env.REFERRAL_CODE) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid referral code",
+      });
+    }
+    // Update the password
+    user.password = password;
+    await user.save();
+
+    // Send success response with token
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
     });
   } catch (error) {
     res.status(500).json({

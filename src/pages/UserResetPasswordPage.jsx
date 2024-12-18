@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   TextField,
@@ -8,63 +8,39 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { createAdmin } from "../redux/actions/adminAction";
+import { useDispatch, useSelector } from "react-redux";
+import { resetPassword } from "../redux/actions/userAction";
 
-const AdminSignupPage = () => {
+const ResetPasswordPage = () => {
   const [form, setForm] = useState({
-    name: "",
     email: "",
     password: "",
     referralCode: "",
   });
-  const { loading, isAdminAuthenticated } = useSelector((state) => state.admin);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    if (isAdminAuthenticated) {
-      navigate("/admin");
-    }
-  }, [isAdminAuthenticated, navigate]);
-
-  const handleSignup = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
-      if (!form.name || !form.email || !form.password || !form.referralCode) {
+      if (!form.email || !form.password || !form.referralCode) {
         return toast.error("Please fill in all fields");
       }
-      dispatch(createAdmin(form));
-
-      navigate("/dashboard");
-      setForm({ name: "", email: "", password: "", referralCode: "" });
+      dispatch(resetPassword(form));
+      toast.success("Password reset successful");
+      setForm({ email: "", password: "", referralCode: "" });
+      navigate("/login");
     } catch (err) {
-      toast.error(err.response.data.message);
+      toast.error(err.response?.data?.message || "An error occurred");
     }
   };
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          backgroundColor: "#f4f6f8",
-          padding: 2,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <Box
@@ -90,35 +66,16 @@ const AdminSignupPage = () => {
           variant="h4"
           align="center"
           gutterBottom
-          sx={{ fontWeight: 600, color: "#d32f2f" }}
+          sx={{ fontWeight: 600, color: "#1976d2" }}
         >
-          Admin Signup
-        </Typography>
-
-        <Typography
-          variant="body2"
-          align="center"
-          gutterBottom
-          sx={{ color: "#666" }}
-        >
-          Create your admin account to get started
+          Reset Password
         </Typography>
 
         <Box
           component="form"
-          onSubmit={handleSignup}
+          onSubmit={handleResetPassword}
           sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 2 }}
         >
-          <TextField
-            name="name"
-            label="Name"
-            variant="outlined"
-            fullWidth
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-
           <TextField
             name="email"
             label="Email"
@@ -132,7 +89,7 @@ const AdminSignupPage = () => {
 
           <TextField
             name="password"
-            label="Password"
+            label="New Password"
             type="password"
             variant="outlined"
             fullWidth
@@ -154,7 +111,7 @@ const AdminSignupPage = () => {
           <Button
             type="submit"
             variant="contained"
-            color="error"
+            color="primary"
             fullWidth
             disabled={loading}
             sx={{
@@ -166,21 +123,11 @@ const AdminSignupPage = () => {
             {loading ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              "Signup"
+              "Reset Password"
             )}
           </Button>
         </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            User Sign Up?{" "}
-            <Button
-              onClick={() => navigate("/signup")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              User Sign Up
-            </Button>
-          </Typography>
-        </Box>
+
         <Box container justifyContent="center" sx={{ mt: 1 }}>
           <Typography variant="body2" sx={{ color: "#666" }}>
             User Login?{" "}
@@ -189,17 +136,6 @@ const AdminSignupPage = () => {
               sx={{ color: "#1976d2", cursor: "pointer" }}
             >
               User Login
-            </Button>
-          </Typography>
-        </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            User Forgot Password?{" "}
-            <Button
-              onClick={() => navigate("/reset-password")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              User Reset Password
             </Button>
           </Typography>
         </Box>
@@ -214,20 +150,9 @@ const AdminSignupPage = () => {
             </Button>
           </Typography>
         </Box>
-        <Box container justifyContent="center" sx={{ mt: 1 }}>
-          <Typography variant="body2" sx={{ color: "#666" }}>
-            Admin Forgot Password?{" "}
-            <Button
-              onClick={() => navigate("/admin-reset-password")}
-              sx={{ color: "#1976d2", cursor: "pointer" }}
-            >
-              Admin Reset Password
-            </Button>
-          </Typography>
-        </Box>
       </Paper>
     </Box>
   );
 };
 
-export default AdminSignupPage;
+export default ResetPasswordPage;

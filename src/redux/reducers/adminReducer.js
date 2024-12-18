@@ -64,6 +64,20 @@ const adminReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.isAdminAuthenticated = true;
+    })
+    // Reset Password
+    .addCase("ResetAdminPasswordRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("ResetAdminPasswordSuccess", (state, action) => {
+      state.loading = false;
+      state.isAdminAuthenticated = false;
+      state.admin = action.payload;
+    })
+    .addCase("ResetAdminPasswordFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.isAdminAuthenticated = false;
     });
 });
 

@@ -30,6 +30,11 @@ const Navbar = () => {
         <div>
           {isAuthenticated || isAdminAuthenticated ? (
             <Stack direction="row" spacing={2}>
+              {isAdminAuthenticated && (
+                <Button color="inherit" component={Link} to="/dashboard">
+                  Dashboard
+                </Button>
+              )}
               <Button
                 color="inherit"
                 component={Link}
@@ -38,11 +43,6 @@ const Navbar = () => {
               >
                 Logout
               </Button>
-              {user?.role === "Admin" && (
-                <Button color="inherit" component={Link} to="/dashboard">
-                  Dashboard
-                </Button>
-              )}
             </Stack>
           ) : (
             <>
