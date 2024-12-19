@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -15,23 +15,15 @@ import { DataGrid } from "@mui/x-data-grid";
 
 // Utility function to process entries by payment mode
 const processEntriesByPaymentMode = (data, mode) => {
-  const filteredEntries = data.filter((row) => row.modeOfPayment === mode);
-
-  if (filteredEntries.length > 0) {
-    return filteredEntries;
-  }
-
-  return [];
+  if (data.length === 0) return [];
+  return data.filter((row) => row.modeOfPayment === mode);
 };
 
 // Reusable SummaryTable component
 const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
-  const finalRows = [...dayRows, ...nightRows];
-
-  // In row if rate and noOfPeople is 0 then remove that row from finalRows
-  // const finalRows = [...dayRows, ...nightRows].filter(
-  //   (row) => row.rate !== 0 && row.noOfPeople !== 0
-  // );
+  const finalRows = [...dayRows, ...nightRows].filter(
+    (row) => row.rate !== 0 && row.noOfPeople !== 0
+  );
 
   if (finalRows.length > 0) {
     finalRows[finalRows.length] = {
@@ -99,6 +91,24 @@ const EntryPage = () => {
   const handleDaySubmit = (data) => setDayData(data);
   const handleNightSubmit = (data) => setNightData(data);
 
+  let processedEntries = useMemo(() => {
+    const cashDay = processEntriesByPaymentMode(dayData, "Cash");
+    const cashNight = processEntriesByPaymentMode(nightData, "Cash");
+    const cardDay = processEntriesByPaymentMode(dayData, "Card");
+    const cardNight = processEntriesByPaymentMode(nightData, "Card");
+    const onlineDay = processEntriesByPaymentMode(dayData, "Online");
+    const onlineNight = processEntriesByPaymentMode(nightData, "Online");
+    const unpaidDay = processEntriesByPaymentMode(dayData, "UnPaid");
+    const unpaidNight = processEntriesByPaymentMode(nightData, "UnPaid");
+
+    return {
+      cash: { day: cashDay, night: cashNight },
+      card: { day: cardDay, night: cardNight },
+      online: { day: onlineDay, night: onlineNight },
+      unpaid: { day: unpaidDay, night: unpaidNight },
+    };
+  }, [dayData, nightData]);
+
   // Columns for DataGrid
   const columns = [
     { field: "id", headerName: "Day/Night", width: 80 },
@@ -107,38 +117,8 @@ const EntryPage = () => {
     { field: "noOfPeople", headerName: "No. of People", width: 100 },
   ];
 
-  // Processed data by payment mode using memoization for performance
-  const cashEntries = useMemo(
-    () => ({
-      day: processEntriesByPaymentMode(dayData, "Cash"),
-      night: processEntriesByPaymentMode(nightData, "Cash"),
-    }),
-    [dayData, nightData]
-  );
-
-  const cardEntries = useMemo(
-    () => ({
-      day: processEntriesByPaymentMode(dayData, "Card"),
-      night: processEntriesByPaymentMode(nightData, "Card"),
-    }),
-    [dayData, nightData]
-  );
-
-  const onlineEntries = useMemo(
-    () => ({
-      day: processEntriesByPaymentMode(dayData, "Online"),
-      night: processEntriesByPaymentMode(nightData, "Online"),
-    }),
-    [dayData, nightData]
-  );
-
-  const unpaidEntries = useMemo(
-    () => ({
-      day: processEntriesByPaymentMode(dayData, "UnPaid"),
-      night: processEntriesByPaymentMode(nightData, "UnPaid"),
-    }),
-    [dayData, nightData]
-  );
+  const calculateTotal = (entries) =>
+    entries.reduce((sum, row) => sum + row.rate, 0);
 
   // Columns for Total DataGrid
   const modeColumns = [
@@ -147,31 +127,37 @@ const EntryPage = () => {
   ];
 
   const modeRows = [
-    { id: "Cash", totals: 0 },
-    { id: "Card", totals: 0 },
-    { id: "Online", totals: 0 },
-    { id: "UnPaid", totals: 0 },
+    {
+      id: "Cash",
+      totals:
+        calculateTotal(processedEntries.cash.day) +
+        calculateTotal(processedEntries.cash.night),
+    },
+    {
+      id: "Card",
+      totals:
+        calculateTotal(processedEntries.card.day) +
+        calculateTotal(processedEntries.card.night),
+    },
+    {
+      id: "Online",
+      totals:
+        calculateTotal(processedEntries.online.day) +
+        calculateTotal(processedEntries.online.night),
+    },
+    {
+      id: "UnPaid",
+      totals:
+        calculateTotal(processedEntries.unpaid.day) +
+        calculateTotal(processedEntries.unpaid.night),
+    },
     { id: "Total", totals: 0 },
   ];
 
-  // Calculate totals for each payment mode
-  modeRows[0].totals =
-    cashEntries.day.reduce((sum, row) => sum + row.rate, 0) +
-    cashEntries.night.reduce((sum, row) => sum + row.rate, 0);
-  modeRows[1].totals =
-    cardEntries.day.reduce((sum, row) => sum + row.rate, 0) +
-    cardEntries.night.reduce((sum, row) => sum + row.rate, 0);
-  modeRows[2].totals =
-    onlineEntries.day.reduce((sum, row) => sum + row.rate, 0) +
-    onlineEntries.night.reduce((sum, row) => sum + row.rate, 0);
-  modeRows[3].totals =
-    unpaidEntries.day.reduce((sum, row) => sum + row.rate, 0) +
-    unpaidEntries.night.reduce((sum, row) => sum + row.rate, 0);
-  modeRows[4].totals =
-    modeRows[0].totals +
-    modeRows[1].totals +
-    modeRows[2].totals +
-    modeRows[3].totals;
+  modeRows[4].totals = modeRows.reduce(
+    (sum, row, idx) => (idx < 4 ? sum + row.totals : sum),
+    0
+  );
 
   return (
     <Grid
@@ -230,7 +216,7 @@ const EntryPage = () => {
               <TableComponent
                 dayOrNight="Day"
                 title="Day Entry Table"
-                rowsLength={11}
+                rowsLength={15}
                 roomCosts={{
                   1: 1800,
                   2: 1800,
@@ -298,7 +284,7 @@ const EntryPage = () => {
               <TableComponent
                 dayOrNight="Night"
                 title="Night Entry Table"
-                rowsLength={11}
+                rowsLength={15}
                 roomCosts={{
                   1: 1800,
                   2: 1800,
@@ -334,14 +320,14 @@ const EntryPage = () => {
               <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
                 <SummaryTable
                   title="Cash Entries Summary"
-                  dayRows={cashEntries.day}
-                  nightRows={cashEntries.night}
+                  dayRows={processedEntries.cash.day}
+                  nightRows={processedEntries.cash.night}
                   columns={columns}
                 />
                 <SummaryTable
                   title="Card Entries Summary"
-                  dayRows={cardEntries.day}
-                  nightRows={cardEntries.night}
+                  dayRows={processedEntries.card.day}
+                  nightRows={processedEntries.card.night}
                   columns={columns}
                 />
               </Stack>
@@ -352,14 +338,14 @@ const EntryPage = () => {
               <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
                 <SummaryTable
                   title="Online Entries Summary"
-                  dayRows={onlineEntries.day}
-                  nightRows={onlineEntries.night}
+                  dayRows={processedEntries.online.day}
+                  nightRows={processedEntries.online.night}
                   columns={columns}
                 />
                 <SummaryTable
                   title="UnPaid Entries Summary"
-                  dayRows={unpaidEntries.day}
-                  nightRows={unpaidEntries.night}
+                  dayRows={processedEntries.unpaid.day}
+                  nightRows={processedEntries.unpaid.night}
                   columns={columns}
                 />
               </Stack>

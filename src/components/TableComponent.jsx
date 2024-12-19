@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { FormControl, Select } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -17,6 +17,7 @@ const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
     type: "",
     modeOfPayment: "",
     fullname: "",
+    mobileNumber: "",
     checkInTime: "",
     checkOutTime: "",
   }));
@@ -87,9 +88,14 @@ const TableComponent = ({
     type: "",
     modeOfPayment: "",
     fullname: "",
+    mobileNumber: "",
     checkInTime: "",
     checkOutTime: "",
   };
+
+  useEffect(() => {
+    onSubmit(rows);
+  }, [onSubmit, rows]);
 
   return (
     <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>
@@ -124,15 +130,7 @@ const TableComponent = ({
               handleRowEdit(params.row);
             },
           },
-          {
-            field: "fullname",
-            headerName: "Full Name",
-            width: 130,
-            editable: true,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
-          },
+
           {
             field: "noOfPeople",
             headerName: "People",
@@ -312,6 +310,24 @@ const TableComponent = ({
               />
             ),
           },
+          {
+            field: "fullname",
+            headerName: "Full Name",
+            width: 130,
+            editable: true,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+          },
+          {
+            field: "mobileNumber",
+            headerName: "Mobile Number",
+            width: 130,
+            editable: true,
+            handleRowEdit: (params) => {
+              handleRowEdit(params.row);
+            },
+          },
         ]}
         editMode="row"
         disableColumnMenu
@@ -320,7 +336,9 @@ const TableComponent = ({
         rowsPerPageOptions={[5, 10, 20]}
         processRowUpdate={handleRowEdit}
         disableSelectionOnClick
-        handleRowEdit={onSubmit(rows)}
+        onProcessRowUpdateError={(params) => {
+          console.error(params);
+        }}
         rowHeight={25}
         sx={{
           "& .MuiDataGrid-columnHeader": {
@@ -332,9 +350,9 @@ const TableComponent = ({
             display: "none",
           },
           fontSize: "12px",
-          "& .MuiDataGrid-scrollbar": {
-            display: "none",
-          },
+          // "& .MuiDataGrid-scrollbar": {
+          //   display: "none",
+          // },
           "& .MuiInputBase-input": {
             fontSize: "12px",
           },
@@ -352,7 +370,6 @@ const TableComponent = ({
             justifyContent: "center",
           },
         }}
-        column
       />
     </div>
   );
