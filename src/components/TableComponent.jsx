@@ -103,7 +103,7 @@ const TableComponent = ({
             handleRowEdit: (params) => {
               handleRowEdit(params.row);
             },
-            editable: false,
+            editable: true,
           },
           {
             field: "cost",
@@ -112,7 +112,7 @@ const TableComponent = ({
             handleRowEdit: (params) => {
               handleRowEdit(params.row);
             },
-            editable: false,
+            editable: true,
           },
           {
             field: "rate",

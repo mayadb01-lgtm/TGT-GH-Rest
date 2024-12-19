@@ -6,6 +6,7 @@ import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import { useLayoutEffect } from "react";
 import Store from "./redux/store.js";
 import { loadUser } from "./redux/actions/userAction.js";
@@ -57,7 +58,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            <ProtectedRoute requiredRole="User">
+            <ProtectedRoute>
               <Navbar />
               <EntryPage />
             </ProtectedRoute>
@@ -66,19 +67,19 @@ const App = () => {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute requiredRole="Admin">
+            <ProtectedAdminRoute>
               <Navbar />
               <EntryPage />
-            </ProtectedRoute>
+            </ProtectedAdminRoute>
           }
         />
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute requiredRole="Admin">
+            <ProtectedAdminRoute>
               <Navbar />
               <DashboardPage />
-            </ProtectedRoute>
+            </ProtectedAdminRoute>
           }
         />
         {/* User */}
@@ -95,7 +96,7 @@ const App = () => {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute requiredRole="User">
+            <ProtectedRoute>
               <Navbar />
               <ProfilePage />
             </ProtectedRoute>

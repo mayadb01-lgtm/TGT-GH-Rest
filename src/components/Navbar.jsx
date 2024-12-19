@@ -5,8 +5,8 @@ import { logoutUser } from "../redux/actions/userAction";
 import { logoutAdmin } from "../redux/actions/adminAction";
 
 const Navbar = () => {
-  const { isAuthenticated, user } = useSelector((state) => state.user);
-  const { isAdminAuthenticated, admin } = useSelector((state) => state.admin);
+  const { isAuthenticated } = useSelector((state) => state.user);
+  const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -25,7 +25,9 @@ const Navbar = () => {
         }}
       >
         <Typography variant="h6" component="div">
-          Guest House
+          <Link to="/" style={{ color: "white", textDecoration: "none" }}>
+            Guest House
+          </Link>
         </Typography>
         <div>
           {isAuthenticated || isAdminAuthenticated ? (

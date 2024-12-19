@@ -45,7 +45,6 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
 
   return (
     <Box
-      fullWidth
       style={{
         margin: 0,
         padding: 0,
@@ -244,6 +243,10 @@ const EntryPage = () => {
                   9: 1500,
                   10: 1500,
                   11: 1500,
+                  12: 0,
+                  13: 0,
+                  14: 0,
+                  15: 0,
                 }}
                 onSubmit={handleDaySubmit}
               />
@@ -308,6 +311,10 @@ const EntryPage = () => {
                   9: 1500,
                   10: 1500,
                   11: 1500,
+                  12: 0,
+                  13: 0,
+                  14: 0,
+                  15: 0,
                 }}
                 onSubmit={handleNightSubmit}
               />
