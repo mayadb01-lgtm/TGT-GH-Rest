@@ -49,15 +49,6 @@ const App = () => {
         <Route
           path="/"
           element={
-            <>
-              <Navbar />
-              <EntryPage />
-            </>
-          }
-        />
-        <Route
-          path="/"
-          element={
             <ProtectedRoute>
               <Navbar />
               <EntryPage />
