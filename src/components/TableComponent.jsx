@@ -106,19 +106,67 @@ const TableComponent = ({
             field: "roomNo",
             headerName: "Room",
             width: 60,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
             editable: true,
+            type: "number",
+            renderEditCell: (params) => (
+              <input
+                type="number"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value > 0 && value <= 11) {
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "roomNo",
+                      value: value,
+                    });
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
+            ),
           },
           {
             field: "cost",
             headerName: "Cost",
             width: 60,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
             editable: true,
+            type: "number",
+            renderEditCell: (params) => (
+              <input
+                type="number"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value >= 0) {
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "cost",
+                      value: value,
+                    });
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
+            ),
           },
           {
             field: "rate",
@@ -126,9 +174,32 @@ const TableComponent = ({
             width: 80,
             editable: true,
             type: "number",
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
+            renderEditCell: (params) => (
+              <input
+                type="number"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value >= 0) {
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "rate",
+                      value: value,
+                    });
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
+            ),
           },
 
           {
@@ -137,9 +208,32 @@ const TableComponent = ({
             width: 60,
             editable: true,
             type: "number",
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
+            renderEditCell: (params) => (
+              <input
+                type="number"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value >= 0) {
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "noOfPeople",
+                      value: value,
+                    });
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
+            ),
           },
           {
             field: "checkInTime",
@@ -324,9 +418,33 @@ const TableComponent = ({
             headerName: "Mobile Number",
             width: 130,
             editable: true,
-            handleRowEdit: (params) => {
-              handleRowEdit(params.row);
-            },
+            type: "number",
+            renderEditCell: (params) => (
+              <input
+                type="number"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 10) {
+                    params.api.setEditCellValue({
+                      id: params.id,
+                      field: "mobileNumber",
+                      value: value,
+                    });
+                  }
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />
+            ),
           },
         ]}
         editMode="row"
@@ -339,6 +457,7 @@ const TableComponent = ({
         onProcessRowUpdateError={(params) => {
           console.error(params);
         }}
+        showCellVerticalBorder
         rowHeight={25}
         sx={{
           "& .MuiDataGrid-columnHeader": {
