@@ -18,6 +18,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { createEntry } from "../redux/actions/entryAction";
 
 // Utility function to process entries by payment mode
 const processEntriesByPaymentMode = (data, mode) => {
@@ -94,6 +96,7 @@ const EntryPage = () => {
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs());
+  const dispatch = useDispatch();
 
   const handleDaySubmit = (data) => setDayData(data);
   const handleNightSubmit = (data) => setNightData(data);
@@ -179,31 +182,43 @@ const EntryPage = () => {
   };
 
   const handleEntrySubmit = async () => {
-    if (modeRows[4].totals === 0) {
-      toast.error("Please enter some data before submitting.");
-      console.log("Please enter some data before submitting.");
-    } else {
-      const filteredDayData = dayData.filter(
-        (row) => row.rate !== 0 && row.noOfPeople !== 0
-      );
-      const filteredNightData = nightData.filter(
-        (row) => row.rate !== 0 && row.noOfPeople !== 0
-      );
-      // Append the date to the entries before submitting to the server
-      const dayEntries = filteredDayData.map((row) => ({
-        ...row,
-        date: selectedDate.format("DD-MM-YYYY"),
-      }));
-      const nightEntries = filteredNightData.map((row) => ({
-        ...row,
-        date: selectedDate.format("DD-MM-YYYY"),
-      }));
+    try {
+      if (modeRows[4].totals === 0) {
+        toast.error("Please enter some data before submitting.");
+        console.log("Please enter some data before submitting.");
+      } else {
+        const filteredDayData = dayData.filter(
+          (row) => row.rate !== 0 && row.noOfPeople !== 0
+        );
+        const filteredNightData = nightData.filter(
+          (row) => row.rate !== 0 && row.noOfPeople !== 0
+        );
+        const dayEntries = filteredDayData.map((row) => ({
+          ...row,
+          date: selectedDate.format("DD-MM-YYYY"),
+        }));
+        const nightEntries = filteredNightData.map((row) => ({
+          ...row,
+          date: selectedDate.format("DD-MM-YYYY"),
+        }));
 
-      // Submit the entries to the server
-      console.log("dayEntries", dayEntries);
-      console.log("nightEntries", nightEntries);
-      console.log("Entries submitted successfully!");
-      toast.success("Entries submitted successfully!");
+        const combinedEntries = [...dayEntries, ...nightEntries];
+        // Do we need to convert the combinedEntries to Stringify?
+        const strCombinedEntries = JSON.stringify(combinedEntries);
+
+        const entryObj = {
+          entries: strCombinedEntries,
+          date: selectedDate.format("DD-MM-YYYY"),
+        };
+        console.log("Entry Object", entryObj);
+        dispatch(createEntry(entryObj));
+        setDayData([]);
+        setNightData([]);
+        setSelectedDate(dayjs());
+      }
+    } catch (error) {
+      console.error("Error submitting entries", error);
+      toast.error("Error submitting entries");
     }
   };
 

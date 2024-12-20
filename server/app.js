@@ -28,9 +28,11 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 // Import routes
 import user from "./controller/user.js";
 import admin from "./controller/admin.js";
+import entry from "./controller/entry.js";
 
 // Use routes
 app.use("/api/v1/user", user);
 app.use("/api/v1/admin", admin);
+app.use("/api/v1/entry", entry);
 
 export default app;
