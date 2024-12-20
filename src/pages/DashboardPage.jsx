@@ -21,19 +21,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // Navigation items
 const NAVIGATION = [
   { kind: "header", title: "Main items" },
-  { kind: "link", title: "Dashboard", icon: <DashboardIcon /> },
-  { kind: "divider" },
   {
     kind: "link",
-    title: "Dashboard 1",
+    title: "Dashboard",
     icon: <DashboardIcon />,
     to: "/dashboard",
   },
   { kind: "divider" },
-  { kind: "header", title: "Settings" },
+  { kind: "link", title: "Profile", to: "/profile" },
   { kind: "link", title: "Log out", to: "/logout" },
   { kind: "link", title: "Home", to: "/" },
-  { kind: "link", title: "Profile", to: "/profile" },
 ];
 
 // Theme setup
@@ -54,7 +51,7 @@ const demoTheme = createTheme({
 });
 
 // Dashboard content component
-const DashboardContent = React.memo(function DashboardContent() {
+const DashboardContent = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const { loading, entries } = useSelector((state) => state.entry);
 
@@ -109,12 +106,7 @@ const DashboardContent = React.memo(function DashboardContent() {
       }}
     >
       <Stack direction="row" spacing={1} style={{ alignItems: "center" }}>
-        <Typography
-          variant="subtitle2"
-          fontWeight={500}
-          color="text.secondary"
-          sx={{ alignSelf: "center" }}
-        >
+        <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
           Select Date
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -127,8 +119,6 @@ const DashboardContent = React.memo(function DashboardContent() {
                 fullWidth
                 variant="outlined"
                 size="small"
-                error={false}
-                helperText={null}
               />
             )}
             views={["day", "month", "year"]}
@@ -140,26 +130,53 @@ const DashboardContent = React.memo(function DashboardContent() {
         rows={entries.map((entry, index) => ({ ...entry, id: index + 1 }))}
         columns={columns}
         pageSize={5}
-        autoHeight
       />
     </Box>
   );
-});
+};
 
-// Dashboard page component
+// Placeholder components for other pages
+const ProfilePage = () => <Typography>Profile Page Content</Typography>;
+const HomePage = () => <Typography>Home Page Content</Typography>;
+const LogoutPage = () => <Typography>Logout Page Content</Typography>;
+
+// Main page component
 const DashboardPage = () => {
   const router = useDemoRouter("/dashboard");
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState("dashboard");
 
   useEffect(() => {
-    dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
-  }, [dispatch]);
+    if (currentPage === "dashboard") {
+      dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
+    }
+  }, [dispatch, currentPage]);
+
+  const renderPageContent = () => {
+    switch (currentPage) {
+      case "profile":
+        return <ProfilePage />;
+      case "home":
+        return <HomePage />;
+      case "logout":
+        return <LogoutPage />;
+      default:
+        return <DashboardContent />;
+    }
+  };
 
   return (
-    <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
-      <DashboardLayout>
-        <DashboardContent />
-      </DashboardLayout>
+    <AppProvider
+      navigation={NAVIGATION.map((item) => ({
+        ...item,
+        onClick: item.to
+          ? () => setCurrentPage(item.to.replace("/", ""))
+          : undefined,
+      }))}
+      router={router}
+      theme={demoTheme}
+    >
+      <DashboardLayout>{renderPageContent()}</DashboardLayout>
     </AppProvider>
   );
 };
