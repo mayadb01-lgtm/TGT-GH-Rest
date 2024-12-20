@@ -165,6 +165,12 @@ const DashboardPage = () => {
     }
   };
 
+  const CustomAppTitle = () => (
+    <Typography variant="h6" color="textPrimary">
+      Ashirwad Admin Dashboard
+    </Typography>
+  );
+
   return (
     <AppProvider
       navigation={NAVIGATION.map((item) => ({
@@ -176,7 +182,13 @@ const DashboardPage = () => {
       router={router}
       theme={demoTheme}
     >
-      <DashboardLayout>{renderPageContent()}</DashboardLayout>
+      <DashboardLayout
+        slots={{
+          appTitle: CustomAppTitle,
+        }}
+      >
+        {renderPageContent()}
+      </DashboardLayout>
     </AppProvider>
   );
 };
