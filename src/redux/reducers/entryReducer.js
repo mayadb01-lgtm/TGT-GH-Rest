@@ -59,6 +59,19 @@ const entryReducer = createReducer(initialState, (builder) => {
     .addCase("DeleteEntryFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    })
+    // Get Entry by Date
+    .addCase("GetEntryByDateRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetEntryByDateSuccess", (state, action) => {
+      state.loading = false;
+      state.entries = action.payload;
+    })
+    .addCase("GetEntryByDateFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.entries = [];
     });
 });
 

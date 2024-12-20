@@ -210,16 +210,38 @@ const EntryPage = () => {
           entries: strCombinedEntries,
           date: selectedDate.format("DD-MM-YYYY"),
         };
+
+        // Create a Dialog Box to confirm the submission
+        if (
+          !window.confirm(
+            `Are you sure you want to submit entries for ${selectedDate.format(
+              "DD-MM-YYYY"
+            )}?`
+          )
+        ) {
+          return;
+        }
         console.log("Entry Object", entryObj);
         dispatch(createEntry(entryObj));
         setDayData([]);
         setNightData([]);
         setSelectedDate(dayjs());
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error submitting entries", error);
       toast.error("Error submitting entries");
     }
+  };
+
+  const handleCancelClick = () => {
+    if (window.confirm("Are you sure you want to cancel the entries?")) {
+      setDayData([]);
+      setNightData([]);
+      setSelectedDate(dayjs());
+      window.location.reload();
+    }
+    console.log("Cancelled entries");
   };
 
   return (
@@ -549,6 +571,7 @@ const EntryPage = () => {
                   variant="outlined"
                   color="secondary"
                   style={{ margin: "2px" }}
+                  onClick={handleCancelClick}
                 >
                   Cancel
                 </Button>

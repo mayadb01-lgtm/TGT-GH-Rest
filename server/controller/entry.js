@@ -7,6 +7,22 @@ const router = Router();
 router.post("/create-entry", async (req, res) => {
   try {
     const { entries, date } = req.body;
+
+    // Only 1 Entry is allowed per date
+    const existingEntry = await Entry.findOne({
+      date,
+      // user: req.user._id, // Find the Entry by date and authenticated user's ID
+    })
+      .lean()
+      .exec();
+
+    if (existingEntry) {
+      return res.status(400).json({
+        success: false,
+        message: "Entry already exists for this date.",
+      });
+    }
+
     let parsedEntries = entries;
 
     // Parse entries from JSON string to JavaScript object
@@ -72,6 +88,34 @@ router.post("/create-entry", async (req, res) => {
       success: true,
       message: "Entry created successfully.",
       data: createdEntry,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Get Entry by Date
+router.get("/get-entry/:date", async (req, res) => {
+  try {
+    const date = req.params.date;
+    const entry = await Entry.findOne({
+      date,
+      // user: req.user._id, // Find the Entry by date and authenticated user's ID
+    });
+
+    if (!entry) {
+      return res.status(404).json({
+        success: false,
+        message: "Entry not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: entry.entry,
     });
   } catch (error) {
     res.status(500).json({

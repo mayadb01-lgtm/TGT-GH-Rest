@@ -25,3 +25,21 @@ export const createEntry = (entryData) => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Get Entries by Date
+export const getEntriesByDate = (date) => async (dispatch) => {
+  try {
+    dispatch({ type: "GetEntriesRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/entry/get-entry/${date}`
+    );
+    console.log("Entries fetched successfully", data);
+    dispatch({ type: "GetEntriesSuccess", payload: data.data });
+  } catch (error) {
+    dispatch({
+      type: "GetEntriesFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
