@@ -106,7 +106,7 @@ const TableComponent = ({
             field: "roomNo",
             headerName: "Room",
             width: 50,
-            editable: true,
+            editable: false,
             type: "number",
             renderEditCell: (params) => (
               <input
@@ -139,7 +139,7 @@ const TableComponent = ({
             field: "cost",
             headerName: "Cost",
             width: 50,
-            editable: true,
+            editable: false,
             type: "number",
             renderEditCell: (params) => (
               <input
@@ -205,7 +205,7 @@ const TableComponent = ({
           {
             field: "noOfPeople",
             headerName: "People",
-            width: 60,
+            width: 55,
             editable: true,
             type: "number",
             renderEditCell: (params) => (
@@ -499,9 +499,9 @@ const TableComponent = ({
             display: "none",
           },
           fontSize: "12px",
-          // "& .MuiDataGrid-scrollbar": {
-          //   display: "none",
-          // },
+          "& .MuiDataGrid-scrollbar": {
+            display: "none",
+          },
           "& .MuiInputBase-input": {
             fontSize: "12px",
           },

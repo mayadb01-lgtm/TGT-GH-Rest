@@ -346,7 +346,7 @@ const EntryPage = () => {
                 <TableComponent
                   dayOrNight="Day"
                   title="Day Entry Table"
-                  rowsLength={15}
+                  rowsLength={11}
                   roomCosts={{
                     1: 1800,
                     2: 1800,
@@ -359,10 +359,6 @@ const EntryPage = () => {
                     9: 1500,
                     10: 1500,
                     11: 1500,
-                    12: 0,
-                    13: 0,
-                    14: 0,
-                    15: 0,
                   }}
                   onSubmit={handleDaySubmit}
                 />
@@ -417,7 +413,7 @@ const EntryPage = () => {
                 <TableComponent
                   dayOrNight="Night"
                   title="Night Entry Table"
-                  rowsLength={15}
+                  rowsLength={11}
                   roomCosts={{
                     1: 1800,
                     2: 1800,
@@ -430,10 +426,6 @@ const EntryPage = () => {
                     9: 1500,
                     10: 1500,
                     11: 1500,
-                    12: 0,
-                    13: 0,
-                    14: 0,
-                    15: 0,
                   }}
                   onSubmit={handleNightSubmit}
                 />
