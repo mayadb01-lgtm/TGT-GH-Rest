@@ -8,12 +8,6 @@ export const isAuthenticated = async (req, res, next) => {
     const { token } = req.cookies;
     const { admin_token } = req.cookies;
 
-    if (admin_token) {
-      console.log("admin_token", admin_token);
-    } else if (token) {
-      console.log("token", token);
-    }
-
     if (!admin_token && !token) {
       return res.status(401).json({
         success: false,

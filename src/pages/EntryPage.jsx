@@ -95,7 +95,9 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
 const EntryPage = () => {
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("DD-MM-YYYY")
+  );
   const dispatch = useDispatch();
 
   const handleDaySubmit = (data) => setDayData(data);
@@ -123,8 +125,8 @@ const EntryPage = () => {
   const columns = [
     { field: "id", headerName: "Day/Night", width: 80 },
     { field: "rate", headerName: "Rate", width: 60 },
-    { field: "fullname", headerName: "Full Name", width: 120 },
-    { field: "noOfPeople", headerName: "No. of People", width: 100 },
+    { field: "fullname", headerName: "Full Name", width: 100 },
+    { field: "noOfPeople", headerName: "No. of People", width: 80 },
   ];
 
   const calculateTotal = (entries) =>
@@ -225,8 +227,8 @@ const EntryPage = () => {
         dispatch(createEntry(entryObj));
         setDayData([]);
         setNightData([]);
-        setSelectedDate(dayjs());
-        window.location.reload();
+        setSelectedDate(dayjs().format("DD-MM-YYYY"));
+        // window.location.reload();
       }
     } catch (error) {
       console.error("Error submitting entries", error);
@@ -238,8 +240,8 @@ const EntryPage = () => {
     if (window.confirm("Are you sure you want to cancel the entries?")) {
       setDayData([]);
       setNightData([]);
-      setSelectedDate(dayjs());
-      window.location.reload();
+      setSelectedDate(dayjs().format("DD-MM-YYYY"));
+      // window.location.reload();
     }
     console.log("Cancelled entries");
   };
@@ -254,7 +256,47 @@ const EntryPage = () => {
         alignItems="start"
       >
         {/* Left Side: Day and Night Entry Tables */}
-        <Grid size={{ xs: 12, sm: 6.5, md: 6.5, lg: 6.5, xl: 6.5 }}>
+        <Grid size={{ xs: 12, sm: 7, md: 7, lg: 7, xl: 7 }}>
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Box style={{ margin: "0", padding: "0" }}>
+              {/* Date Picker */}
+              <Stack
+                direction="row"
+                spacing={1}
+                style={{ margin: "0", padding: "0", alignItems: "center" }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  fontWeight={500}
+                  style={{ margin: "12px" }}
+                >
+                  Select Date
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    views={["year", "month", "day"]}
+                    value={selectedDate}
+                    onChange={(newDate) => handleDateChange(newDate)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        error={false}
+                        helperText={null}
+                      />
+                    )}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        padding: 1,
+                      },
+                    }}
+                  />
+                </LocalizationProvider>
+              </Stack>
+            </Box>
+          </Grid>
           <Box>
             {/* Day Entries */}
             <Accordion
@@ -402,47 +444,7 @@ const EntryPage = () => {
         </Grid>
 
         {/* Right Side: Filters Table */}
-        <Grid size={{ xs: 12, sm: 5.5, md: 5.5, lg: 5.5, xl: 5.5 }}>
-          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-            <Box style={{ margin: "0", padding: "0" }}>
-              {/* Date Picker */}
-              <Stack
-                direction="row"
-                spacing={1}
-                style={{ margin: "0", padding: "0", alignItems: "center" }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={500}
-                  style={{ margin: "12px" }}
-                >
-                  Select Date
-                </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    views={["year", "month", "day"]}
-                    value={selectedDate}
-                    onChange={(newDate) => handleDateChange(newDate)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        variant="outlined"
-                        size="small"
-                        error={false}
-                        helperText={null}
-                      />
-                    )}
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        padding: 1,
-                      },
-                    }}
-                  />
-                </LocalizationProvider>
-              </Stack>
-            </Box>
-          </Grid>
+        <Grid size={{ xs: 12, sm: 5, md: 5, lg: 5, xl: 5 }}>
           <Grid
             size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
             display={"flex"}

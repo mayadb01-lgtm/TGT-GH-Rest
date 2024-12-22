@@ -52,7 +52,9 @@ const demoTheme = createTheme({
 
 // Dashboard content component
 const DashboardContent = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("DD-MM-YYYY")
+  );
   const { loading, entries } = useSelector((state) => state.entry);
 
   const dispatch = useDispatch();
@@ -64,7 +66,7 @@ const DashboardContent = () => {
   };
 
   useEffect(() => {
-    dispatch(getEntriesByDate(selectedDate.format("DD-MM-YYYY")));
+    dispatch(getEntriesByDate(selectedDate));
   }, [dispatch, selectedDate]);
 
   const columns = [
