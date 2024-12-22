@@ -256,7 +256,7 @@ const EntryPage = () => {
         alignItems="start"
       >
         {/* Left Side: Day and Night Entry Tables */}
-        <Grid size={{ xs: 12, sm: 7, md: 7, lg: 7, xl: 7 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box style={{ margin: "0", padding: "0" }}>
               {/* Date Picker */}
@@ -272,7 +272,10 @@ const EntryPage = () => {
                 >
                   Select Date
                 </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+                <LocalizationProvider
+                  dateAdapter={AdapterDayjs}
+                  adapterLocale="en-gb"
+                >
                   <DatePicker
                     views={["year", "month", "day"]}
                     value={dayjs(selectedDate, "DD-MM-YYYY")}
@@ -298,21 +301,17 @@ const EntryPage = () => {
           </Grid>
           <Box>
             {/* Day Entries */}
-            <Accordion
-              defaultExpanded
-              style={{ margin: "0", paddingBlock: "0" }}
-            >
+            <Accordion defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="day-entries-content"
                 id="day-entries-header"
                 style={{
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: "rbga(41,43,44,0.1)",
                   borderBottom: "1px solid #e0e0e0",
-                  margin: "0",
-                  padding: "0 18px",
                   minHeight: "0",
-                  height: "30px",
+                  height: "40px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                 }}
               >
                 <Stack
@@ -325,7 +324,7 @@ const EntryPage = () => {
                     variant="subtitle2"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "12px",
+                      fontSize: "14px",
                     }}
                   >
                     Day Entries
@@ -335,7 +334,7 @@ const EntryPage = () => {
                     variant="subtitle2"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "12px",
+                      fontSize: "14px",
                     }}
                   >
                     Aashirvad Guest House
@@ -365,21 +364,17 @@ const EntryPage = () => {
               </AccordionDetails>
             </Accordion>
             {/* Night Entries */}
-            <Accordion
-              defaultExpanded
-              style={{ margin: "0", paddingBlock: "0" }}
-            >
+            <Accordion defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="night-entries-content"
                 id="night-entries-header"
                 style={{
-                  backgroundColor: "#f6f6f6",
+                  backgroundColor: "rbga(41,43,44,0.1)",
                   borderBottom: "1px solid #e0e0e0",
-                  margin: "0",
-                  padding: "0 18px",
                   minHeight: "0",
-                  height: "30px",
+                  height: "40px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                 }}
               >
                 <Stack
@@ -393,7 +388,7 @@ const EntryPage = () => {
                     variant="h6"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "12px", // Smaller font size
+                      fontSize: "14px",
                     }}
                   >
                     Night Entries
@@ -402,7 +397,7 @@ const EntryPage = () => {
                     variant="h6"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "12px", // Smaller font size
+                      fontSize: "14px",
                     }}
                   >
                     Aashirvad Guest House

@@ -108,6 +108,8 @@ const TableComponent = ({
             width: 50,
             editable: false,
             type: "number",
+            cellClassName: "light-gray",
+            headerClassName: "light-gray",
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -137,10 +139,12 @@ const TableComponent = ({
           },
           {
             field: "cost",
-            headerName: "Cost",
+            headerName: "Price",
             width: 50,
             editable: false,
             type: "number",
+            cellClassName: "light-gray",
+            headerClassName: "light-gray",
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -174,6 +178,8 @@ const TableComponent = ({
             width: 60,
             editable: true,
             type: "number",
+            cellClassName: "orange",
+            headerClassName: "orange",
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -208,6 +214,8 @@ const TableComponent = ({
             width: 55,
             editable: true,
             type: "number",
+            cellClassName: "orange",
+            headerClassName: "orange",
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -240,6 +248,8 @@ const TableComponent = ({
             headerName: "Check In",
             width: 100,
             editable: true,
+            cellClassName: "blue",
+            headerClassName: "blue",
             renderEditCell: (params) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
@@ -310,6 +320,8 @@ const TableComponent = ({
             headerName: "Check Out",
             width: 120,
             editable: true,
+            cellClassName: "blue",
+            headerClassName: "blue",
             renderEditCell: (params) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
@@ -379,6 +391,8 @@ const TableComponent = ({
             field: "type",
             headerName: "Type",
             width: 120,
+            cellClassName: "orange",
+            headerClassName: "orange",
             renderCell: (params) => (
               <DropdownCell
                 value={params.row.type}
@@ -402,6 +416,8 @@ const TableComponent = ({
             field: "modeOfPayment",
             headerName: "Payment",
             width: 120,
+            cellClassName: "orange",
+            headerClassName: "orange",
             renderCell: (params) => (
               <DropdownCell
                 value={params.row.modeOfPayment}
@@ -417,6 +433,8 @@ const TableComponent = ({
             headerName: "Full Name",
             width: 150,
             editable: true,
+            cellClassName: "blue",
+            headerClassName: "blue",
             handleRowEdit: (params) => {
               <input
                 type="text"
@@ -445,9 +463,11 @@ const TableComponent = ({
           {
             field: "mobileNumber",
             headerName: "Mobile",
-            width: 100,
+            width: 110,
             editable: true,
             type: "number",
+            cellClassName: "blue",
+            headerClassName: "blue",
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -524,6 +544,37 @@ const TableComponent = ({
           "& .MuiDataGrid-cell--editing": {
             boxShadow: "none",
           },
+          ".orange": {
+            backgroundColor: "rgb(247,180,38)",
+            color: "white",
+          },
+          ".blue": {
+            backgroundColor: "rgb(30,97,255)",
+            color: "white",
+          },
+          ".light-gray": {
+            backgroundColor: "rgb(164,169,175)",
+            color: "white",
+          },
+          ".green": {
+            backgroundColor: "rgb(38,177,76)",
+            color: "white",
+          },
+          "& .MuiFormControl-root": {
+            color: "white",
+          },
+          "& .MuiNativeSelect-select": {
+            color: "white",
+          },
+          "& .MuiNativeSelect-select option": {
+            color: "black",
+          },
+        }}
+        getRowClassName={(params) => {
+          return params.id === "totals" ? "green" : "";
+        }}
+        getCellClassName={(params) => {
+          return params.id === "totals" ? "green" : "";
         }}
       />
     </div>
