@@ -20,7 +20,9 @@ import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { createEntry } from "../redux/actions/entryAction";
+import "dayjs/locale/en-gb";
 
+dayjs.locale("en-gb");
 // Utility function to process entries by payment mode
 const processEntriesByPaymentMode = (data, mode) => {
   if (data.length === 0) return [];
@@ -126,7 +128,7 @@ const EntryPage = () => {
     { field: "id", headerName: "Day/Night", width: 80 },
     { field: "rate", headerName: "Rate", width: 60 },
     { field: "fullname", headerName: "Full Name", width: 100 },
-    { field: "noOfPeople", headerName: "No. of People", width: 80 },
+    { field: "noOfPeople", headerName: "People", width: 80 },
   ];
 
   const calculateTotal = (entries) =>
@@ -174,12 +176,10 @@ const EntryPage = () => {
   const handleDateChange = (newDate) => {
     if (modeRows[4].totals > 0) {
       if (window.confirm("Are you sure you want to change the date?")) {
-        setSelectedDate(newDate);
+        setSelectedDate(dayjs(newDate, "DD-MM-YYYY"));
         setDayData([]);
         setNightData([]);
       }
-    } else {
-      setSelectedDate(newDate);
     }
   };
 
@@ -197,11 +197,11 @@ const EntryPage = () => {
         );
         const dayEntries = filteredDayData.map((row) => ({
           ...row,
-          date: selectedDate.format("DD-MM-YYYY"),
+          date: selectedDate,
         }));
         const nightEntries = filteredNightData.map((row) => ({
           ...row,
-          date: selectedDate.format("DD-MM-YYYY"),
+          date: selectedDate,
         }));
 
         const combinedEntries = [...dayEntries, ...nightEntries];
@@ -210,7 +210,7 @@ const EntryPage = () => {
 
         const entryObj = {
           entries: strCombinedEntries,
-          date: selectedDate.format("DD-MM-YYYY"),
+          date: selectedDate,
         };
 
         // Create a Dialog Box to confirm the submission
@@ -272,15 +272,14 @@ const EntryPage = () => {
                 >
                   Select Date
                 </Typography>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                   <DatePicker
                     views={["year", "month", "day"]}
-                    value={selectedDate}
+                    value={dayjs(selectedDate, "DD-MM-YYYY")}
                     onChange={(newDate) => handleDateChange(newDate)}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        fullWidth
                         variant="outlined"
                         size="small"
                         error={false}

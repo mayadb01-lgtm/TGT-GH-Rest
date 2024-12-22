@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { useDispatch, useSelector } from "react-redux";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -74,7 +74,7 @@ const DashboardContent = () => {
     { field: "roomNo", headerName: "Room No", width: 130 },
     { field: "cost", headerName: "Cost", width: 90 },
     { field: "rate", headerName: "Rate", width: 90 },
-    { field: "noOfPeople", headerName: "No of People", width: 130 },
+    { field: "noOfPeople", headerName: "People", width: 130 },
     { field: "type", headerName: "Type", width: 130 },
     { field: "modeOfPayment", headerName: "Mode of Payment", width: 130 },
     { field: "checkInTime", headerName: "Check In Time", width: 130 },

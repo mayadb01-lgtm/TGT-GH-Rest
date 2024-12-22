@@ -18,6 +18,7 @@ import AdminSignupPage from "./pages/AdminSignupPage.jsx";
 import { loadAdmin } from "./redux/actions/adminAction.js";
 import AdminResetPasswordPage from "./pages/AdminResetPasswordPage.jsx";
 import UserResetPasswordPage from "./pages/UserResetPasswordPage.jsx";
+import "./App.css";
 
 const App = () => {
   const { loading: userLoading } = useSelector((state) => state.user);

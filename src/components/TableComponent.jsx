@@ -105,7 +105,7 @@ const TableComponent = ({
           {
             field: "roomNo",
             headerName: "Room",
-            width: 60,
+            width: 50,
             editable: true,
             type: "number",
             renderEditCell: (params) => (
@@ -138,7 +138,7 @@ const TableComponent = ({
           {
             field: "cost",
             headerName: "Cost",
-            width: 60,
+            width: 50,
             editable: true,
             type: "number",
             renderEditCell: (params) => (
@@ -171,7 +171,7 @@ const TableComponent = ({
           {
             field: "rate",
             headerName: "Rate",
-            width: 80,
+            width: 60,
             editable: true,
             type: "number",
             renderEditCell: (params) => (
@@ -238,7 +238,7 @@ const TableComponent = ({
           {
             field: "checkInTime",
             headerName: "Check In",
-            width: 120,
+            width: 100,
             editable: true,
             renderEditCell: (params) => (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -258,10 +258,11 @@ const TableComponent = ({
                     <input
                       {...props}
                       style={{
-                        fontSize: "14px",
+                        fontSize: "12px",
                         height: "24px",
+                        textAlign: "center",
                         width: "100%",
-                        border: "1px solid #ccc",
+                        border: "none",
                         borderRadius: "6px",
                         padding: "4px",
                         outline: "none",
@@ -275,6 +276,9 @@ const TableComponent = ({
                     "& .MuiInputBase-root": {
                       height: "24px",
                       fontSize: "14px",
+                    },
+                    "& .MuiInputBase-root input": {
+                      textAlign: "center",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -324,10 +328,11 @@ const TableComponent = ({
                     <input
                       {...props}
                       style={{
-                        fontSize: "14px",
+                        fontSize: "12px",
                         height: "24px",
+                        textAlign: "center",
                         width: "100%",
-                        border: "1px solid #ccc",
+                        border: "none",
                         borderRadius: "6px",
                         padding: "4px",
                         outline: "none",
@@ -341,6 +346,9 @@ const TableComponent = ({
                     "& .MuiInputBase-root": {
                       height: "24px",
                       fontSize: "14px",
+                    },
+                    "& .MuiInputBase-root input": {
+                      textAlign: "center",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -407,16 +415,37 @@ const TableComponent = ({
           {
             field: "fullname",
             headerName: "Full Name",
-            width: 130,
+            width: 150,
             editable: true,
             handleRowEdit: (params) => {
-              handleRowEdit(params.row);
+              <input
+                type="text"
+                value={params.value}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  params.api.setEditCellValue({
+                    id: params.id,
+                    field: "fullname",
+                    value: value,
+                  });
+                }}
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  width: "100%",
+                  border: "none",
+                  borderRadius: "6px",
+                  padding: "4px",
+                  outline: "none",
+                  backgroundColor: "#fff",
+                }}
+              />;
             },
           },
           {
             field: "mobileNumber",
-            headerName: "Mobile Number",
-            width: 130,
+            headerName: "Mobile",
+            width: 100,
             editable: true,
             type: "number",
             renderEditCell: (params) => (
@@ -464,6 +493,7 @@ const TableComponent = ({
             maxHeight: "25px",
             fontStyle: "normal",
             fontWeight: "bold",
+            padding: "0px",
           },
           "& .MuiDataGrid-footerContainer": {
             display: "none",
@@ -487,6 +517,12 @@ const TableComponent = ({
           "& .MuiDataGrid-columnHeaderTitleContainer": {
             display: "flex",
             justifyContent: "center",
+          },
+          "& .MuiDataGrid-row--editing": {
+            boxShadow: "none",
+          },
+          "& .MuiDataGrid-cell--editing": {
+            boxShadow: "none",
           },
         }}
       />
