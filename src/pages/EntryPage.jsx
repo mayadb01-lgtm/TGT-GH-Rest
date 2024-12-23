@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   Typography,
   Box,
@@ -12,107 +12,17 @@ import {
 import Grid from "@mui/material/Grid2";
 import TableComponent from "../components/TableComponent";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { createEntry, getEntriesByDate } from "../redux/actions/entryAction";
+import { createEntry } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
-
+import SummaryTable from "../components/SummaryTable";
+import { paymentColors, processEntriesByPaymentMode } from "../utils/utils";
 dayjs.locale("en-gb");
-// Utility function to process entries by payment mode
-const processEntriesByPaymentMode = (data, mode) => {
-  if (data.length === 0) return [];
-  return data.filter((row) => row.modeOfPayment === mode);
-};
-
-const paymentColors = {
-  Card: "rgb(75, 144, 127)",
-  PPC: "rgb(199, 133, 189)",
-  PPS: "rgb(134, 165, 55)",
-  Cash: "rgb(44, 190, 132)",
-  UnPaid: "rgb(234,138,122)",
-  Select: "rgb(48, 123, 161)",
-};
-
-// Reusable SummaryTable component
-const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
-  const finalRows = [...dayRows, ...nightRows].filter(
-    (row) => row.rate !== 0 && row.noOfPeople !== 0
-  );
-
-  if (finalRows.length > 0) {
-    finalRows[finalRows.length] = {
-      id: `Total ${title}`,
-      roomNo: "",
-      rate: finalRows.reduce((sum, row) => sum + row.rate, 0),
-      fullname: "",
-      noOfPeople: "",
-    };
-  }
-
-  return (
-    <Box
-      style={{
-        margin: 0,
-        padding: 0,
-        fontSize: "12px",
-      }}
-    >
-      <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
-        {" "}
-        {/* Compact spacing */}
-        <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
-          {" "}
-          {/* Width 50% for side-by-side layout */}
-          <Typography
-            variant="subtitle2"
-            fontWeight={500}
-            style={{
-              marginBottom: "4px",
-              padding: "4px",
-            }}
-          >
-            {title}
-          </Typography>
-          <DataGrid
-            rows={finalRows}
-            columns={columns}
-            pageSize={5}
-            rowsPerPageOptions={[5, 10, 20]}
-            style={{
-              fontSize: "12px",
-              height: "220px",
-              width: "100%",
-              backgroundColor: color,
-              color: "white",
-            }}
-            rowHeight={25}
-            disableColumnMenu
-            disableColumnSorting
-            showColumnVerticalBorder
-            disableColumnResize
-            sx={{
-              "& .MuiDataGrid-columnHeader": {
-                maxHeight: "25px",
-                backgroundColor: color,
-              },
-              "& .MuiDataGrid-footerContainer": {
-                display: "none",
-              },
-              "& .MuiDataGrid-scrollbar": {
-                display: "none",
-              },
-            }}
-          />
-        </Box>
-      </Stack>
-    </Box>
-  );
-};
 
 const EntryPage = () => {
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
@@ -122,9 +32,6 @@ const EntryPage = () => {
     dayjs().format("DD-MM-YYYY")
   );
   const dispatch = useDispatch();
-
-  const handleDaySubmit = (data) => setDayData(data);
-  const handleNightSubmit = (data) => setNightData(data);
 
   let processedEntries = useMemo(() => {
     const cashDay = processEntriesByPaymentMode(dayData, "Cash");
@@ -243,10 +150,12 @@ const EntryPage = () => {
 
         const dayEntries = filteredDayData.map((row) => ({
           ...row,
+          period: "day",
           date: selectedDate,
         }));
         const nightEntries = filteredNightData.map((row) => ({
           ...row,
+          period: "night",
           date: selectedDate,
         }));
 
@@ -262,9 +171,7 @@ const EntryPage = () => {
         // Create a Dialog Box to confirm the submission
         if (
           !window.confirm(
-            `Are you sure you want to submit entries for ${selectedDate.format(
-              "DD-MM-YYYY"
-            )}?`
+            `Are you sure you want to submit entries for ${selectedDate}?`
           )
         ) {
           return;
@@ -291,13 +198,6 @@ const EntryPage = () => {
     }
     console.log("Cancelled entries");
   };
-
-  // For Admin Users - Fetch Entries by Date
-  useEffect(() => {
-    if (selectedDate && isAdminAuthenticated) {
-      dispatch(getEntriesByDate(selectedDate));
-    }
-  }, [selectedDate, isAdminAuthenticated, dispatch]);
 
   return (
     <>
@@ -398,6 +298,7 @@ const EntryPage = () => {
               </AccordionSummary>
               <AccordionDetails style={{ margin: "0", padding: "0" }}>
                 <TableComponent
+                  selectedDate={selectedDate}
                   dayOrNight="Day"
                   title="Day Entry Table"
                   rowsLength={11}
@@ -414,7 +315,7 @@ const EntryPage = () => {
                     10: 1500,
                     11: 1500,
                   }}
-                  onSubmit={handleDaySubmit}
+                  onSubmit={setDayData}
                 />
               </AccordionDetails>
             </Accordion>
@@ -461,6 +362,7 @@ const EntryPage = () => {
               </AccordionSummary>
               <AccordionDetails style={{ margin: "0", padding: "0" }}>
                 <TableComponent
+                  selectedDate={selectedDate}
                   dayOrNight="Night"
                   title="Night Entry Table"
                   rowsLength={11}
@@ -477,7 +379,7 @@ const EntryPage = () => {
                     10: 1500,
                     11: 1500,
                   }}
-                  onSubmit={handleNightSubmit}
+                  onSubmit={setNightData}
                 />
               </AccordionDetails>
             </Accordion>
