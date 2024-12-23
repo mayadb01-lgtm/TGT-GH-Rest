@@ -6,8 +6,8 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
-  Button,
   TextField,
+  Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import TableComponent from "../components/TableComponent";
@@ -18,7 +18,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createEntry } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 
@@ -30,11 +30,12 @@ const processEntriesByPaymentMode = (data, mode) => {
 };
 
 const paymentColors = {
-  Card: "rgb(74,116,106)",
-  Online: "rgb(231,213,173)",
-  Cash: "rgb(99,186,151)",
+  Card: "rgb(75, 144, 127)",
+  PPC: "rgb(199, 133, 189)",
+  PPS: "rgb(134, 165, 55)",
+  Cash: "rgb(44, 190, 132)",
   UnPaid: "rgb(234,138,122)",
-  Select: "#e0e0e0", // Grey
+  Select: "rgb(48, 123, 161)",
 };
 
 // Reusable SummaryTable component
@@ -102,6 +103,9 @@ const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
               "& .MuiDataGrid-footerContainer": {
                 display: "none",
               },
+              "& .MuiDataGrid-scrollbar": {
+                display: "none",
+              },
             }}
           />
         </Box>
@@ -111,6 +115,7 @@ const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
 };
 
 const EntryPage = () => {
+  const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(
@@ -126,15 +131,18 @@ const EntryPage = () => {
     const cashNight = processEntriesByPaymentMode(nightData, "Cash");
     const cardDay = processEntriesByPaymentMode(dayData, "Card");
     const cardNight = processEntriesByPaymentMode(nightData, "Card");
-    const onlineDay = processEntriesByPaymentMode(dayData, "Online");
-    const onlineNight = processEntriesByPaymentMode(nightData, "Online");
+    const ppsDay = processEntriesByPaymentMode(dayData, "PPS");
+    const ppsNight = processEntriesByPaymentMode(nightData, "PPS");
+    const ppcDay = processEntriesByPaymentMode(dayData, "PPC");
+    const ppcNight = processEntriesByPaymentMode(nightData, "PPC");
     const unpaidDay = processEntriesByPaymentMode(dayData, "UnPaid");
     const unpaidNight = processEntriesByPaymentMode(nightData, "UnPaid");
 
     return {
       cash: { day: cashDay, night: cashNight },
       card: { day: cardDay, night: cardNight },
-      online: { day: onlineDay, night: onlineNight },
+      pps: { day: ppsDay, night: ppsNight },
+      ppc: { day: ppcDay, night: ppcNight },
       unpaid: { day: unpaidDay, night: unpaidNight },
     };
   }, [dayData, nightData]);
@@ -152,8 +160,8 @@ const EntryPage = () => {
 
   // Columns for Total DataGrid
   const modeColumns = [
-    { field: "id", headerName: "Revenue", width: 150 },
-    { field: "totals", headerName: "Total", width: 100 },
+    { field: "id", headerName: "Revenue", width: "160" },
+    { field: "totals", headerName: "Total", width: "160" },
   ];
 
   const modeRows = [
@@ -170,10 +178,16 @@ const EntryPage = () => {
         calculateTotal(processedEntries.card.night),
     },
     {
-      id: "Online",
+      id: "PPS",
       totals:
-        calculateTotal(processedEntries.online.day) +
-        calculateTotal(processedEntries.online.night),
+        calculateTotal(processedEntries.pps.day) +
+        calculateTotal(processedEntries.pps.night),
+    },
+    {
+      id: "PPC",
+      totals:
+        calculateTotal(processedEntries.ppc.day) +
+        calculateTotal(processedEntries.ppc.night),
     },
     {
       id: "UnPaid",
@@ -310,6 +324,8 @@ const EntryPage = () => {
                         padding: 1,
                       },
                     }}
+                    disableFuture={isAdminAuthenticated ? false : true}
+                    disablePast={isAdminAuthenticated ? false : true}
                   />
                 </LocalizationProvider>
               </Stack>
@@ -324,7 +340,7 @@ const EntryPage = () => {
                 id="day-entries-header"
                 style={{
                   backgroundColor: "rbga(41,43,44,0.1)",
-                  borderBottom: "1px solid #e0e0e0",
+                  border: "1px solid #e0e0e0",
                   minHeight: "0",
                   height: "40px",
                   boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
@@ -483,12 +499,34 @@ const EntryPage = () => {
                   sx={{ padding: "0 8px" }}
                 >
                   <SummaryTable
-                    title="Online Entries Summary"
-                    dayRows={processedEntries.online.day}
-                    nightRows={processedEntries.online.night}
+                    title="PPS Entries Summary"
+                    dayRows={processedEntries.pps.day}
+                    nightRows={processedEntries.pps.night}
                     columns={columns}
-                    color={paymentColors.Online}
+                    color={paymentColors.PPS}
                   />
+                  <SummaryTable
+                    title="PPC Entries Summary"
+                    dayRows={processedEntries.ppc.day}
+                    nightRows={processedEntries.ppc.night}
+                    columns={columns}
+                    color={paymentColors.PPC}
+                  />
+                </Stack>
+              </Box>
+            </Grid>
+          </Grid>
+          <Grid
+            size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
+            display={"flex"}
+          >
+            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+              <Box>
+                <Stack
+                  direction="column"
+                  spacing={0.5}
+                  sx={{ padding: "0 8px" }}
+                >
                   <SummaryTable
                     title="UnPaid Entries Summary"
                     dayRows={processedEntries.unpaid.day}
@@ -499,93 +537,62 @@ const EntryPage = () => {
                 </Stack>
               </Box>
             </Grid>
-          </Grid>
-          <Box>
-            <Stack
-              direction="row"
-              spacing={1}
-              display={"flex"}
-              sx={{
-                margin: "0",
-                width: "100%",
-                flex: 1,
-              }}
-            >
-              <Box
-                style={{
-                  margin: "2px 0",
-                  padding: "0",
-                  width: "100%",
-                  flex: 0.55,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  color="primary"
-                  fontSize={14}
-                  fontWeight={500}
-                  style={{ marginInline: "8px" }}
+            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+              <Box>
+                <Stack
+                  direction="column"
+                  spacing={0.5}
+                  sx={{ padding: "0 8px" }}
                 >
-                  Revenue Summary
-                </Typography>
-                <DataGrid
-                  rows={modeRows}
-                  columns={modeColumns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5]}
-                  style={{
-                    fontSize: "12px",
-                    marginInline: "8px",
-                  }}
-                  rowHeight={30}
-                  disableColumnMenu
-                  disableColumnSorting
-                  sx={{
-                    "& .MuiDataGrid-columnHeader": {
-                      maxHeight: "30px",
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                      display: "none",
-                    },
-                  }}
-                />
+                  <SummaryTable
+                    title="Revenue Summary"
+                    dayRows={modeRows}
+                    nightRows={[]}
+                    columns={modeColumns}
+                    color={paymentColors.Select}
+                  />
+                </Stack>
               </Box>
-              <Box
-                style={{
-                  margin: "2px 0",
-                  padding: "0",
-                  width: "100%",
-                  flex: 0.5,
-                  flexDirection: "column",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={500}
-                  style={{ margin: "4px" }}
-                  color="primary"
-                >
-                  Save and Submit Entries for Date
-                </Typography>
+            </Grid>
+          </Grid>
+          <Grid
+            size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
+            display={"flex"}
+          >
+            <Box style={{ padding: "8px" }}>
+              <Typography variant="subtitle2" fontWeight={500}>
+                Submit Entries
+              </Typography>
+              <Stack direction="row" spacing={2}>
                 <Button
-                  variant="outlined"
-                  color="primary"
-                  style={{ margin: "2px" }}
                   onClick={handleEntrySubmit}
+                  variant="outlined"
+                  color="success"
+                  sx={{
+                    margin: "0px 8px",
+                    "&:hover": {
+                      backgroundColor: "#a3d9a5",
+                    },
+                  }}
                 >
                   Submit
                 </Button>
                 <Button
-                  variant="outlined"
-                  color="secondary"
-                  style={{ margin: "2px" }}
                   onClick={handleCancelClick}
+                  variant="outlined"
+                  color="error"
+                  sx={{
+                    margin: "0px 4px",
+                    "&:hover": {
+                      backgroundColor: "#f28b82",
+                    },
+                  }}
                 >
                   Cancel
                 </Button>
-              </Box>
-            </Stack>
-          </Box>
+              </Stack>
+            </Box>
+          </Grid>
         </Grid>
       </Grid>
       <Toaster position="top-center" />

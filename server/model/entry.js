@@ -22,7 +22,7 @@ const entrySchemaObj = new Schema(
     },
     modeOfPayment: {
       type: String,
-      enum: ["Online", "Cash", "Card", "UPI"],
+      enum: ["Cash", "Card", "UPI", "PPS", "PPC"],
       required: true,
     },
     fullname: { type: String, default: "" },

@@ -24,13 +24,13 @@ const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
 };
 
 const paymentColors = {
-  Card: "rgb(74,116,106)",
-  Online: "rgb(231,213,173)",
-  Cash: "rgb(99,186,151)",
+  Card: "rgb(75, 144, 127)",
+  PPC: "rgb(199, 133, 189)",
+  PPS: "rgb(134, 165, 55)",
+  Cash: "rgb(44, 190, 132)",
   UnPaid: "rgb(234,138,122)",
-  Select: "#e0e0e0", // Grey
+  Select: "rgb(48, 123, 161)",
 };
-
 // Dropdown Cell Renderer
 const DropdownCell = ({ value, options, onChange }) => (
   <FormControl
@@ -445,7 +445,7 @@ const TableComponent = ({
             renderCell: (params) => (
               <DropdownCell
                 value={params.row.modeOfPayment}
-                options={["Select", "Card", "Online", "Cash", "UnPaid"]}
+                options={["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"]}
                 onChange={(value) =>
                   handleRowEdit({ ...params.row, modeOfPayment: value })
                 }
