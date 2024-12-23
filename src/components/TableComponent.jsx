@@ -23,13 +23,25 @@ const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
   }));
 };
 
+const paymentColors = {
+  Card: "rgb(74,116,106)",
+  Online: "rgb(231,213,173)",
+  Cash: "rgb(99,186,151)",
+  UnPaid: "rgb(234,138,122)",
+  Select: "#e0e0e0", // Grey
+};
+
 // Dropdown Cell Renderer
 const DropdownCell = ({ value, options, onChange }) => (
   <FormControl
     size="small"
     style={{
       height: "100%",
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
       justifyContent: "center",
+      backgroundColor: paymentColors[value],
     }}
   >
     <Select
@@ -39,13 +51,25 @@ const DropdownCell = ({ value, options, onChange }) => (
       variant="outlined"
       style={{
         fontSize: "12px",
-        padding: "2px 8px",
-        height: "80%",
+        padding: "0px",
+        height: "100%",
+        width: "100%",
         lineHeight: "normal",
+        "&:hover": {
+          backgroundColor: "transparent",
+        },
       }}
+      // IconComponent={() => null}
     >
       {options.map((option) => (
-        <option key={option} value={option}>
+        <option
+          key={option}
+          value={option}
+          style={{
+            color: option === "Select" ? "black" : "white",
+            backgroundColor: paymentColors[option] || "black",
+          }}
+        >
           {option}
         </option>
       ))}
@@ -77,14 +101,12 @@ const TableComponent = ({
       )
     );
   };
-
-  // Calculate totals
   const totalsRow = {
     id: "totals",
     roomNo: "Totals",
     cost: "",
     rate: rows.reduce((sum, row) => sum + row.rate, 0),
-    noOfPeople: "",
+    noOfPeople: rows.reduce((sum, row) => sum + row.noOfPeople, 0),
     type: "",
     modeOfPayment: "",
     fullname: "",
@@ -114,6 +136,7 @@ const TableComponent = ({
               <input
                 type="number"
                 value={params.value}
+                className="light-gray"
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value > 0 && value <= 11) {
@@ -132,7 +155,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />
             ),
@@ -149,6 +171,7 @@ const TableComponent = ({
               <input
                 type="number"
                 value={params.value}
+                className="light-gray"
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value >= 0) {
@@ -167,7 +190,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />
             ),
@@ -184,6 +206,7 @@ const TableComponent = ({
               <input
                 type="number"
                 value={params.value}
+                className="orange"
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value >= 0) {
@@ -202,7 +225,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />
             ),
@@ -220,6 +242,7 @@ const TableComponent = ({
               <input
                 type="number"
                 value={params.value}
+                className="orange"
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value >= 0) {
@@ -238,7 +261,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />
             ),
@@ -246,7 +268,7 @@ const TableComponent = ({
           {
             field: "checkInTime",
             headerName: "Check In",
-            width: 100,
+            width: 120,
             editable: true,
             cellClassName: "blue",
             headerClassName: "blue",
@@ -276,9 +298,9 @@ const TableComponent = ({
                         borderRadius: "6px",
                         padding: "4px",
                         outline: "none",
-                        backgroundColor: "#fff",
                       }}
-                      placeholder="Select Time" // Placeholder text
+                      placeholder="Select Time"
+                      className="blue"
                     />
                   )}
                   ampm
@@ -286,6 +308,7 @@ const TableComponent = ({
                     "& .MuiInputBase-root": {
                       height: "24px",
                       fontSize: "14px",
+                      color: "white",
                     },
                     "& .MuiInputBase-root input": {
                       textAlign: "center",
@@ -348,9 +371,9 @@ const TableComponent = ({
                         borderRadius: "6px",
                         padding: "4px",
                         outline: "none",
-                        backgroundColor: "#fff",
                       }}
-                      placeholder="Select Time" // Placeholder text
+                      placeholder="Select Time"
+                      className="blue"
                     />
                   )}
                   ampm
@@ -358,6 +381,7 @@ const TableComponent = ({
                     "& .MuiInputBase-root": {
                       height: "24px",
                       fontSize: "14px",
+                      color: "white",
                     },
                     "& .MuiInputBase-root input": {
                       textAlign: "center",
@@ -390,7 +414,7 @@ const TableComponent = ({
           {
             field: "type",
             headerName: "Type",
-            width: 120,
+            width: 100,
             cellClassName: "orange",
             headerClassName: "orange",
             renderCell: (params) => (
@@ -415,7 +439,7 @@ const TableComponent = ({
           {
             field: "modeOfPayment",
             headerName: "Payment",
-            width: 120,
+            width: 100,
             cellClassName: "orange",
             headerClassName: "orange",
             renderCell: (params) => (
@@ -439,6 +463,7 @@ const TableComponent = ({
               <input
                 type="text"
                 value={params.value}
+                className="blue"
                 onChange={(e) => {
                   const value = e.target.value;
                   params.api.setEditCellValue({
@@ -455,7 +480,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />;
             },
@@ -463,7 +487,7 @@ const TableComponent = ({
           {
             field: "mobileNumber",
             headerName: "Mobile",
-            width: 110,
+            width: 120,
             editable: true,
             type: "number",
             cellClassName: "blue",
@@ -472,6 +496,7 @@ const TableComponent = ({
               <input
                 type="number"
                 value={params.value}
+                className="blue"
                 onChange={(e) => {
                   const value = e.target.value;
                   if (value.length <= 10) {
@@ -490,7 +515,6 @@ const TableComponent = ({
                   borderRadius: "6px",
                   padding: "4px",
                   outline: "none",
-                  backgroundColor: "#fff",
                 }}
               />
             ),
@@ -533,6 +557,7 @@ const TableComponent = ({
           "& .MuiDataGrid-cell": {
             display: "flex",
             justifyContent: "center",
+            padding: "0px",
           },
           "& .MuiDataGrid-columnHeaderTitleContainer": {
             display: "flex",
@@ -560,11 +585,31 @@ const TableComponent = ({
             backgroundColor: "rgb(38,177,76)",
             color: "white",
           },
+          "& .orange.orange": {
+            backgroundColor: "rgb(247,180,38)",
+            color: "white",
+          },
+          "& .blue.blue": {
+            backgroundColor: "rgb(30,97,255)",
+            color: "white",
+          },
+          "& .light-gray.light-gray": {
+            backgroundColor: "rgb(164,169,175)",
+            color: "white",
+          },
+          "& .green.green": {
+            backgroundColor: "rgb(38,177,76)",
+            color: "white",
+          },
           "& .MuiFormControl-root": {
             color: "white",
           },
           "& .MuiNativeSelect-select": {
             color: "white",
+            // padding: "0px",
+          },
+          "& .MuiNativeSelect-select select": {
+            padding: "0px",
           },
           "& .MuiNativeSelect-select option": {
             color: "black",
@@ -576,6 +621,7 @@ const TableComponent = ({
         getCellClassName={(params) => {
           return params.id === "totals" ? "green" : "";
         }}
+        disableColumnResize
       />
     </div>
   );
