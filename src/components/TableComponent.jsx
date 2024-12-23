@@ -532,6 +532,9 @@ const TableComponent = ({
         }}
         showCellVerticalBorder
         rowHeight={25}
+        style={{
+          color: "white",
+        }}
         sx={{
           "& .MuiDataGrid-columnHeader": {
             maxHeight: "25px",

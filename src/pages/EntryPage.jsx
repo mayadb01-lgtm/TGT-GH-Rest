@@ -29,8 +29,16 @@ const processEntriesByPaymentMode = (data, mode) => {
   return data.filter((row) => row.modeOfPayment === mode);
 };
 
+const paymentColors = {
+  Card: "rgb(74,116,106)",
+  Online: "rgb(231,213,173)",
+  Cash: "rgb(99,186,151)",
+  UnPaid: "rgb(234,138,122)",
+  Select: "#e0e0e0", // Grey
+};
+
 // Reusable SummaryTable component
-const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
+const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
   const finalRows = [...dayRows, ...nightRows].filter(
     (row) => row.rate !== 0 && row.noOfPeople !== 0
   );
@@ -62,7 +70,10 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
           <Typography
             variant="subtitle2"
             fontWeight={500}
-            style={{ marginBottom: "4px" }} // Compact spacing
+            style={{
+              marginBottom: "4px",
+              padding: "4px",
+            }}
           >
             {title}
           </Typography>
@@ -75,13 +86,18 @@ const SummaryTable = ({ title, dayRows, nightRows, columns }) => {
               fontSize: "12px",
               height: "220px",
               width: "100%",
+              backgroundColor: color,
+              color: "white",
             }}
             rowHeight={25}
             disableColumnMenu
             disableColumnSorting
+            showColumnVerticalBorder
+            disableColumnResize
             sx={{
               "& .MuiDataGrid-columnHeader": {
                 maxHeight: "25px",
+                backgroundColor: color,
               },
               "& .MuiDataGrid-footerContainer": {
                 display: "none",
@@ -430,7 +446,7 @@ const EntryPage = () => {
         </Grid>
 
         {/* Right Side: Filters Table */}
-        <Grid size={{ xs: 12, sm: 5, md: 5, lg: 5, xl: 5 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5, xl: 5 }}>
           <Grid
             size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
             display={"flex"}
@@ -447,12 +463,14 @@ const EntryPage = () => {
                     dayRows={processedEntries.cash.day}
                     nightRows={processedEntries.cash.night}
                     columns={columns}
+                    color={paymentColors.Cash}
                   />
                   <SummaryTable
                     title="Card Entries Summary"
                     dayRows={processedEntries.card.day}
                     nightRows={processedEntries.card.night}
                     columns={columns}
+                    color={paymentColors.Card}
                   />
                 </Stack>
               </Box>
@@ -469,12 +487,14 @@ const EntryPage = () => {
                     dayRows={processedEntries.online.day}
                     nightRows={processedEntries.online.night}
                     columns={columns}
+                    color={paymentColors.Online}
                   />
                   <SummaryTable
                     title="UnPaid Entries Summary"
                     dayRows={processedEntries.unpaid.day}
                     nightRows={processedEntries.unpaid.night}
                     columns={columns}
+                    color={paymentColors.UnPaid}
                   />
                 </Stack>
               </Box>
