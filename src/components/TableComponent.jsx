@@ -102,7 +102,7 @@ const TableComponent = ({
     );
   };
   const totalsRow = {
-    id: "totals",
+    id: `${dayOrNight}-totals`,
     roomNo: "Totals",
     cost: "",
     rate: rows.reduce((sum, row) => sum + row.rate, 0),
@@ -197,7 +197,7 @@ const TableComponent = ({
           {
             field: "rate",
             headerName: "Rate",
-            width: 60,
+            width: 80,
             editable: true,
             type: "number",
             cellClassName: "orange",
@@ -229,7 +229,6 @@ const TableComponent = ({
               />
             ),
           },
-
           {
             field: "noOfPeople",
             headerName: "People",

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -19,7 +19,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { createEntry } from "../redux/actions/entryAction";
+import { createEntry, getEntriesByDate } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 
 dayjs.locale("en-gb");
@@ -46,7 +46,7 @@ const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
 
   if (finalRows.length > 0) {
     finalRows[finalRows.length] = {
-      id: "Total",
+      id: `Total ${title}`,
       roomNo: "",
       rate: finalRows.reduce((sum, row) => sum + row.rate, 0),
       fullname: "",
@@ -198,33 +198,49 @@ const EntryPage = () => {
     { id: "Total", totals: 0 },
   ];
 
-  modeRows[4].totals = modeRows.reduce(
+  modeRows[5].totals = modeRows.reduce(
     (sum, row, idx) => (idx < 4 ? sum + row.totals : sum),
     0
   );
 
   const handleDateChange = (newDate) => {
-    if (modeRows[4].totals > 0) {
+    if (modeRows[5].totals > 0) {
       if (window.confirm("Are you sure you want to change the date?")) {
-        setSelectedDate(dayjs(newDate, "DD-MM-YYYY"));
+        setSelectedDate(newDate.format("DD-MM-YYYY"));
         setDayData([]);
         setNightData([]);
       }
+    } else {
+      setSelectedDate(newDate.format("DD-MM-YYYY"));
+      setDayData([]);
+      setNightData([]);
     }
   };
 
   const handleEntrySubmit = async () => {
     try {
-      if (modeRows[4].totals === 0) {
+      if (modeRows[5].totals === 0) {
         toast.error("Please enter some data before submitting.");
         console.log("Please enter some data before submitting.");
       } else {
         const filteredDayData = dayData.filter(
-          (row) => row.rate !== 0 && row.noOfPeople !== 0
+          (row) =>
+            row.rate !== 0 &&
+            row.noOfPeople !== 0 &&
+            row.type !== "" &&
+            row.modeOfPayment !== ""
         );
         const filteredNightData = nightData.filter(
-          (row) => row.rate !== 0 && row.noOfPeople !== 0
+          (row) =>
+            row.rate !== 0 &&
+            row.noOfPeople !== 0 &&
+            row.type !== "" &&
+            row.modeOfPayment !== ""
         );
+
+        filteredDayData.sort((a, b) => a.roomNo - b.roomNo);
+        filteredNightData.sort((a, b) => a.roomNo - b.roomNo);
+
         const dayEntries = filteredDayData.map((row) => ({
           ...row,
           date: selectedDate,
@@ -235,7 +251,7 @@ const EntryPage = () => {
         }));
 
         const combinedEntries = [...dayEntries, ...nightEntries];
-        // Do we need to convert the combinedEntries to Stringify?
+
         const strCombinedEntries = JSON.stringify(combinedEntries);
 
         const entryObj = {
@@ -275,6 +291,13 @@ const EntryPage = () => {
     }
     console.log("Cancelled entries");
   };
+
+  // For Admin Users - Fetch Entries by Date
+  useEffect(() => {
+    if (selectedDate && isAdminAuthenticated) {
+      dispatch(getEntriesByDate(selectedDate));
+    }
+  }, [selectedDate, isAdminAuthenticated, dispatch]);
 
   return (
     <>
@@ -555,23 +578,26 @@ const EntryPage = () => {
               </Box>
             </Grid>
           </Grid>
-          <Grid
-            size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
-            display={"flex"}
-          >
-            <Box style={{ padding: "8px" }}>
-              <Typography variant="subtitle2" fontWeight={500}>
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Box
+              sx={{ px: 2 }}
+              flexDirection={"row"}
+              display={"flex"}
+              alignItems={"center"}
+              gap={2}
+            >
+              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
                 Submit Entries
               </Typography>
-              <Stack direction="row" spacing={2}>
+              <Stack direction="row" spacing={1}>
                 <Button
                   onClick={handleEntrySubmit}
-                  variant="outlined"
+                  variant="contained"
                   color="success"
                   sx={{
-                    margin: "0px 8px",
+                    px: 3,
                     "&:hover": {
-                      backgroundColor: "#a3d9a5",
+                      backgroundColor: "#81c784",
                     },
                   }}
                 >
@@ -579,12 +605,12 @@ const EntryPage = () => {
                 </Button>
                 <Button
                   onClick={handleCancelClick}
-                  variant="outlined"
+                  variant="contained"
                   color="error"
                   sx={{
-                    margin: "0px 4px",
+                    px: 3,
                     "&:hover": {
-                      backgroundColor: "#f28b82",
+                      backgroundColor: "#e57373",
                     },
                   }}
                 >
