@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { FormControl, Select } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import { getEntriesByDate } from "../redux/actions/entryAction";
+import DropdownCell from "./DropdownCell";
 
 const initializeRows = (period, rowsLength, roomCosts) => {
   return Array.from({ length: rowsLength }, (_, i) => ({
@@ -23,60 +23,6 @@ const initializeRows = (period, rowsLength, roomCosts) => {
     checkOutTime: "10:00 AM",
   }));
 };
-
-const paymentColors = {
-  Card: "rgb(75, 144, 127)",
-  PPC: "rgb(199, 133, 189)",
-  PPS: "rgb(134, 165, 55)",
-  Cash: "rgb(44, 190, 132)",
-  UnPaid: "rgb(234,138,122)",
-  Select: "rgb(48, 123, 161)",
-};
-
-// Dropdown Cell Renderer
-const DropdownCell = ({ value, options, onChange }) => (
-  <FormControl
-    size="small"
-    style={{
-      height: "100%",
-      width: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: paymentColors[value],
-    }}
-  >
-    <Select
-      native
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      variant="outlined"
-      style={{
-        fontSize: "12px",
-        padding: "0px",
-        height: "100%",
-        width: "100%",
-        lineHeight: "normal",
-        "&:hover": {
-          backgroundColor: "transparent",
-        },
-      }}
-    >
-      {options.map((option) => (
-        <option
-          key={option}
-          value={option}
-          style={{
-            color: option === "Select" ? "black" : "white",
-            backgroundColor: paymentColors[option] || "black",
-          }}
-        >
-          {option}
-        </option>
-      ))}
-    </Select>
-  </FormControl>
-);
 
 const TableComponent = ({
   title,

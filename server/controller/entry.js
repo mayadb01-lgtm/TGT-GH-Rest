@@ -204,4 +204,25 @@ router.put("/update-entry/:date", async (req, res) => {
   }
 });
 
+// Get All modeOfPayment = "Unpaid" Entries
+router.get("/get-unpaid-entries", async (req, res) => {
+  try {
+    const entries = await Entry.find({});
+
+    const unpaidEntries = entries.flatMap((entry) =>
+      entry.entry.filter((item) => item.modeOfPayment === "UnPaid")
+    );
+
+    res.status(200).json({
+      success: true,
+      data: unpaidEntries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export default router;

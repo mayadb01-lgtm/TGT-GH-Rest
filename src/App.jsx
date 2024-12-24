@@ -16,6 +16,7 @@ import { Box, CircularProgress } from "@mui/material";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminSignupPage from "./pages/AdminSignupPage.jsx";
 import { loadAdmin } from "./redux/actions/adminAction.js";
+import { getUnPaidEntries } from "./redux/actions/entryAction.js";
 import AdminResetPasswordPage from "./pages/AdminResetPasswordPage.jsx";
 import UserResetPasswordPage from "./pages/UserResetPasswordPage.jsx";
 import "./App.css";
@@ -26,6 +27,7 @@ const App = () => {
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadAdmin());
+    Store.dispatch(getUnPaidEntries());
   }, []);
 
   if (userLoading || adminLoading) {

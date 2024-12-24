@@ -2,6 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   entries: [],
+  unpaidEntries: [],
   loading: true,
   error: null,
 };
@@ -72,6 +73,18 @@ const entryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.entries = [];
+    })
+    // Get All UnPaid Entries
+    .addCase("GetUnPaidEntriesRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetUnPaidEntriesSuccess", (state, action) => {
+      state.loading = false;
+      state.unpaidEntries = action.payload;
+    })
+    .addCase("GetUnPaidEntriesFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     });
 });
 

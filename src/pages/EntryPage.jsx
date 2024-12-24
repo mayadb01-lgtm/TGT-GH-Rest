@@ -22,6 +22,7 @@ import { createEntry, updateEntryByDate } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 import SummaryTable from "../components/SummaryTable";
 import { paymentColors, processEntriesByPaymentMode } from "../utils/utils";
+import PendingJamaTable from "../components/PendingJamaTable";
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
@@ -492,8 +493,6 @@ const EntryPage = () => {
             <Accordion defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls="night-entries-content"
-                id="night-entries-header"
                 style={{
                   backgroundColor: "rbga(41,43,44,0.1)",
                   borderBottom: "1px solid #e0e0e0",
@@ -677,6 +676,49 @@ const EntryPage = () => {
                   }}
                   onSubmit={setExtraNightData}
                 />
+              </AccordionDetails>
+            </Accordion>
+            {/* Custom Entry - UnPaid Entries */}
+            <Accordion defaultExpanded>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                style={{
+                  backgroundColor: "rbga(41,43,44,0.1)",
+                  borderBottom: "1px solid #e0e0e0",
+                  minHeight: "0",
+                  height: "40px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  flex={1}
+                  justifyContent={"space-between"}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "14px",
+                    }}
+                  >
+                    Pending Jama Entries
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "14px",
+                    }}
+                  >
+                    Aashirvad Guest House
+                  </Typography>
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails style={{ margin: "0", padding: "0" }}>
+                <PendingJamaTable />
               </AccordionDetails>
             </Accordion>
           </Box>

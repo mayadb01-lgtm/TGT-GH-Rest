@@ -68,3 +68,21 @@ export const updateEntryByDate = (date, entryData) => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Get UnPaid Entries
+export const getUnPaidEntries = () => async (dispatch) => {
+  try {
+    dispatch({ type: "GetUnPaidEntriesRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/entry/get-unpaid-entries`
+    );
+    console.log("UnPaid Entries fetched successfully", data);
+    dispatch({ type: "GetUnPaidEntriesSuccess", payload: data.data });
+  } catch (error) {
+    dispatch({
+      type: "GetUnPaidEntriesFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
