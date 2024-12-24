@@ -8,19 +8,19 @@ import { MobileTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import { getEntriesByDate } from "../redux/actions/entryAction";
 
-const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
+const initializeRows = (period, rowsLength, roomCosts) => {
   return Array.from({ length: rowsLength }, (_, i) => ({
-    id: `${dayOrNight} - ${i + 1}`,
+    id: `${period} - ${i + 1}`,
     roomNo: i + 1,
     cost: roomCosts[i + 1] || 0,
     rate: 0,
     noOfPeople: 0,
     type: "",
     modeOfPayment: "",
-    fullname: "",
-    mobileNumber: 0,
-    checkInTime: "",
-    checkOutTime: "",
+    fullname: `${period} - ${i + 1} Name`,
+    mobileNumber: 1234567890,
+    checkInTime: "11:00 AM",
+    checkOutTime: "10:00 AM",
   }));
 };
 
@@ -80,7 +80,7 @@ const DropdownCell = ({ value, options, onChange }) => (
 
 const TableComponent = ({
   title,
-  dayOrNight,
+  period,
   rowsLength,
   roomCosts,
   onSubmit,
@@ -91,7 +91,7 @@ const TableComponent = ({
   const dispatch = useDispatch();
 
   const [rows, setRows] = useState(
-    initializeRows(dayOrNight, rowsLength, roomCosts)
+    initializeRows(period, rowsLength, roomCosts)
   );
   const handleRowEdit = (updatedRow) => {
     setRows((prevRows) =>
@@ -107,7 +107,11 @@ const TableComponent = ({
   };
 
   useEffect(() => {
-    if (selectedDate && isAdminAuthenticated) {
+    if (
+      selectedDate &&
+      isAdminAuthenticated &&
+      selectedDate !== dayjs().format("DD-MM-YYYY")
+    ) {
       dispatch(getEntriesByDate(selectedDate));
     }
   }, [selectedDate, isAdminAuthenticated, dispatch]);
@@ -117,11 +121,17 @@ const TableComponent = ({
       selectedDate &&
       isAdminAuthenticated &&
       entries.length > 0 &&
-      rows.length > 0
+      rows.length > 0 &&
+      selectedDate !== dayjs().format("DD-MM-YYYY")
     ) {
-
       const dayEntries = entries.filter((entry) => entry.period === "day");
       const nightEntries = entries.filter((entry) => entry.period === "night");
+      const extraDayEntries = entries.filter(
+        (entry) => entry.period === "extraDay"
+      );
+      const extraNightEntries = entries.filter(
+        (entry) => entry.period === "extraNight"
+      );
 
       // Update rows with entries
       const updatedDayEntries = rows.map((row) => {
@@ -144,8 +154,6 @@ const TableComponent = ({
         return row;
       });
 
-      console.log("TableComponent Updated Day Entries: ", updatedDayEntries);
-
       const updatedNightEntries = rows.map((row) => {
         const entry = nightEntries.find((entry) => entry.roomNo === row.roomNo);
         if (entry) {
@@ -166,10 +174,49 @@ const TableComponent = ({
         return row;
       });
 
-      console.log(
-        "TableComponent Updated Night Entries: ",
-        updatedNightEntries
-      );
+      const updatedExtraDayEntries = rows.map((row) => {
+        const entry = extraDayEntries.find(
+          (entry) => entry.roomNo === row.roomNo
+        );
+        if (entry) {
+          return {
+            ...row,
+            id: entry.id,
+            cost: entry.cost,
+            rate: entry.rate,
+            noOfPeople: entry.noOfPeople,
+            type: entry.type,
+            modeOfPayment: entry.modeOfPayment,
+            fullname: entry.fullname,
+            mobileNumber: entry.mobileNumber,
+            checkInTime: entry.checkInTime,
+            checkOutTime: entry.checkOutTime,
+          };
+        }
+        return row;
+      });
+
+      const updatedExtraNightEntries = rows.map((row) => {
+        const entry = extraNightEntries.find(
+          (entry) => entry.roomNo === row.roomNo
+        );
+        if (entry) {
+          return {
+            ...row,
+            id: entry.id,
+            cost: entry.cost,
+            rate: entry.rate,
+            noOfPeople: entry.noOfPeople,
+            type: entry.type,
+            modeOfPayment: entry.modeOfPayment,
+            fullname: entry.fullname,
+            mobileNumber: entry.mobileNumber,
+            checkInTime: entry.checkInTime,
+            checkOutTime: entry.checkOutTime,
+          };
+        }
+        return row;
+      });
 
       const dayRows = updatedDayEntries.map((entry) => ({
         id: entry.id,
@@ -185,8 +232,6 @@ const TableComponent = ({
         checkOutTime: entry.checkOutTime,
       }));
 
-      console.log("TableComponent Day Rows: ", dayRows);
-
       const nightRows = updatedNightEntries.map((entry) => ({
         id: entry.id,
         roomNo: entry.roomNo,
@@ -201,22 +246,52 @@ const TableComponent = ({
         checkOutTime: entry.checkOutTime,
       }));
 
-      console.log("TableComponent Night Rows: ", nightRows);
+      const extraDayRows = updatedExtraDayEntries.map((entry) => ({
+        id: entry.id,
+        roomNo: entry.roomNo,
+        cost: entry.cost,
+        rate: entry.rate,
+        noOfPeople: entry.noOfPeople,
+        type: entry.type,
+        modeOfPayment: entry.modeOfPayment,
+        fullname: entry.fullname,
+        mobileNumber: entry.mobileNumber,
+        checkInTime: entry.checkInTime,
+        checkOutTime: entry.checkOutTime,
+      }));
 
-      if (dayOrNight.toLowerCase() === "day") {
+      const extraNightRows = updatedExtraNightEntries.map((entry) => ({
+        id: entry.id,
+        roomNo: entry.roomNo,
+        cost: entry.cost,
+        rate: entry.rate,
+        noOfPeople: entry.noOfPeople,
+        type: entry.type,
+        modeOfPayment: entry.modeOfPayment,
+        fullname: entry.fullname,
+        mobileNumber: entry.mobileNumber,
+        checkInTime: entry.checkInTime,
+        checkOutTime: entry.checkOutTime,
+      }));
+
+      if (period.toLowerCase() === "day") {
         setRows(dayRows);
-      } else if (dayOrNight.toLowerCase() === "night") {
+      } else if (period.toLowerCase() === "night") {
         setRows(nightRows);
+      } else if (period.toLowerCase() === "extraday") {
+        setRows(extraDayRows);
+      } else if (period.toLowerCase() === "extranight") {
+        setRows(extraNightRows);
       }
     } else {
-      setRows(initializeRows(dayOrNight, rowsLength, roomCosts));
+      setRows(initializeRows(period, rowsLength, roomCosts));
     }
   }, [entries, selectedDate, isAdminAuthenticated]);
 
-  console.log("Table Component Rows: ", rows);
+  // console.log("Table Component Rows: ", rows);
 
   const totalsRow = {
-    id: `${dayOrNight}-totals`,
+    id: `${period}-totals`,
     roomNo: "Totals",
     cost: "",
     rate: rows?.reduce((sum, row) => sum + row.rate, 0),

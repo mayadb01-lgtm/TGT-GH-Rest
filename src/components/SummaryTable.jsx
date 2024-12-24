@@ -1,10 +1,21 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Stack, Typography } from "@mui/material";
 
-const SummaryTable = ({ title, dayRows, nightRows, columns, color }) => {
-  const finalRows = [...dayRows, ...nightRows].filter(
-    (row) => row.rate !== 0 && row.noOfPeople !== 0
-  );
+const SummaryTable = ({
+  title,
+  dayRows,
+  nightRows,
+  extraDayRows,
+  extraNightRows,
+  columns,
+  color,
+}) => {
+  const finalRows = [
+    ...dayRows,
+    ...nightRows,
+    ...(extraDayRows || []),
+    ...(extraNightRows || []),
+  ].filter((row) => row.rate !== 0 && row.noOfPeople !== 0);
 
   if (finalRows.length > 0) {
     finalRows[finalRows.length] = {
