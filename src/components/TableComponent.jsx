@@ -18,7 +18,7 @@ const initializeRows = (dayOrNight, rowsLength, roomCosts) => {
     type: "",
     modeOfPayment: "",
     fullname: "",
-    mobileNumber: "",
+    mobileNumber: 0,
     checkInTime: "",
     checkOutTime: "",
   }));
@@ -93,125 +93,6 @@ const TableComponent = ({
   const [rows, setRows] = useState(
     initializeRows(dayOrNight, rowsLength, roomCosts)
   );
-
-  useEffect(() => {
-    if (selectedDate && isAdminAuthenticated) {
-      dispatch(getEntriesByDate(selectedDate));
-    }
-  }, [selectedDate, isAdminAuthenticated, dispatch]);
-
-  useEffect(() => {
-    if (isAdminAuthenticated && entries.length > 0 && rows.length > 0) {
-      if (selectedDate === entries[0]?.date) {
-        // First Seggregate day and night entries
-
-        const dayEntries = entries.filter((entry) => entry.period === "day");
-        const nightEntries = entries.filter(
-          (entry) => entry.period === "night"
-        );
-
-        // Update rows with entries
-        const updatedDayEntries = rows.map((row) => {
-          const entry = dayEntries.find((entry) => entry.roomNo === row.roomNo);
-          if (entry) {
-            return {
-              ...row,
-              id: entry.id,
-              cost: entry.cost,
-              rate: entry.rate,
-              noOfPeople: entry.noOfPeople,
-              type: entry.type,
-              modeOfPayment: entry.modeOfPayment,
-              fullname: entry.fullname,
-              mobileNumber: entry.mobileNumber,
-              checkInTime: entry.checkInTime,
-              checkOutTime: entry.checkOutTime,
-            };
-          }
-          return row;
-        });
-
-        console.log("TableComponent Updated Day Entries: ", updatedDayEntries);
-
-        const updatedNightEntries = rows.map((row) => {
-          const entry = nightEntries.find(
-            (entry) => entry.roomNo === row.roomNo
-          );
-          if (entry) {
-            return {
-              ...row,
-              id: entry.id,
-              cost: entry.cost,
-              rate: entry.rate,
-              noOfPeople: entry.noOfPeople,
-              type: entry.type,
-              modeOfPayment: entry.modeOfPayment,
-              fullname: entry.fullname,
-              mobileNumber: entry.mobileNumber,
-              checkInTime: entry.checkInTime,
-              checkOutTime: entry.checkOutTime,
-            };
-          }
-          return row;
-        });
-
-        console.log(
-          "TableComponent Updated Night Entries: ",
-          updatedNightEntries
-        );
-
-        const dayRows = updatedDayEntries.map((entry) => ({
-          id: entry.id,
-          roomNo: entry.roomNo,
-          cost: entry.cost,
-          rate: entry.rate,
-          noOfPeople: entry.noOfPeople,
-          type: entry.type,
-          modeOfPayment: entry.modeOfPayment,
-          fullname: entry.fullname,
-          mobileNumber: entry.mobileNumber,
-          checkInTime: entry.checkInTime,
-          checkOutTime: entry.checkOutTime,
-        }));
-
-        console.log("TableComponent Day Rows: ", dayRows);
-
-        const nightRows = updatedNightEntries.map((entry) => ({
-          id: entry.id,
-          roomNo: entry.roomNo,
-          cost: entry.cost,
-          rate: entry.rate,
-          noOfPeople: entry.noOfPeople,
-          type: entry.type,
-          modeOfPayment: entry.modeOfPayment,
-          fullname: entry.fullname,
-          mobileNumber: entry.mobileNumber,
-          checkInTime: entry.checkInTime,
-          checkOutTime: entry.checkOutTime,
-        }));
-
-        console.log("TableComponent Night Rows: ", nightRows);
-
-        if (dayOrNight.toLowerCase() === "day") {
-          setRows(dayRows);
-        } else if (dayOrNight.toLowerCase() === "night") {
-          setRows(nightRows);
-        } else {
-          setRows(initializeRows(dayOrNight, rowsLength, roomCosts));
-        }
-      } else {
-        // Fallback to initialized rows if date doesn't match
-        setRows(initializeRows(dayOrNight, rowsLength, roomCosts));
-      }
-    } else {
-      // Fallback to initialized rows if entries are empty
-      setRows(initializeRows(dayOrNight, rowsLength, roomCosts));
-    }
-  }, [entries, selectedDate, isAdminAuthenticated]);
-
-  console.log("Table Component Rows: ", rows);
-
-  // Handle row update logic
   const handleRowEdit = (updatedRow) => {
     setRows((prevRows) =>
       prevRows.map((row) =>
@@ -224,6 +105,115 @@ const TableComponent = ({
       )
     );
   };
+
+  useEffect(() => {
+    if (selectedDate && isAdminAuthenticated) {
+      dispatch(getEntriesByDate(selectedDate));
+    }
+  }, [selectedDate, isAdminAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (
+      selectedDate &&
+      isAdminAuthenticated &&
+      entries.length > 0 &&
+      rows.length > 0
+    ) {
+
+      const dayEntries = entries.filter((entry) => entry.period === "day");
+      const nightEntries = entries.filter((entry) => entry.period === "night");
+
+      // Update rows with entries
+      const updatedDayEntries = rows.map((row) => {
+        const entry = dayEntries.find((entry) => entry.roomNo === row.roomNo);
+        if (entry) {
+          return {
+            ...row,
+            id: entry.id,
+            cost: entry.cost,
+            rate: entry.rate,
+            noOfPeople: entry.noOfPeople,
+            type: entry.type,
+            modeOfPayment: entry.modeOfPayment,
+            fullname: entry.fullname,
+            mobileNumber: entry.mobileNumber,
+            checkInTime: entry.checkInTime,
+            checkOutTime: entry.checkOutTime,
+          };
+        }
+        return row;
+      });
+
+      console.log("TableComponent Updated Day Entries: ", updatedDayEntries);
+
+      const updatedNightEntries = rows.map((row) => {
+        const entry = nightEntries.find((entry) => entry.roomNo === row.roomNo);
+        if (entry) {
+          return {
+            ...row,
+            id: entry.id,
+            cost: entry.cost,
+            rate: entry.rate,
+            noOfPeople: entry.noOfPeople,
+            type: entry.type,
+            modeOfPayment: entry.modeOfPayment,
+            fullname: entry.fullname,
+            mobileNumber: entry.mobileNumber,
+            checkInTime: entry.checkInTime,
+            checkOutTime: entry.checkOutTime,
+          };
+        }
+        return row;
+      });
+
+      console.log(
+        "TableComponent Updated Night Entries: ",
+        updatedNightEntries
+      );
+
+      const dayRows = updatedDayEntries.map((entry) => ({
+        id: entry.id,
+        roomNo: entry.roomNo,
+        cost: entry.cost,
+        rate: entry.rate,
+        noOfPeople: entry.noOfPeople,
+        type: entry.type,
+        modeOfPayment: entry.modeOfPayment,
+        fullname: entry.fullname,
+        mobileNumber: entry.mobileNumber,
+        checkInTime: entry.checkInTime,
+        checkOutTime: entry.checkOutTime,
+      }));
+
+      console.log("TableComponent Day Rows: ", dayRows);
+
+      const nightRows = updatedNightEntries.map((entry) => ({
+        id: entry.id,
+        roomNo: entry.roomNo,
+        cost: entry.cost,
+        rate: entry.rate,
+        noOfPeople: entry.noOfPeople,
+        type: entry.type,
+        modeOfPayment: entry.modeOfPayment,
+        fullname: entry.fullname,
+        mobileNumber: entry.mobileNumber,
+        checkInTime: entry.checkInTime,
+        checkOutTime: entry.checkOutTime,
+      }));
+
+      console.log("TableComponent Night Rows: ", nightRows);
+
+      if (dayOrNight.toLowerCase() === "day") {
+        setRows(dayRows);
+      } else if (dayOrNight.toLowerCase() === "night") {
+        setRows(nightRows);
+      }
+    } else {
+      setRows(initializeRows(dayOrNight, rowsLength, roomCosts));
+    }
+  }, [entries, selectedDate, isAdminAuthenticated]);
+
+  console.log("Table Component Rows: ", rows);
 
   const totalsRow = {
     id: `${dayOrNight}-totals`,

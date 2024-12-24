@@ -18,7 +18,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { createEntry } from "../redux/actions/entryAction";
+import { createEntry, updateEntryByDate } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 import SummaryTable from "../components/SummaryTable";
 import { paymentColors, processEntriesByPaymentMode } from "../utils/utils";
@@ -126,66 +126,86 @@ const EntryPage = () => {
 
   const handleEntrySubmit = async () => {
     try {
+      // Early return if no data is present
       if (modeRows[5].totals === 0) {
         toast.error("Please enter some data before submitting.");
-        console.log("Please enter some data before submitting.");
-      } else {
-        const filteredDayData = dayData.filter(
-          (row) =>
-            row.rate !== 0 &&
-            row.noOfPeople !== 0 &&
-            row.type !== "" &&
-            row.modeOfPayment !== ""
-        );
-        const filteredNightData = nightData.filter(
-          (row) =>
-            row.rate !== 0 &&
-            row.noOfPeople !== 0 &&
-            row.type !== "" &&
-            row.modeOfPayment !== ""
-        );
+        console.warn("No data to submit.");
+        return;
+      }
 
-        filteredDayData.sort((a, b) => a.roomNo - b.roomNo);
-        filteredNightData.sort((a, b) => a.roomNo - b.roomNo);
-
-        const dayEntries = filteredDayData.map((row) => ({
-          ...row,
-          period: "day",
-          date: selectedDate,
-        }));
-        const nightEntries = filteredNightData.map((row) => ({
-          ...row,
-          period: "night",
-          date: selectedDate,
-        }));
-
-        const combinedEntries = [...dayEntries, ...nightEntries];
-
-        const strCombinedEntries = JSON.stringify(combinedEntries);
-
-        const entryObj = {
-          entries: strCombinedEntries,
-          date: selectedDate,
-        };
-
-        // Create a Dialog Box to confirm the submission
-        if (
-          !window.confirm(
-            `Are you sure you want to submit entries for ${selectedDate}?`
+      // Filter and prepare entries
+      const processEntries = (data, period) =>
+        data
+          .filter(
+            (row) =>
+              row.rate !== 0 &&
+              row.noOfPeople !== 0 &&
+              row.type !== "" &&
+              row.modeOfPayment !== ""
           )
-        ) {
-          return;
-        }
-        console.log("Entry Object", entryObj);
-        dispatch(createEntry(entryObj));
+          .map((row) => ({
+            ...row,
+            period,
+            date: selectedDate,
+          }))
+          .sort((a, b) => a.roomNo - b.roomNo);
+
+      const dayEntries = processEntries(dayData, "day");
+      const nightEntries = processEntries(nightData, "night");
+      const combinedEntries = [...dayEntries, ...nightEntries];
+
+      if (combinedEntries.length === 0) {
+        toast.error("No valid entries to submit.");
+        console.warn("Filtered data resulted in no entries.");
+        return;
+      }
+
+      const entryObj = {
+        entries: JSON.stringify(combinedEntries),
+        date: selectedDate,
+      };
+
+      // Reset helper
+      const resetForm = () => {
         setDayData([]);
         setNightData([]);
         setSelectedDate(dayjs().format("DD-MM-YYYY"));
-        // window.location.reload();
+      };
+
+      // Editing existing entries for admin
+      if (isAdminAuthenticated) {
+        console.log("Editing Entries");
+
+        const confirmEdit = window.confirm(
+          `Are you sure you want to edit entries for ${selectedDate}?`
+        );
+
+        if (!confirmEdit) {
+          return;
+        }
+
+        dispatch(updateEntryByDate(selectedDate, entryObj));
+        resetForm();
+        return;
       }
+
+      // Submitting new entries
+      const confirmSubmit = window.confirm(
+        `Are you sure you want to submit entries for ${selectedDate}?`
+      );
+
+      if (!confirmSubmit) {
+        return;
+      }
+
+      console.log("Submitting Entries", entryObj);
+      dispatch(createEntry(entryObj));
+      resetForm();
     } catch (error) {
-      console.error("Error submitting entries", error);
-      toast.error("Error submitting entries");
+      console.error("Error submitting entries:", error);
+      toast.error(
+        "An error occurred while submitting entries. Please try again."
+      );
     }
   };
 

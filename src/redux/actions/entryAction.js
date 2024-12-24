@@ -43,3 +43,28 @@ export const getEntriesByDate = (date) => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Update Entry by Date
+export const updateEntryByDate = (date, entryData) => async (dispatch) => {
+  try {
+    dispatch({ type: "UpdateEntryRequest" });
+    const { data } = await axios.put(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/entry/update-entry/${date}`,
+      entryData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Entry updated successfully", data);
+    dispatch({ type: "UpdateEntrySuccess", payload: data.data });
+    toast.success("Entry updated successfully");
+  } catch (error) {
+    dispatch({
+      type: "UpdateEntryFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};

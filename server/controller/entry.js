@@ -107,15 +107,94 @@ router.get("/get-entry/:date", async (req, res) => {
     });
 
     if (!entry) {
-      return res.status(404).json({
-        success: false,
-        message: "Entry not found.",
+      return res.status(200).json({
+        success: true,
+        data: [],
       });
     }
 
     res.status(200).json({
       success: true,
       data: entry.entry,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Update Entry by Date
+router.put("/update-entry/:date", async (req, res) => {
+  try {
+    const date = req.params.date;
+    const { entries } = req.body;
+
+    // Parse entries from JSON string to JavaScript object
+    let parsedEntries = entries;
+    if (typeof entries === "string") {
+      parsedEntries = JSON.parse(entries);
+    }
+
+    // Validate request body
+    if (
+      !parsedEntries ||
+      !Array.isArray(parsedEntries) ||
+      parsedEntries.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Entries must be a non-empty array.",
+      });
+    }
+
+    const requiredFields = [
+      "id",
+      "roomNo",
+      "cost",
+      "rate",
+      "noOfPeople",
+      "type",
+      "modeOfPayment",
+      "checkInTime",
+      "checkOutTime",
+      "date",
+    ];
+
+    // Validate each entry in the array
+    for (const entry of parsedEntries) {
+      for (const field of requiredFields) {
+        if (!entry[field]) {
+          return res.status(400).json({
+            success: false,
+            message: `Missing field: ${field}`,
+          });
+        }
+      }
+    }
+
+    // Find the Entry by date and authenticated user's ID
+    const entry = await Entry.findOne({
+      date,
+      // user: req.user._id,
+    });
+
+    if (!entry) {
+      return res.status(404).json({
+        success: false,
+        message: "Entry not found.",
+      });
+    }
+
+    // Update the Entry
+    entry.entry = parsedEntries;
+    const updatedEntry = await entry.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Entry updated successfully.",
+      data: updatedEntry,
     });
   } catch (error) {
     res.status(500).json({
