@@ -191,6 +191,7 @@ const EntryPage = () => {
         setNightData([]);
         setExtraDayData([]);
         setExtraNightData([]);
+        setPendingJamaRows(initializePendingJamaRows);
       }
     } else {
       setSelectedDate(newDate.format("DD-MM-YYYY"));
@@ -198,10 +199,29 @@ const EntryPage = () => {
       setNightData([]);
       setExtraDayData([]);
       setExtraNightData([]);
+      setPendingJamaRows(initializePendingJamaRows);
     }
   };
 
-  const processEntries = (data, period, selectedDate) => {
+  const processEntries = (data, period, selectedDate, updatedDate) => {
+    return data
+      .filter(
+        (row) =>
+          row.rate !== 0 &&
+          row.noOfPeople !== 0 &&
+          row.type !== "" &&
+          row.modeOfPayment !== ""
+      )
+      .map((row) => ({
+        ...row,
+        period,
+        date: selectedDate,
+        createDate: updatedDate,
+      }))
+      .sort((a, b) => a.roomNo - b.roomNo);
+  };
+
+  const processUpdateEntries = (data, period, selectedDate) => {
     return data
       .filter(
         (row) =>
@@ -242,16 +262,28 @@ const EntryPage = () => {
         return;
       }
 
-      const dayEntries = processEntries(dayData, "day", selectedDate);
-      const nightEntries = processEntries(nightData, "night", selectedDate);
+      const dayEntries = processEntries(
+        dayData,
+        "day",
+        selectedDate,
+        selectedDate
+      );
+      const nightEntries = processEntries(
+        nightData,
+        "night",
+        selectedDate,
+        selectedDate
+      );
       const extraDayEntries = processEntries(
         extraDayData,
         "extraDay",
+        selectedDate,
         selectedDate
       );
       const extraNightEntries = processEntries(
         extraNightData,
         "extraNight",
+        selectedDate,
         selectedDate
       );
 
@@ -272,6 +304,7 @@ const EntryPage = () => {
           ...row,
           period: row.period,
           date: selectedDate,
+          createDate: selectedDate,
         }));
       }
 
@@ -327,24 +360,51 @@ const EntryPage = () => {
         return;
       }
 
-      const dayEntries = processEntries(dayData, "day", selectedDate);
-      const nightEntries = processEntries(nightData, "night", selectedDate);
-      const extraDayEntries = processEntries(
+      const dayEntries = processUpdateEntries(dayData, "day", selectedDate);
+      const nightEntries = processUpdateEntries(
+        nightData,
+        "night",
+        selectedDate
+      );
+      const extraDayEntries = processUpdateEntries(
         extraDayData,
         "extraDay",
         selectedDate
       );
-      const extraNightEntries = processEntries(
+      const extraNightEntries = processUpdateEntries(
         extraNightData,
         "extraNight",
         selectedDate
       );
+
+      // Handle Pending Jama Entries
+      const pendingJamaEntryFilteredRows = pendingJamaRows.filter(
+        (row) =>
+          row.date !== "" &&
+          row.roomNo !== "" &&
+          row.fullname !== "" &&
+          row.mobileNumber !== "" &&
+          row.rate !== 0 &&
+          row.modeOfPayment !== ""
+      );
+
+      let pendingJamaEntries = [];
+      if (pendingJamaEntryFilteredRows.length > 0) {
+        pendingJamaEntries = pendingJamaEntryFilteredRows.map((row) => ({
+          ...row,
+          period: row.period,
+          date: selectedDate,
+        }));
+
+        console.log("Pending Jama Entries", pendingJamaEntries);
+      }
 
       const combinedEntries = [
         ...dayEntries,
         ...nightEntries,
         ...extraDayEntries,
         ...extraNightEntries,
+        ...pendingJamaEntries,
       ];
 
       if (combinedEntries.length === 0) {

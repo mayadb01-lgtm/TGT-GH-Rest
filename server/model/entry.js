@@ -29,6 +29,7 @@ const entrySchemaObj = new Schema(
     checkInTime: { type: String },
     checkOutTime: { type: String },
     date: { type: String, required: true },
+    createDate: { type: String, required: true },
     period: { type: String, required: true },
     createdAt: { type: Date, default: Date.now() },
     isPaid: {

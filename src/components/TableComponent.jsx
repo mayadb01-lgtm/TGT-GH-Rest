@@ -22,6 +22,7 @@ const initializeRows = (period, rowsLength, roomCosts) => {
     checkInTime: "11:00 AM",
     checkOutTime: "10:00 AM",
     period: period,
+    createDate: "",
   }));
 };
 
