@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -14,12 +13,15 @@ import {
   Paper,
   MenuItem,
   Select,
+  Button,
 } from "@mui/material";
 import { useSelector } from "react-redux";
+import { DeleteOutline } from "@mui/icons-material";
+import toast from "react-hot-toast";
 
 dayjs.locale("en-gb");
 
-const PendingJamaTable = () => {
+const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
   const { unpaidEntries } = useSelector((state) => state.entry);
 
   const getRoomNoList = (date) => {
@@ -61,22 +63,6 @@ const PendingJamaTable = () => {
       .map((entry) => entry.rate);
   };
 
-  const initializePendingJamaRows = () => {
-    return Array.from({ length: 10 }, (_, idx) => ({
-      id: idx + 1,
-      date: "",
-      roomNo: "",
-      fullname: "",
-      mobileNumber: "",
-      rate: 0,
-      modeOfPayment: "",
-    }));
-  };
-
-  const [pendingJamaRows, setPendingJamaRows] = useState(
-    initializePendingJamaRows
-  );
-
   const handleRowEdit = (id, field, value) => {
     setPendingJamaRows((prevRows) =>
       prevRows.map((row) =>
@@ -103,6 +89,7 @@ const PendingJamaTable = () => {
               "Mobile No",
               "Rate",
               "Mode of Payment",
+              "Action",
             ].map((header, index) => (
               <TableCell
                 key={index}
@@ -112,6 +99,7 @@ const PendingJamaTable = () => {
                   textAlign: "center",
                   border: "1px solid #ddd",
                   height: "24px",
+                  padding: "0px",
                 }}
               >
                 {header}
@@ -139,8 +127,8 @@ const PendingJamaTable = () => {
                 },
               }}
             >
-              <TableCell>{row.id}</TableCell>
-              <TableCell>
+              <TableCell width={"5%"}>{row.id}</TableCell>
+              <TableCell width={"20%"}>
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
                   adapterLocale="en-gb"
@@ -157,7 +145,7 @@ const PendingJamaTable = () => {
                   />
                 </LocalizationProvider>
               </TableCell>
-              <TableCell>
+              <TableCell width={"10%"}>
                 <Select
                   value={row.roomNo}
                   onChange={(e) =>
@@ -172,7 +160,7 @@ const PendingJamaTable = () => {
                   ))}
                 </Select>
               </TableCell>
-              <TableCell>
+              <TableCell width={"20%"}>
                 <Select
                   value={row.fullname}
                   onChange={(e) =>
@@ -187,7 +175,7 @@ const PendingJamaTable = () => {
                   ))}
                 </Select>
               </TableCell>
-              <TableCell>
+              <TableCell width={"20%"}>
                 <Select
                   value={row.mobileNumber}
                   onChange={(e) =>
@@ -204,7 +192,7 @@ const PendingJamaTable = () => {
                   )}
                 </Select>
               </TableCell>
-              <TableCell>
+              <TableCell width={"10%"}>
                 <Select
                   value={row.rate}
                   onChange={(e) =>
@@ -224,7 +212,7 @@ const PendingJamaTable = () => {
                   ))}
                 </Select>
               </TableCell>
-              <TableCell>
+              <TableCell width={"10%"}>
                 <Select
                   value={row.modeOfPayment}
                   onChange={(e) =>
@@ -240,6 +228,33 @@ const PendingJamaTable = () => {
                     )
                   )}
                 </Select>
+              </TableCell>
+              <TableCell width={"5%"}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    setPendingJamaRows((prevRows) =>
+                      prevRows.map((prevRow) =>
+                        prevRow.id === row.id
+                          ? {
+                              id: prevRow.id,
+                              date: "",
+                              roomNo: "",
+                              fullname: "",
+                              mobileNumber: "",
+                              rate: 0,
+                              modeOfPayment: "",
+                            }
+                          : prevRow
+                      )
+                    );
+                    toast.success("Row Cleared Successfully");
+                  }}
+                >
+                  <DeleteOutline />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

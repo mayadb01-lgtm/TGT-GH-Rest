@@ -4,9 +4,9 @@ const entrySchemaObj = new Schema(
   {
     id: { type: String, required: true },
     roomNo: { type: Number, required: true },
-    cost: { type: Number, required: true },
+    cost: { type: Number },
     rate: { type: Number, required: true },
-    noOfPeople: { type: Number, required: true },
+    noOfPeople: { type: Number },
     type: {
       type: String,
       enum: [
@@ -18,7 +18,6 @@ const entrySchemaObj = new Schema(
         "Foreigner",
         "Other",
       ],
-      required: true,
     },
     modeOfPayment: {
       type: String,
@@ -32,6 +31,12 @@ const entrySchemaObj = new Schema(
     date: { type: String, required: true },
     period: { type: String, required: true },
     createdAt: { type: Date, default: Date.now() },
+    isPaid: {
+      type: Boolean,
+      default: function () {
+        return this.modeOfPayment === "UnPaid" ? false : true;
+      },
+    },
   },
   { timestamps: true }
 );

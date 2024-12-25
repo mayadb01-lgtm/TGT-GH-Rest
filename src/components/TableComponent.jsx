@@ -21,6 +21,7 @@ const initializeRows = (period, rowsLength, roomCosts) => {
     mobileNumber: 1234567890,
     checkInTime: "11:00 AM",
     checkOutTime: "10:00 AM",
+    period: period,
   }));
 };
 
@@ -53,11 +54,7 @@ const TableComponent = ({
   };
 
   useEffect(() => {
-    if (
-      selectedDate &&
-      isAdminAuthenticated &&
-      selectedDate !== dayjs().format("DD-MM-YYYY")
-    ) {
+    if (selectedDate && isAdminAuthenticated) {
       dispatch(getEntriesByDate(selectedDate));
     }
   }, [selectedDate, isAdminAuthenticated, dispatch]);

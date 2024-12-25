@@ -49,18 +49,7 @@ router.post("/create-entry", async (req, res) => {
       });
     }
 
-    const requiredFields = [
-      "id",
-      "roomNo",
-      "cost",
-      "rate",
-      "noOfPeople",
-      "type",
-      "modeOfPayment",
-      "checkInTime",
-      "checkOutTime",
-      "date",
-    ];
+    const requiredFields = ["id", "rate", "modeOfPayment", "date"];
 
     // Validate each entry in the array
     for (const entry of parsedEntries) {
@@ -149,18 +138,7 @@ router.put("/update-entry/:date", async (req, res) => {
       });
     }
 
-    const requiredFields = [
-      "id",
-      "roomNo",
-      "cost",
-      "rate",
-      "noOfPeople",
-      "type",
-      "modeOfPayment",
-      "checkInTime",
-      "checkOutTime",
-      "date",
-    ];
+    const requiredFields = ["id", "rate", "modeOfPayment", "date"];
 
     // Validate each entry in the array
     for (const entry of parsedEntries) {

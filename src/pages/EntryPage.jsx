@@ -36,6 +36,23 @@ const EntryPage = () => {
   );
   const dispatch = useDispatch();
 
+  const initializePendingJamaRows = () => {
+    return Array.from({ length: 10 }, (_, idx) => ({
+      id: idx + 1,
+      date: "",
+      roomNo: "",
+      fullname: "",
+      mobileNumber: "",
+      rate: 0,
+      modeOfPayment: "",
+      period: "UnPaid",
+    }));
+  };
+
+  const [pendingJamaRows, setPendingJamaRows] = useState(
+    initializePendingJamaRows
+  );
+
   let processedEntries = useMemo(() => {
     // Cash
     const cashDay = processEntriesByPaymentMode(dayData, "Cash");
@@ -162,7 +179,7 @@ const EntryPage = () => {
   ];
 
   modeRows[5].totals = modeRows.reduce(
-    (sum, row, idx) => (idx < 4 ? sum + row.totals : sum),
+    (sum, row, idx) => (idx < 5 ? sum + row.totals : sum),
     0
   );
 
@@ -206,12 +223,14 @@ const EntryPage = () => {
     setNightData,
     setExtraDayData,
     setExtraNightData,
+    setPendingJamaRows,
     setSelectedDate
   ) => {
     setDayData([]);
     setNightData([]);
     setExtraDayData([]);
     setExtraNightData([]);
+    setPendingJamaRows(initializePendingJamaRows);
     setSelectedDate(dayjs().format("DD-MM-YYYY"));
   };
 
@@ -236,11 +255,32 @@ const EntryPage = () => {
         selectedDate
       );
 
+      // Handle Pending Jama Entries
+      const pendingJamaEntryFilteredRows = pendingJamaRows.filter(
+        (row) =>
+          row.date !== "" &&
+          row.roomNo !== "" &&
+          row.fullname !== "" &&
+          row.mobileNumber !== "" &&
+          row.rate !== 0 &&
+          row.modeOfPayment !== ""
+      );
+
+      let pendingJamaEntries = [];
+      if (pendingJamaEntryFilteredRows.length > 0) {
+        pendingJamaEntries = pendingJamaEntryFilteredRows.map((row) => ({
+          ...row,
+          period: row.period,
+          date: selectedDate,
+        }));
+      }
+
       const combinedEntries = [
         ...dayEntries,
         ...nightEntries,
         ...extraDayEntries,
         ...extraNightEntries,
+        ...pendingJamaEntries,
       ];
 
       if (combinedEntries.length === 0) {
@@ -268,6 +308,7 @@ const EntryPage = () => {
         setNightData,
         setExtraDayData,
         setExtraNightData,
+        setPendingJamaRows,
         setSelectedDate
       );
     } catch (error) {
@@ -718,7 +759,11 @@ const EntryPage = () => {
                 </Stack>
               </AccordionSummary>
               <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <PendingJamaTable />
+                <PendingJamaTable
+                  pendingJamaRows={pendingJamaRows}
+                  setPendingJamaRows={setPendingJamaRows}
+                  period="UnPaid"
+                />
               </AccordionDetails>
             </Accordion>
           </Box>
