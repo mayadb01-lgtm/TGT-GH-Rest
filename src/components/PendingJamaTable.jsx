@@ -18,11 +18,41 @@ import {
 import { useSelector } from "react-redux";
 import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 dayjs.locale("en-gb");
 
 const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
-  const { unpaidEntries } = useSelector((state) => state.entry);
+  const { entries, unpaidEntries } = useSelector((state) => state.entry);
+
+  useEffect(() => {
+    if (entries.length > 0) {
+      const filteredEntries = entries.filter(
+        (entry) => entry.period === "UnPaid"
+      );
+      if (filteredEntries.length > 0) {
+        setPendingJamaRows((prevRows) => {
+          return prevRows.map((prevRow) => {
+            const entry = filteredEntries.find(
+              (entry) => entry.id == prevRow.id
+            );
+            if (entry) {
+              return {
+                id: prevRow.id,
+                date: entry.date,
+                roomNo: entry.roomNo,
+                fullname: entry.fullname,
+                mobileNumber: entry.mobileNumber,
+                rate: entry.rate,
+                modeOfPayment: entry.modeOfPayment,
+              };
+            }
+            return prevRow;
+          });
+        });
+      }
+    }
+  }, [entries, setPendingJamaRows, unpaidEntries.length]);
 
   const getRoomNoList = (date) => {
     return [
@@ -152,6 +182,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "roomNo", e.target.value)
                   }
                   fullWidth
+                  renderValue={(value) => value}
                 >
                   {getRoomNoList(row.date).map((roomNo) => (
                     <MenuItem key={roomNo} value={roomNo}>
@@ -167,6 +198,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "fullname", e.target.value)
                   }
                   fullWidth
+                  renderValue={(value) => value}
                 >
                   {getFullNameList(row.date, row.roomNo).map((name) => (
                     <MenuItem key={name} value={name}>
@@ -182,6 +214,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "mobileNumber", e.target.value)
                   }
                   fullWidth
+                  renderValue={(value) => value}
                 >
                   {getMobileNumberList(row.date, row.roomNo, row.fullname).map(
                     (num) => (
@@ -199,6 +232,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "rate", e.target.value)
                   }
                   fullWidth
+                  renderValue={(value) => value}
                 >
                   {getRateList(
                     row.date,
@@ -219,6 +253,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "modeOfPayment", e.target.value)
                   }
                   fullWidth
+                  renderValue={(value) => value}
                 >
                   {["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"].map(
                     (mode) => (

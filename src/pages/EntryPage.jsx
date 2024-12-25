@@ -40,9 +40,9 @@ const EntryPage = () => {
     return Array.from({ length: 10 }, (_, idx) => ({
       id: idx + 1,
       date: "",
-      roomNo: "",
+      roomNo: 0,
       fullname: "",
-      mobileNumber: "",
+      mobileNumber: 0,
       rate: 0,
       modeOfPayment: "",
       period: "UnPaid",
@@ -762,7 +762,6 @@ const EntryPage = () => {
                 <PendingJamaTable
                   pendingJamaRows={pendingJamaRows}
                   setPendingJamaRows={setPendingJamaRows}
-                  period="UnPaid"
                 />
               </AccordionDetails>
             </Accordion>
