@@ -27,8 +27,9 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
 
   useEffect(() => {
     if (entries.length > 0) {
+      console.log("Entries", entries);
       const filteredEntries = entries.filter(
-        (entry) => entry.period && entry.period === "UnPaid"
+        (entry) => entry?.period && entry.period === "UnPaid"
       );
       if (filteredEntries.length > 0) {
         setPendingJamaRows((prevRows) => {
@@ -45,6 +46,8 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 mobileNumber: entry.mobileNumber,
                 rate: entry.rate,
                 modeOfPayment: entry.modeOfPayment,
+                createDate: entry?.createDate,
+                period: entry?.period,
               };
             }
             return prevRow;

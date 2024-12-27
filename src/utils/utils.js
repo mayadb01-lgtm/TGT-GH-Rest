@@ -36,6 +36,7 @@ export const initializePendingJamaRows = () => {
     rate: 0,
     modeOfPayment: "",
     period: "UnPaid",
+    createDate: "",
   }));
 };
 
@@ -57,8 +58,8 @@ export const processEntries = (data, period, selectedDate, updatedDate) => {
     .filter(
       (row) =>
         row.rate !== 0 &&
-        row.noOfPeople !== 0 &&
-        row.type !== "" &&
+        // row.noOfPeople !== 0 &&
+        // row.type !== "" &&
         row.modeOfPayment !== ""
     )
     .map((row) => ({
@@ -66,6 +67,23 @@ export const processEntries = (data, period, selectedDate, updatedDate) => {
       period,
       date: selectedDate,
       createDate: updatedDate,
+    }))
+    .sort((a, b) => a.roomNo - b.roomNo);
+};
+
+export const processUpdateEntries = (data, period, selectedDate) => {
+  return data
+    .filter(
+      (row) =>
+        row.rate !== 0 &&
+        // row.noOfPeople !== 0 &&
+        // row.type !== "" &&
+        row.modeOfPayment !== ""
+    )
+    .map((row) => ({
+      ...row,
+      period,
+      date: selectedDate,
     }))
     .sort((a, b) => a.roomNo - b.roomNo);
 };

@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+dayjs.locale("en-gb");
 
 // Navigation items
 const NAVIGATION = [
@@ -52,16 +53,15 @@ const demoTheme = createTheme({
 
 // Dashboard content component
 const DashboardContent = () => {
+  const { loading, entries } = useSelector((state) => state.entry);
+  const dispatch = useDispatch();
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
   );
-  const { loading, entries } = useSelector((state) => state.entry);
-
-  const dispatch = useDispatch();
 
   const handleDateChange = (newDate) => {
     if (newDate) {
-      setSelectedDate(newDate);
+      setSelectedDate(newDate.format("DD-MM-YYYY"));
     }
   };
 
@@ -111,10 +111,10 @@ const DashboardContent = () => {
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
           Select Date
         </Typography>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <DatePicker
-            value={selectedDate}
-            onChange={handleDateChange}
+            value={dayjs(selectedDate, "DD-MM-YYYY")}
+            onChange={(newDate) => handleDateChange(newDate)}
             renderInput={(params) => (
               <TextField
                 {...params}

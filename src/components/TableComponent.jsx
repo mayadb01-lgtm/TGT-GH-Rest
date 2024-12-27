@@ -93,6 +93,8 @@ const TableComponent = ({
             mobileNumber: entry.mobileNumber,
             checkInTime: entry.checkInTime,
             checkOutTime: entry.checkOutTime,
+            createDate: entry.createDate,
+            period: entry.period,
           };
         }
         return row;
@@ -113,6 +115,8 @@ const TableComponent = ({
             mobileNumber: entry.mobileNumber,
             checkInTime: entry.checkInTime,
             checkOutTime: entry.checkOutTime,
+            createDate: entry.createDate,
+            period: entry.period,
           };
         }
         return row;
@@ -135,6 +139,8 @@ const TableComponent = ({
             mobileNumber: entry.mobileNumber,
             checkInTime: entry.checkInTime,
             checkOutTime: entry.checkOutTime,
+            createDate: entry.createDate,
+            period: entry.period,
           };
         }
         return row;
@@ -157,6 +163,8 @@ const TableComponent = ({
             mobileNumber: entry.mobileNumber,
             checkInTime: entry.checkInTime,
             checkOutTime: entry.checkOutTime,
+            createDate: entry.createDate,
+            period: entry.period,
           };
         }
         return row;
@@ -174,6 +182,8 @@ const TableComponent = ({
         mobileNumber: entry.mobileNumber,
         checkInTime: entry.checkInTime,
         checkOutTime: entry.checkOutTime,
+        createDate: entry.createDate,
+        period: entry.period,
       }));
 
       const nightRows = updatedNightEntries.map((entry) => ({
@@ -188,6 +198,8 @@ const TableComponent = ({
         mobileNumber: entry.mobileNumber,
         checkInTime: entry.checkInTime,
         checkOutTime: entry.checkOutTime,
+        createDate: entry.createDate,
+        period: entry.period,
       }));
 
       const extraDayRows = updatedExtraDayEntries.map((entry) => ({
@@ -202,6 +214,8 @@ const TableComponent = ({
         mobileNumber: entry.mobileNumber,
         checkInTime: entry.checkInTime,
         checkOutTime: entry.checkOutTime,
+        createDate: entry.createDate,
+        period: entry.period,
       }));
 
       const extraNightRows = updatedExtraNightEntries.map((entry) => ({
@@ -216,6 +230,8 @@ const TableComponent = ({
         mobileNumber: entry.mobileNumber,
         checkInTime: entry.checkInTime,
         checkOutTime: entry.checkOutTime,
+        createDate: entry.createDate,
+        period: entry.period,
       }));
 
       if (period.toLowerCase() === "day") {

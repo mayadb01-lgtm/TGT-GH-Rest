@@ -25,6 +25,7 @@ import {
   modeSummaryColumn,
   finalModeColumns,
   processEntries,
+  processUpdateEntries,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
 import { EntrySection, PaymentSummary } from "../utils/util";
@@ -180,30 +181,12 @@ const EntryPage = () => {
     }
   };
 
-  const processUpdateEntries = (data, period, selectedDate) => {
-    return data
-      .filter(
-        (row) =>
-          row.rate !== 0 &&
-          row.noOfPeople !== 0 &&
-          row.type !== "" &&
-          row.modeOfPayment !== ""
-      )
-      .map((row) => ({
-        ...row,
-        period,
-        date: selectedDate,
-      }))
-      .sort((a, b) => a.roomNo - b.roomNo);
-  };
-
   const resetForm = (
     setDayData,
     setNightData,
     setExtraDayData,
     setExtraNightData,
-    setPendingJamaRows,
-    setSelectedDate
+    setPendingJamaRows
   ) => {
     setDayData([]);
     setNightData([]);
@@ -292,7 +275,7 @@ const EntryPage = () => {
 
       if (!confirmSubmit) return;
 
-      console.log("Submitting Entries", entryObj);
+      console.log("Submitting Entries", combinedEntries);
       dispatch(createEntry(entryObj));
 
       resetForm(
@@ -384,7 +367,7 @@ const EntryPage = () => {
 
         if (!confirmEdit) return;
 
-        console.log("Editing Entries", entryObj);
+        console.log("Editing Entries", combinedEntries);
         dispatch(updateEntryByDate(selectedDate, entryObj));
 
         resetForm(
@@ -392,8 +375,12 @@ const EntryPage = () => {
           setNightData,
           setExtraDayData,
           setExtraNightData,
+          setPendingJamaRows,
           setSelectedDate
         );
+      } else {
+        toast.error("You are not authorized to edit entries.");
+        console.warn("Unauthorized access.");
       }
     } catch (error) {
       console.error("Error submitting entries:", error);
@@ -411,6 +398,7 @@ const EntryPage = () => {
           setNightData,
           setExtraDayData,
           setExtraNightData,
+          setPendingJamaRows,
           setSelectedDate
         );
       }
@@ -420,6 +408,7 @@ const EntryPage = () => {
         setNightData,
         setExtraDayData,
         setExtraNightData,
+        setPendingJamaRows,
         setSelectedDate
       );
     }
