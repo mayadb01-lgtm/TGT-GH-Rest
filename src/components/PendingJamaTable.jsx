@@ -130,6 +130,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   border: "1px solid #ddd",
                   height: "24px",
                   padding: "0px",
+                  fontSize: "12px",
                 }}
               >
                 {header}
@@ -146,6 +147,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 "& .MuiTableRow-root": {
                   hight: "24px",
                   padding: "0px",
+                  fontSize: "12px",
                 },
                 "& .MuiInputBase-input": {
                   padding: "2px 8px",
@@ -157,7 +159,14 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 },
               }}
             >
-              <TableCell width={"5%"}>{row.id}</TableCell>
+              <TableCell
+                width={"5%"}
+                sx={{
+                  fontSize: "12px",
+                }}
+              >
+                {row.id}
+              </TableCell>
               <TableCell width={"20%"}>
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
@@ -172,6 +181,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     renderInput={(params) => (
                       <TextField {...params} size="small" fullWidth />
                     )}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "12px",
+                      },
+                    }}
                   />
                 </LocalizationProvider>
               </TableCell>
@@ -183,6 +197,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }
                   fullWidth
                   renderValue={(value) => value}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                    },
+                  }}
                 >
                   {getRoomNoList(row.date).map((roomNo) => (
                     <MenuItem key={roomNo} value={roomNo}>
@@ -199,6 +218,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }
                   fullWidth
                   renderValue={(value) => value}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                    },
+                  }}
                 >
                   {getFullNameList(row.date, row.roomNo).map((name) => (
                     <MenuItem key={name} value={name}>
@@ -215,6 +239,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }
                   fullWidth
                   renderValue={(value) => value}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                    },
+                  }}
                 >
                   {getMobileNumberList(row.date, row.roomNo, row.fullname).map(
                     (num) => (
@@ -233,6 +262,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }
                   fullWidth
                   renderValue={(value) => value}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                    },
+                  }}
                 >
                   {getRateList(
                     row.date,
@@ -254,6 +288,11 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }
                   fullWidth
                   renderValue={(value) => value}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      fontSize: "12px",
+                    },
+                  }}
                 >
                   {["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"].map(
                     (mode) => (
@@ -287,8 +326,9 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     );
                     toast.success("Row Cleared Successfully");
                   }}
+                  sx={{ fontSize: "12px" }}
                 >
-                  <DeleteOutline />
+                  <DeleteOutline fontSize="small" />
                 </Button>
               </TableCell>
             </TableRow>
