@@ -7,10 +7,8 @@ import {
   AccordionDetails,
   Stack,
   TextField,
-  Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import TableComponent from "../components/TableComponent";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -20,13 +18,21 @@ import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { createEntry, updateEntryByDate } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
-import SummaryTable from "../components/SummaryTable";
-import { paymentColors, processEntriesByPaymentMode } from "../utils/utils";
+import {
+  initializePendingJamaRows,
+  paymentColors,
+  processEntriesByPaymentMode,
+  modeSummaryColumn,
+  finalModeColumns,
+  processEntries,
+} from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
+import { EntrySection, PaymentSummary } from "../utils/util";
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
+  const dispatch = useDispatch();
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
   const [extraDayData, setExtraDayData] = useState([]);
@@ -34,21 +40,6 @@ const EntryPage = () => {
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
   );
-  const dispatch = useDispatch();
-
-  const initializePendingJamaRows = () => {
-    return Array.from({ length: 10 }, (_, idx) => ({
-      id: idx + 1,
-      date: "",
-      roomNo: 0,
-      fullname: "",
-      mobileNumber: 0,
-      rate: 0,
-      modeOfPayment: "",
-      period: "UnPaid",
-    }));
-  };
-
   const [pendingJamaRows, setPendingJamaRows] = useState(
     initializePendingJamaRows
   );
@@ -85,54 +76,40 @@ const EntryPage = () => {
 
     return {
       cash: {
-        day: cashDay,
-        night: cashNight,
-        extraDay: cashExtraDay,
-        extraNight: cashExtraNight,
+        day: cashDay ? cashDay : [],
+        night: cashNight ? cashNight : [],
+        extraDay: cashExtraDay ? cashExtraDay : [],
+        extraNight: cashExtraNight ? cashExtraNight : [],
       },
       card: {
-        day: cardDay,
-        night: cardNight,
-        extraDay: cardExtraDay,
-        extraNight: cardExtraNight,
+        day: cardDay ? cardDay : [],
+        night: cardNight ? cardNight : [],
+        extraDay: cardExtraDay ? cardExtraDay : [],
+        extraNight: cardExtraNight ? cardExtraNight : [],
       },
       pps: {
-        day: ppsDay,
-        night: ppsNight,
-        extraDay: ppsExtraDay,
-        extraNight: ppsExtraNight,
+        day: ppsDay ? ppsDay : [],
+        night: ppsNight ? ppsNight : [],
+        extraDay: ppsExtraDay ? ppsExtraDay : [],
+        extraNight: ppsExtraNight ? ppsExtraNight : [],
       },
       ppc: {
-        day: ppcDay,
-        night: ppcNight,
-        extraDay: ppcExtraDay,
-        extraNight: ppcExtraNight,
+        day: ppcDay ? ppcDay : [],
+        night: ppcNight ? ppcNight : [],
+        extraDay: ppcExtraDay ? ppcExtraDay : [],
+        extraNight: ppcExtraNight ? ppcExtraNight : [],
       },
       unpaid: {
-        day: unpaidDay,
-        night: unpaidNight,
-        extraDay: unpaidExtraDay,
-        extraNight: unpaidExtraNight,
+        day: unpaidDay ? unpaidDay : [],
+        night: unpaidNight ? unpaidNight : [],
+        extraDay: unpaidExtraDay ? unpaidExtraDay : [],
+        extraNight: unpaidExtraNight ? unpaidExtraNight : [],
       },
     };
   }, [dayData, nightData, extraDayData, extraNightData]);
 
-  // Columns for DataGrid
-  const columns = [
-    { field: "id", headerName: "Day/Night", width: 80 },
-    { field: "rate", headerName: "Rate", width: 60 },
-    { field: "fullname", headerName: "Full Name", width: 100 },
-    { field: "noOfPeople", headerName: "People", width: 80 },
-  ];
-
   const calculateTotal = (entries) =>
-    entries.reduce((sum, row) => sum + row.rate, 0);
-
-  // Columns for Total DataGrid
-  const modeColumns = [
-    { field: "id", headerName: "Revenue", width: "160" },
-    { field: "totals", headerName: "Total", width: "160" },
-  ];
+    entries ? entries.reduce((sum, row) => sum + row.rate, 0) : 0;
 
   const modeRows = [
     {
@@ -201,24 +178,6 @@ const EntryPage = () => {
       setExtraNightData([]);
       setPendingJamaRows(initializePendingJamaRows);
     }
-  };
-
-  const processEntries = (data, period, selectedDate, updatedDate) => {
-    return data
-      .filter(
-        (row) =>
-          row.rate !== 0 &&
-          row.noOfPeople !== 0 &&
-          row.type !== "" &&
-          row.modeOfPayment !== ""
-      )
-      .map((row) => ({
-        ...row,
-        period,
-        date: selectedDate,
-        createDate: updatedDate,
-      }))
-      .sort((a, b) => a.roomNo - b.roomNo);
   };
 
   const processUpdateEntries = (data, period, selectedDate) => {
@@ -466,11 +425,6 @@ const EntryPage = () => {
     }
   };
 
-  console.log("Day Data Home", dayData);
-  console.log("Night Data Home", nightData);
-  console.log("Extra Day Data Home", extraDayData);
-  console.log("Extra Night Data Home", extraNightData);
-
   return (
     <>
       <Grid
@@ -527,264 +481,19 @@ const EntryPage = () => {
             </Box>
           </Grid>
           <Box>
-            {/* Day Entries */}
-            <Accordion defaultExpanded>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                style={{
-                  backgroundColor: "rbga(41,43,44,0.1)",
-                  border: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Day Entries
-                  </Typography>
-
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <TableComponent
-                  selectedDate={selectedDate}
-                  period="Day"
-                  title="Day Entry Table"
-                  rowsLength={11}
-                  roomCosts={{
-                    1: 1800,
-                    2: 1800,
-                    3: 1800,
-                    4: 1800,
-                    5: 1800,
-                    6: 2200,
-                    7: 2200,
-                    8: 1800,
-                    9: 1500,
-                    10: 1500,
-                    11: 1500,
-                  }}
-                  onSubmit={setDayData}
-                />
-              </AccordionDetails>
-            </Accordion>
-            {/* Night Entries */}
-            {/* Divider - Seperator */}
-            <Accordion defaultExpanded>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                style={{
-                  backgroundColor: "rbga(41,43,44,0.1)",
-                  borderBottom: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Night Entries
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <TableComponent
-                  selectedDate={selectedDate}
-                  period="Night"
-                  title="Night Entry Table"
-                  rowsLength={11}
-                  roomCosts={{
-                    1: 1800,
-                    2: 1800,
-                    3: 1800,
-                    4: 1800,
-                    5: 1800,
-                    6: 2200,
-                    7: 2200,
-                    8: 1800,
-                    9: 1500,
-                    10: 1500,
-                    11: 1500,
-                  }}
-                  onSubmit={setNightData}
-                />
-              </AccordionDetails>
-            </Accordion>
-            <Box sx={{ height: "8px" }} />
-            {/* Extra Day Entries */}
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                style={{
-                  backgroundColor: "rbga(41,43,44,0.1)",
-                  border: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Extra Day Entries
-                  </Typography>
-
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <TableComponent
-                  selectedDate={selectedDate}
-                  period="extraDay"
-                  title="Extra Day Entry Table"
-                  rowsLength={11}
-                  roomCosts={{
-                    1: 1800,
-                    2: 1800,
-                    3: 1800,
-                    4: 1800,
-                    5: 1800,
-                    6: 2200,
-                    7: 2200,
-                    8: 1800,
-                    9: 1500,
-                    10: 1500,
-                    11: 1500,
-                  }}
-                  onSubmit={setExtraDayData}
-                />
-              </AccordionDetails>
-            </Accordion>
-            {/* Extra Night Entries */}
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="night-entries-content"
-                id="night-entries-header"
-                style={{
-                  backgroundColor: "rbga(41,43,44,0.1)",
-                  borderBottom: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Extra Night Entries
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <TableComponent
-                  selectedDate={selectedDate}
-                  period="extraNight"
-                  title={"Extra Night Entry Table"}
-                  rowsLength={11}
-                  roomCosts={{
-                    1: 1800,
-                    2: 1800,
-                    3: 1800,
-                    4: 1800,
-                    5: 1800,
-                    6: 2200,
-                    7: 2200,
-                    8: 1800,
-                    9: 1500,
-                    10: 1500,
-                    11: 1500,
-                  }}
-                  onSubmit={setExtraNightData}
-                />
-              </AccordionDetails>
-            </Accordion>
+            <EntrySection
+              selectedDate={selectedDate}
+              setDayData={setDayData}
+              setNightData={setNightData}
+              setExtraDayData={setExtraDayData}
+              setExtraNightData={setExtraNightData}
+            />
             {/* Custom Entry - UnPaid Entries */}
             <Accordion defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 style={{
-                  backgroundColor: "rbga(41,43,44,0.1)",
+                  backgroundColor: "#df86ff",
                   borderBottom: "1px solid #e0e0e0",
                   minHeight: "0",
                   height: "40px",
@@ -827,168 +536,18 @@ const EntryPage = () => {
             </Accordion>
           </Box>
         </Grid>
-
         {/* Right Side: Filters Table */}
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5, xl: 5 }}>
-          <Grid
-            size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
-            display={"flex"}
-          >
-            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-              <Box>
-                <Stack
-                  direction="column"
-                  spacing={0.5}
-                  sx={{ padding: "0 8px" }}
-                >
-                  <SummaryTable
-                    title="Cash Entries Summary"
-                    dayRows={processedEntries.cash.day}
-                    nightRows={processedEntries.cash.night}
-                    extraDayRows={processedEntries.cash.extraDay}
-                    extraNightRows={processedEntries.cash.extraNight}
-                    columns={columns}
-                    color={paymentColors.Cash}
-                  />
-                  <SummaryTable
-                    title="Card Entries Summary"
-                    dayRows={processedEntries.card.day}
-                    nightRows={processedEntries.card.night}
-                    extraDayRows={processedEntries.card.extraDay}
-                    extraNightRows={processedEntries.card.extraNight}
-                    columns={columns}
-                    color={paymentColors.Card}
-                  />
-                </Stack>
-              </Box>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-              <Box>
-                <Stack
-                  direction="column"
-                  spacing={0.5}
-                  sx={{ padding: "0 8px" }}
-                >
-                  <SummaryTable
-                    title="PPS Entries Summary"
-                    dayRows={processedEntries.pps.day}
-                    nightRows={processedEntries.pps.night}
-                    extraDayRows={processedEntries.pps.extraDay}
-                    extraNightRows={processedEntries.pps.extraNight}
-                    columns={columns}
-                    color={paymentColors.PPS}
-                  />
-                  <SummaryTable
-                    title="PPC Entries Summary"
-                    dayRows={processedEntries.ppc.day}
-                    nightRows={processedEntries.ppc.night}
-                    extraDayRows={processedEntries.ppc.extraDay}
-                    extraNightRows={processedEntries.ppc.extraNight}
-                    columns={columns}
-                    color={paymentColors.PPC}
-                  />
-                </Stack>
-              </Box>
-            </Grid>
-          </Grid>
-          <Grid
-            size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}
-            display={"flex"}
-          >
-            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-              <Box>
-                <Stack
-                  direction="column"
-                  spacing={0.5}
-                  sx={{ padding: "0 8px" }}
-                >
-                  <SummaryTable
-                    title="UnPaid Entries Summary"
-                    dayRows={processedEntries.unpaid.day}
-                    nightRows={processedEntries.unpaid.night}
-                    extraDayRows={processedEntries.unpaid.extraDay}
-                    extraNightRows={processedEntries.unpaid.extraNight}
-                    columns={columns}
-                    color={paymentColors.UnPaid}
-                  />
-                </Stack>
-              </Box>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-              <Box>
-                <Stack
-                  direction="column"
-                  spacing={0.5}
-                  sx={{ padding: "0 8px" }}
-                >
-                  <SummaryTable
-                    title="Revenue Summary"
-                    dayRows={modeRows}
-                    nightRows={[]}
-                    columns={modeColumns}
-                    color={paymentColors.Select}
-                  />
-                </Stack>
-              </Box>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Box
-              sx={{ px: 2 }}
-              flexDirection={"row"}
-              display={"flex"}
-              alignItems={"center"}
-              gap={2}
-            >
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Submit Entries
-              </Typography>
-              <Stack direction="row" spacing={1}>
-                {isAdminAuthenticated && (
-                  <Button
-                    onClick={handleEntryEdit}
-                    variant="contained"
-                    color="success"
-                    sx={{
-                      px: 3,
-                      "&:hover": {
-                        backgroundColor: "#81c784",
-                      },
-                    }}
-                  >
-                    Update
-                  </Button>
-                )}
-                <Button
-                  onClick={handleEntrySubmit}
-                  variant="contained"
-                  color="success"
-                  sx={{
-                    px: 3,
-                    "&:hover": {
-                      backgroundColor: "#81c784",
-                    },
-                  }}
-                >
-                  Submit
-                </Button>
-                <Button
-                  onClick={handleCancelClick}
-                  variant="contained"
-                  color="error"
-                  sx={{
-                    px: 3,
-                    "&:hover": {
-                      backgroundColor: "#e57373",
-                    },
-                  }}
-                >
-                  Cancel
-                </Button>
-              </Stack>
-            </Box>
-          </Grid>
-        </Grid>
+        <PaymentSummary
+          processedEntries={processedEntries}
+          columns={modeSummaryColumn}
+          paymentColors={paymentColors}
+          modeRows={modeRows}
+          modeColumns={finalModeColumns}
+          isAdminAuthenticated={isAdminAuthenticated}
+          handleEntrySubmit={handleEntrySubmit}
+          handleEntryEdit={handleEntryEdit}
+          handleCancelClick={handleCancelClick}
+        />
       </Grid>
       <Toaster position="top-center" />
     </>

@@ -18,7 +18,7 @@ import {
 import { useSelector } from "react-redux";
 import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 dayjs.locale("en-gb");
 
@@ -28,7 +28,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
   useEffect(() => {
     if (entries.length > 0) {
       const filteredEntries = entries.filter(
-        (entry) => entry.period === "UnPaid"
+        (entry) => entry.period && entry.period === "UnPaid"
       );
       if (filteredEntries.length > 0) {
         setPendingJamaRows((prevRows) => {
@@ -52,17 +52,18 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
         });
       }
     }
-  }, [entries, setPendingJamaRows, unpaidEntries.length]);
+  }, [entries, setPendingJamaRows]);
 
-  const getRoomNoList = (date) => {
-    return [
-      ...new Set(
-        unpaidEntries
-          .filter((entry) => entry.date === date)
-          .map((entry) => entry.roomNo)
-      ),
-    ];
-  };
+  const getRoomNoList = useMemo(() => {
+    const map = new Map();
+    unpaidEntries.forEach((entry) => {
+      if (!map.has(entry.date)) {
+        map.set(entry.date, new Set());
+      }
+      map.get(entry.date).add(entry.roomNo);
+    });
+    return map;
+  }, [unpaidEntries]);
 
   const getFullNameList = (date, roomNo) => {
     return unpaidEntries
@@ -160,14 +161,14 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               }}
             >
               <TableCell
-                width={"5%"}
+                width={"3%"}
                 sx={{
                   fontSize: "12px",
                 }}
               >
                 {row.id}
               </TableCell>
-              <TableCell width={"20%"}>
+              <TableCell width={"17%"}>
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
                   adapterLocale="en-gb"
@@ -189,7 +190,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   />
                 </LocalizationProvider>
               </TableCell>
-              <TableCell width={"10%"}>
+              <TableCell width={"5%"}>
                 <Select
                   value={row.roomNo}
                   onChange={(e) =>
@@ -203,8 +204,14 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     },
                   }}
                 >
-                  {getRoomNoList(row.date).map((roomNo) => (
-                    <MenuItem key={roomNo} value={roomNo}>
+                  {[...(getRoomNoList.get(row.date) || [])].map((roomNo) => (
+                    <MenuItem
+                      key={roomNo}
+                      value={roomNo}
+                      sx={{
+                        fontSize: "12px",
+                      }}
+                    >
                       {roomNo}
                     </MenuItem>
                   ))}
@@ -224,9 +231,15 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     },
                   }}
                 >
-                  {getFullNameList(row.date, row.roomNo).map((name) => (
-                    <MenuItem key={name} value={name}>
-                      {name}
+                  {getFullNameList(row.date, row.roomNo).map((fullname) => (
+                    <MenuItem
+                      key={fullname}
+                      value={fullname}
+                      sx={{
+                        fontSize: "12px",
+                      }}
+                    >
+                      {fullname}
                     </MenuItem>
                   ))}
                 </Select>
@@ -246,15 +259,21 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   }}
                 >
                   {getMobileNumberList(row.date, row.roomNo, row.fullname).map(
-                    (num) => (
-                      <MenuItem key={num} value={num}>
-                        {num}
+                    (mobileNumber) => (
+                      <MenuItem
+                        key={mobileNumber}
+                        value={mobileNumber}
+                        sx={{
+                          fontSize: "12px",
+                        }}
+                      >
+                        {mobileNumber}
                       </MenuItem>
                     )
                   )}
                 </Select>
               </TableCell>
-              <TableCell width={"10%"}>
+              <TableCell width={"15%"}>
                 <Select
                   value={row.rate}
                   onChange={(e) =>
@@ -274,13 +293,19 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     row.fullname,
                     row.mobileNumber
                   ).map((rate) => (
-                    <MenuItem key={rate} value={rate}>
+                    <MenuItem
+                      key={rate}
+                      value={rate}
+                      sx={{
+                        fontSize: "12px",
+                      }}
+                    >
                       {rate}
                     </MenuItem>
                   ))}
                 </Select>
               </TableCell>
-              <TableCell width={"10%"}>
+              <TableCell width={"15%"}>
                 <Select
                   value={row.modeOfPayment}
                   onChange={(e) =>
@@ -294,20 +319,21 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     },
                   }}
                 >
-                  {["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"].map(
-                    (mode) => (
-                      <MenuItem key={mode} value={mode}>
-                        {mode}
-                      </MenuItem>
-                    )
-                  )}
+                  {["Cash", "Card", "PPS", "PPC", "UnPaid"].map((mode) => (
+                    <MenuItem
+                      key={mode}
+                      value={mode}
+                      sx={{
+                        fontSize: "12px",
+                      }}
+                    >
+                      {mode}
+                    </MenuItem>
+                  ))}
                 </Select>
               </TableCell>
               <TableCell width={"5%"}>
                 <Button
-                  variant="outlined"
-                  color="error"
-                  size="small"
                   onClick={() => {
                     setPendingJamaRows((prevRows) =>
                       prevRows.map((prevRow) =>

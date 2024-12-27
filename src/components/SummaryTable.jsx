@@ -11,8 +11,8 @@ const SummaryTable = ({
   color,
 }) => {
   const finalRows = [
-    ...dayRows,
-    ...nightRows,
+    ...(dayRows || []),
+    ...(nightRows || []),
     ...(extraDayRows || []),
     ...(extraNightRows || []),
   ].filter((row) => row.rate !== 0 && row.noOfPeople !== 0);
