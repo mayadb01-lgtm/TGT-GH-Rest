@@ -308,6 +308,9 @@ const EntryPage = () => {
         setPendingJamaRows,
         setSelectedDate
       );
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 3000);
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -401,6 +404,9 @@ const EntryPage = () => {
           setPendingJamaRows,
           setSelectedDate
         );
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 3000);
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
