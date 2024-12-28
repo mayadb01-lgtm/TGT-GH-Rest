@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/userAction";
 import { logoutAdmin } from "../redux/actions/adminAction";
+import { ThemeSwitcher } from "@toolpad/core";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -108,6 +109,7 @@ const Navbar = () => {
           }}
         >
           {navLinks}
+          <ThemeSwitcher />
         </Stack>
         <IconButton
           color="inherit"

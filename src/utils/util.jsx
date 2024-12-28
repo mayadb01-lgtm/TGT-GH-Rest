@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import { roomCosts } from "./utils";
 import TableComponent from "../components/TableComponent";
 import SummaryTable from "../components/SummaryTable";
+import { useState } from "react";
 
 export const EntryAccordion = ({
   title,
@@ -25,50 +26,57 @@ export const EntryAccordion = ({
   roomCosts,
   onSubmit,
   bgColor,
-}) => (
-  <Accordion>
-    <AccordionSummary
-      expandIcon={<ExpandMoreIcon />}
-      style={{
-        backgroundColor: bgColor,
-        border: "1px solid #e0e0e0",
-        minHeight: "0",
-        height: "40px",
-        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Stack
-        direction="row"
-        alignItems="center"
-        flex={1}
-        justifyContent="space-between"
+  panel,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const handleChange = (currentPanel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? currentPanel : false);
+  };
+  return (
+    <Accordion expanded={expanded === panel} onChange={handleChange(panel)}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        style={{
+          backgroundColor: bgColor,
+          border: "1px solid #e0e0e0",
+          minHeight: "0",
+          height: "40px",
+          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+        }}
       >
-        <Typography
-          variant="subtitle2"
-          sx={{ fontWeight: 500, fontSize: "14px" }}
+        <Stack
+          direction="row"
+          alignItems="center"
+          flex={1}
+          justifyContent="space-between"
         >
-          {title}
-        </Typography>
-        <Typography
-          variant="subtitle2"
-          sx={{ fontWeight: 500, fontSize: "14px" }}
-        >
-          Aashirvad Guest House
-        </Typography>
-      </Stack>
-    </AccordionSummary>
-    <AccordionDetails style={{ margin: 0, padding: 0 }}>
-      <TableComponent
-        selectedDate={selectedDate}
-        period={period}
-        title={`${title} Table`}
-        rowsLength={11}
-        roomCosts={roomCosts}
-        onSubmit={onSubmit}
-      />
-    </AccordionDetails>
-  </Accordion>
-);
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 500, fontSize: "14px" }}
+          >
+            {title}
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 500, fontSize: "14px" }}
+          >
+            Aashirvad Guest House
+          </Typography>
+        </Stack>
+      </AccordionSummary>
+      <AccordionDetails style={{ margin: 0, padding: 0 }}>
+        <TableComponent
+          selectedDate={selectedDate}
+          period={period}
+          title={`${title} Table`}
+          rowsLength={11}
+          roomCosts={roomCosts}
+          onSubmit={onSubmit}
+        />
+      </AccordionDetails>
+    </Accordion>
+  );
+};
 
 export const DatePickerComponent = ({
   selectedDate,
@@ -110,26 +118,30 @@ export const EntrySection = ({
         period: "Day",
         onSubmit: setDayData,
         bgColor: "#88d3fc",
+        panel: "panel1",
       },
       {
         title: "Night Entries",
         period: "Night",
         onSubmit: setNightData,
         bgColor: "#cecece",
+        panel: "panel2",
       },
       {
         title: "Extra Day Entries",
         period: "extraDay",
         onSubmit: setExtraDayData,
         bgColor: "#88d3fc",
+        panel: "panel3",
       },
       {
         title: "Extra Night Entries",
         period: "extraNight",
         onSubmit: setExtraNightData,
         bgColor: "#cecece",
+        panel: "panel4",
       },
-    ].map(({ title, period, onSubmit, bgColor }) => (
+    ].map(({ title, period, onSubmit, bgColor, panel }) => (
       <EntryAccordion
         key={title}
         title={title}
@@ -138,6 +150,7 @@ export const EntrySection = ({
         roomCosts={roomCosts}
         onSubmit={onSubmit}
         bgColor={bgColor}
+        panel={panel}
       />
     ))}
   </>

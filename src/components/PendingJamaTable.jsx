@@ -114,7 +114,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
     <TableContainer component={Paper} sx={{ maxHeight: 600, boxShadow: 3 }}>
       <Table size="small" stickyHeader>
         <TableHead>
-          <TableRow>
+          <TableRow sx={{ border: "1px solid #000" }}>
             {[
               "ID",
               "Date",
@@ -129,9 +129,9 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 key={index}
                 sx={{
                   fontWeight: "bold",
-                  backgroundColor: "#f4f6f8",
+                  backgroundColor: "#edb7f7",
                   textAlign: "center",
-                  border: "1px solid #ddd",
+                  border: "1px solid #fff",
                   height: "24px",
                   padding: "0px",
                   fontSize: "12px",
@@ -202,6 +202,9 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   fullWidth
                   renderValue={(value) => value}
                   sx={{
+                    "& .MuiTableCell-root": {
+                      padding: "0px",
+                    },
                     "& .MuiInputBase-input": {
                       fontSize: "12px",
                     },
@@ -213,6 +216,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                       value={roomNo}
                       sx={{
                         fontSize: "12px",
+                        padding: "0px",
                       }}
                     >
                       {roomNo}
