@@ -266,8 +266,9 @@ const EntryPage = () => {
         pendingJamaEntries = pendingJamaEntryFilteredRows.map((row) => ({
           ...row,
           period: row.period,
-          date: selectedDate,
+          date: row.date,
           createDate: selectedDate,
+          updatedDate: selectedDate,
         }));
       }
 
@@ -356,7 +357,8 @@ const EntryPage = () => {
         pendingJamaEntries = pendingJamaEntryFilteredRows.map((row) => ({
           ...row,
           period: row.period,
-          date: selectedDate,
+          date: row.date,
+          updatedDate: selectedDate,
         }));
 
         console.log("Pending Jama Entries", pendingJamaEntries);

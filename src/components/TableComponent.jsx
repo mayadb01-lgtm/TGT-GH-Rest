@@ -68,13 +68,13 @@ const TableComponent = ({
       rows.length > 0
       // selectedDate !== dayjs().format("DD-MM-YYYY")
     ) {
-      const dayEntries = entries.filter((entry) => entry.period === "day");
-      const nightEntries = entries.filter((entry) => entry.period === "night");
+      const dayEntries = entries.filter((entry) => entry?.period === "day");
+      const nightEntries = entries.filter((entry) => entry?.period === "night");
       const extraDayEntries = entries.filter(
-        (entry) => entry.period === "extraDay"
+        (entry) => entry?.period === "extraDay"
       );
       const extraNightEntries = entries.filter(
-        (entry) => entry.period === "extraNight"
+        (entry) => entry?.period === "extraNight"
       );
 
       // Update rows with entries

@@ -30,8 +30,10 @@ const entrySchemaObj = new Schema(
     checkOutTime: { type: String },
     date: { type: String, required: true },
     createDate: { type: String, required: true },
+    updatedDate: { type: String, required: true },
     period: { type: String, required: true },
     createdAt: { type: Date, default: Date.now() },
+    paidDate: { type: String, default: "" },
     isPaid: {
       type: Boolean,
       default: function () {
