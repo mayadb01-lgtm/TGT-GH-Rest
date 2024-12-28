@@ -129,7 +129,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 key={index}
                 sx={{
                   fontWeight: "bold",
-                  backgroundColor: "#edb7f7",
+                  backgroundColor: "#e32aff",
                   textAlign: "center",
                   border: "1px solid #fff",
                   height: "24px",
@@ -150,7 +150,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               sx={{
                 "& .MuiTableRow-root": {
                   hight: "24px",
-                  // padding: "0px",
+                  padding: "0px",
                   fontSize: "12px",
                 },
                 "& .MuiInputBase-input": {

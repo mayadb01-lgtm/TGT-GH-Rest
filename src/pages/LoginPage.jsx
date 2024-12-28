@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const { loading, isAuthenticated } = useSelector((state) => state.user);
+  const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -37,10 +38,12 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAdminAuthenticated) {
+      navigate("/admin");
+    } else if (isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAdminAuthenticated, isAuthenticated, navigate]);
 
   return (
     <Box

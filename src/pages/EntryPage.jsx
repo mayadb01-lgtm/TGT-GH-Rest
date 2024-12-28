@@ -522,7 +522,7 @@ const EntryPage = () => {
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 style={{
-                  backgroundColor: "#edb7f7",
+                  backgroundColor: "#e32aff",
                   borderBottom: "1px solid #e0e0e0",
                   minHeight: "0",
                   height: "40px",

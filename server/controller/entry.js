@@ -102,7 +102,6 @@ router.get("/get-entry/:date", async (req, res) => {
       });
     }
 
-    entry.entry = entry.entry.filter((item) => item.period !== "UnPaid");
     res.status(200).json({
       success: true,
       data: entry.entry,

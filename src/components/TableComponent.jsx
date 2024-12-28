@@ -7,24 +7,7 @@ import { MobileTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import { getEntriesByDate } from "../redux/actions/entryAction";
 import DropdownCell from "./DropdownCell";
-
-const initializeRows = (period, rowsLength, roomCosts) => {
-  return Array.from({ length: rowsLength }, (_, i) => ({
-    id: `${period} - ${i + 1}`,
-    roomNo: i + 1,
-    cost: roomCosts[i + 1] || 0,
-    rate: 0,
-    noOfPeople: 0,
-    type: "",
-    modeOfPayment: "",
-    fullname: `${period} - ${i + 1} Name`,
-    mobileNumber: 1234567890,
-    checkInTime: "11:00 AM",
-    checkOutTime: "10:00 AM",
-    period: period,
-    createDate: "",
-  }));
-};
+import { initializeRows } from "../utils/utils";
 
 const TableComponent = ({
   title,

@@ -63,7 +63,7 @@ const App = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: "#f4f6f8",
+          backgroundColor: "#000000",
           padding: 2,
         }}
       >
