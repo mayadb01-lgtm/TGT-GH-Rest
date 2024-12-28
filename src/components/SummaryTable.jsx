@@ -7,6 +7,10 @@ const SummaryTable = ({
   nightRows,
   extraDayRows,
   extraNightRows,
+  pendingJamaCash,
+  pendingJamaCard,
+  pendingJamaPPS,
+  pendingJamaPPC,
   columns,
   color,
 }) => {
@@ -15,7 +19,11 @@ const SummaryTable = ({
     ...(nightRows || []),
     ...(extraDayRows || []),
     ...(extraNightRows || []),
-  ].filter((row) => row.rate !== 0 && row.noOfPeople !== 0);
+    ...(pendingJamaCash || []),
+    ...(pendingJamaCard || []),
+    ...(pendingJamaPPS || []),
+    ...(pendingJamaPPC || []),
+  ].filter((row) => row.rate !== 0);
 
   if (finalRows.length > 0) {
     finalRows[finalRows.length] = {

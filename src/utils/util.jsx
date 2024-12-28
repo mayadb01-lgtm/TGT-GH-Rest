@@ -168,6 +168,10 @@ export const SummaryGrid = ({ entries, columns, colors }) => (
             nightRows={entry.nightRows}
             extraDayRows={entry.extraDayRows}
             extraNightRows={entry.extraNightRows}
+            pendingJamaCash={entry.pendingJamaCash}
+            pendingJamaCard={entry.pendingJamaCard}
+            pendingJamaPPS={entry.pendingJamaPPS}
+            pendingJamaPPC={entry.pendingJamaPPC}
             columns={columns}
             color={colors[entry.colorKey]}
           />
@@ -198,6 +202,7 @@ export const PaymentSummary = ({
             nightRows: processedEntries.cash.night,
             extraDayRows: processedEntries.cash.extraDay,
             extraNightRows: processedEntries.cash.extraNight,
+            pendingJamaCash: processedEntries.cash.pendingJamaCash,
             colorKey: "Cash",
           },
           {
@@ -206,6 +211,7 @@ export const PaymentSummary = ({
             nightRows: processedEntries.card.night,
             extraDayRows: processedEntries.card.extraDay,
             extraNightRows: processedEntries.card.extraNight,
+            pendingJamaCard: processedEntries.card.pendingJamaCard,
             colorKey: "Card",
           },
         ]}
@@ -220,6 +226,7 @@ export const PaymentSummary = ({
             nightRows: processedEntries.pps.night,
             extraDayRows: processedEntries.pps.extraDay,
             extraNightRows: processedEntries.pps.extraNight,
+            pendingJamaPPS: processedEntries.pps.pendingJamaPPS,
             colorKey: "PPS",
           },
           {
@@ -228,6 +235,7 @@ export const PaymentSummary = ({
             nightRows: processedEntries.ppc.night,
             extraDayRows: processedEntries.ppc.extraDay,
             extraNightRows: processedEntries.ppc.extraNight,
+            pendingJamaPPC: processedEntries.ppc.pendingJamaPPC,
             colorKey: "PPC",
           },
         ]}

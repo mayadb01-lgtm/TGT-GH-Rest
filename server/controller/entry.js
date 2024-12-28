@@ -95,8 +95,6 @@ router.get("/get-entry/:date", async (req, res) => {
       // user: req.user._id, // Find the Entry by date and authenticated user's ID
     });
 
-    entry.entry = entry.entry.filter((item) => item.period !== "UnPaid");
-
     if (!entry) {
       return res.status(200).json({
         success: true,
@@ -104,6 +102,7 @@ router.get("/get-entry/:date", async (req, res) => {
       });
     }
 
+    entry.entry = entry.entry.filter((item) => item.period !== "UnPaid");
     res.status(200).json({
       success: true,
       data: entry.entry,

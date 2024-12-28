@@ -150,7 +150,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               sx={{
                 "& .MuiTableRow-root": {
                   hight: "24px",
-                  padding: "0px",
+                  // padding: "0px",
                   fontSize: "12px",
                 },
                 "& .MuiInputBase-input": {
@@ -203,7 +203,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   renderValue={(value) => value}
                   sx={{
                     "& .MuiTableCell-root": {
-                      padding: "0px",
+                      // padding: "0px",
                     },
                     "& .MuiInputBase-input": {
                       fontSize: "12px",
@@ -216,7 +216,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                       value={roomNo}
                       sx={{
                         fontSize: "12px",
-                        padding: "0px",
+                        // padding: "0px",
                       }}
                     >
                       {roomNo}
@@ -326,7 +326,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     },
                   }}
                 >
-                  {["Cash", "Card", "PPS", "PPC", "UnPaid"].map((mode) => (
+                  {["Cash", "Card", "PPS", "PPC"].map((mode) => (
                     <MenuItem
                       key={mode}
                       value={mode}

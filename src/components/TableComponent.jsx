@@ -65,8 +65,8 @@ const TableComponent = ({
       selectedDate &&
       isAdminAuthenticated &&
       entries.length > 0 &&
-      rows.length > 0 &&
-      selectedDate !== dayjs().format("DD-MM-YYYY")
+      rows.length > 0
+      // selectedDate !== dayjs().format("DD-MM-YYYY")
     ) {
       const dayEntries = entries.filter((entry) => entry.period === "day");
       const nightEntries = entries.filter((entry) => entry.period === "night");
@@ -246,7 +246,7 @@ const TableComponent = ({
     } else {
       setRows(initializeRows(period, rowsLength, roomCosts));
     }
-  }, [entries, selectedDate, isAdminAuthenticated]);
+  }, [entries, selectedDate]);
 
   // console.log("Table Component Rows: ", rows);
 
@@ -266,7 +266,7 @@ const TableComponent = ({
 
   useEffect(() => {
     onSubmit(rows);
-  }, [onSubmit, rows]);
+  }, [onSubmit, rows, selectedDate]);
 
   return (
     <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>
@@ -316,6 +316,9 @@ const TableComponent = ({
             type: "number",
             cellClassName: "light-gray",
             headerClassName: "light-gray",
+            valueFormatter: (params) => {
+              params.value;
+            },
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -351,6 +354,9 @@ const TableComponent = ({
             type: "number",
             cellClassName: "orange",
             headerClassName: "orange",
+            valueFormatter: (params) => {
+              params.value;
+            },
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -386,6 +392,9 @@ const TableComponent = ({
             type: "number",
             cellClassName: "orange",
             headerClassName: "orange",
+            valueFormatter: (params) => {
+              params.value;
+            },
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -482,7 +491,7 @@ const TableComponent = ({
                   lineHeight: "24px",
                 }}
               >
-                {params.value || "Check In Time"}
+                {params.value || ""}
               </div>
             ),
           },
@@ -555,7 +564,7 @@ const TableComponent = ({
                   lineHeight: "24px",
                 }}
               >
-                {params.value || "Check Out Time"}
+                {params.value || ""}
               </div>
             ),
           },
@@ -565,24 +574,29 @@ const TableComponent = ({
             width: 100,
             cellClassName: "orange",
             headerClassName: "orange",
-            renderCell: (params) => (
-              <DropdownCell
-                value={params.row.type}
-                options={[
-                  "Select",
-                  "Single",
-                  "Couple",
-                  "Family",
-                  "Employee",
-                  "NRI",
-                  "Foreigner",
-                  "Other",
-                ]}
-                onChange={(value) =>
-                  handleRowEdit({ ...params.row, type: value })
-                }
-              />
-            ),
+            renderCell: (params) => {
+              if (params.row.id.includes("totals")) {
+                return <div>{params.row.type}</div>;
+              }
+              return (
+                <DropdownCell
+                  value={params.row.type}
+                  options={[
+                    "Select",
+                    "Single",
+                    "Couple",
+                    "Family",
+                    "Employee",
+                    "NRI",
+                    "Foreigner",
+                    "Other",
+                  ]}
+                  onChange={(value) =>
+                    handleRowEdit({ ...params.row, type: value })
+                  }
+                />
+              );
+            },
           },
           {
             field: "modeOfPayment",
@@ -590,15 +604,20 @@ const TableComponent = ({
             width: 100,
             cellClassName: "orange",
             headerClassName: "orange",
-            renderCell: (params) => (
-              <DropdownCell
-                value={params.row.modeOfPayment}
-                options={["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"]}
-                onChange={(value) =>
-                  handleRowEdit({ ...params.row, modeOfPayment: value })
-                }
-              />
-            ),
+            renderCell: (params) => {
+              if (params.row.id.includes("totals")) {
+                return <div>{params.row.modeOfPayment}</div>;
+              }
+              return (
+                <DropdownCell
+                  value={params.row.modeOfPayment}
+                  options={["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"]}
+                  onChange={(value) =>
+                    handleRowEdit({ ...params.row, modeOfPayment: value })
+                  }
+                />
+              );
+            },
           },
           {
             field: "fullname",
@@ -640,6 +659,9 @@ const TableComponent = ({
             type: "number",
             cellClassName: "blue",
             headerClassName: "blue",
+            valueFormatter: (params) => {
+              params.value;
+            },
             renderEditCell: (params) => (
               <input
                 type="number"
@@ -767,10 +789,16 @@ const TableComponent = ({
           },
         }}
         getRowClassName={(params) => {
-          return params.id === "totals" ? "green" : "";
+          if (params.id.includes("totals")) {
+            return "green";
+          }
+          return "";
         }}
         getCellClassName={(params) => {
-          return params.id === "totals" ? "green" : "";
+          if (params.id.includes("totals")) {
+            return "green";
+          }
+          return "";
         }}
         disableColumnResize
       />

@@ -7,6 +7,7 @@ import {
   AccordionDetails,
   Stack,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -51,21 +52,33 @@ const EntryPage = () => {
     const cashNight = processEntriesByPaymentMode(nightData, "Cash");
     const cashExtraDay = processEntriesByPaymentMode(extraDayData, "Cash");
     const cashExtraNight = processEntriesByPaymentMode(extraNightData, "Cash");
+    const pendingJamaCash = pendingJamaRows.filter(
+      (row) => row.modeOfPayment === "Cash" && row.period === "UnPaid"
+    );
     // Card
     const cardDay = processEntriesByPaymentMode(dayData, "Card");
     const cardNight = processEntriesByPaymentMode(nightData, "Card");
     const cardExtraDay = processEntriesByPaymentMode(extraDayData, "Card");
     const cardExtraNight = processEntriesByPaymentMode(extraNightData, "Card");
+    const pendingJamaCard = pendingJamaRows.filter(
+      (row) => row.modeOfPayment === "Card" && row.period === "UnPaid"
+    );
     // PPS
     const ppsDay = processEntriesByPaymentMode(dayData, "PPS");
     const ppsNight = processEntriesByPaymentMode(nightData, "PPS");
     const ppsExtraDay = processEntriesByPaymentMode(extraDayData, "PPS");
     const ppsExtraNight = processEntriesByPaymentMode(extraNightData, "PPS");
+    const pendingJamaPPS = pendingJamaRows.filter(
+      (row) => row.modeOfPayment === "PPS" && row.period === "UnPaid"
+    );
     // PPC
     const ppcDay = processEntriesByPaymentMode(dayData, "PPC");
     const ppcNight = processEntriesByPaymentMode(nightData, "PPC");
     const ppcExtraDay = processEntriesByPaymentMode(extraDayData, "PPC");
     const ppcExtraNight = processEntriesByPaymentMode(extraNightData, "PPC");
+    const pendingJamaPPC = pendingJamaRows.filter(
+      (row) => row.modeOfPayment === "PPC" && row.period === "UnPaid"
+    );
     // UnPaid
     const unpaidDay = processEntriesByPaymentMode(dayData, "UnPaid");
     const unpaidNight = processEntriesByPaymentMode(nightData, "UnPaid");
@@ -81,24 +94,28 @@ const EntryPage = () => {
         night: cashNight ? cashNight : [],
         extraDay: cashExtraDay ? cashExtraDay : [],
         extraNight: cashExtraNight ? cashExtraNight : [],
+        pendingJamaCash: pendingJamaCash ? pendingJamaCash : [],
       },
       card: {
         day: cardDay ? cardDay : [],
         night: cardNight ? cardNight : [],
         extraDay: cardExtraDay ? cardExtraDay : [],
         extraNight: cardExtraNight ? cardExtraNight : [],
+        pendingJamaCard: pendingJamaCard ? pendingJamaCard : [],
       },
       pps: {
         day: ppsDay ? ppsDay : [],
         night: ppsNight ? ppsNight : [],
         extraDay: ppsExtraDay ? ppsExtraDay : [],
         extraNight: ppsExtraNight ? ppsExtraNight : [],
+        pendingJamaPPS: pendingJamaPPS ? pendingJamaPPS : [],
       },
       ppc: {
         day: ppcDay ? ppcDay : [],
         night: ppcNight ? ppcNight : [],
         extraDay: ppcExtraDay ? ppcExtraDay : [],
         extraNight: ppcExtraNight ? ppcExtraNight : [],
+        pendingJamaPPC: pendingJamaPPC ? pendingJamaPPC : [],
       },
       unpaid: {
         day: unpaidDay ? unpaidDay : [],
@@ -107,7 +124,7 @@ const EntryPage = () => {
         extraNight: unpaidExtraNight ? unpaidExtraNight : [],
       },
     };
-  }, [dayData, nightData, extraDayData, extraNightData]);
+  }, [dayData, nightData, extraDayData, extraNightData, pendingJamaRows]);
 
   const calculateTotal = (entries) =>
     entries ? entries.reduce((sum, row) => sum + row.rate, 0) : 0;
@@ -119,7 +136,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.cash.day) +
         calculateTotal(processedEntries.cash.night) +
         calculateTotal(processedEntries.cash.extraDay) +
-        calculateTotal(processedEntries.cash.extraNight),
+        calculateTotal(processedEntries.cash.extraNight) +
+        calculateTotal(processedEntries.cash.pendingJamaCash),
     },
     {
       id: "Card",
@@ -127,7 +145,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.card.day) +
         calculateTotal(processedEntries.card.night) +
         calculateTotal(processedEntries.card.extraDay) +
-        calculateTotal(processedEntries.card.extraNight),
+        calculateTotal(processedEntries.card.extraNight) +
+        calculateTotal(processedEntries.card.pendingJamaCard),
     },
     {
       id: "PPS",
@@ -135,7 +154,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.pps.day) +
         calculateTotal(processedEntries.pps.night) +
         calculateTotal(processedEntries.pps.extraDay) +
-        calculateTotal(processedEntries.pps.extraNight),
+        calculateTotal(processedEntries.pps.extraNight) +
+        calculateTotal(processedEntries.pps.pendingJamaPPS),
     },
     {
       id: "PPC",
@@ -143,7 +163,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.ppc.day) +
         calculateTotal(processedEntries.ppc.night) +
         calculateTotal(processedEntries.ppc.extraDay) +
-        calculateTotal(processedEntries.ppc.extraNight),
+        calculateTotal(processedEntries.ppc.extraNight) +
+        calculateTotal(processedEntries.ppc.pendingJamaPPC),
     },
     {
       id: "UnPaid",
@@ -413,6 +434,23 @@ const EntryPage = () => {
       );
     }
   };
+
+  if (!selectedDate) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          backgroundColor: "#f4f6f8",
+          padding: 2,
+        }}
+      >
+        <CircularProgress fontSize="large" />
+      </Box>
+    );
+  }
 
   return (
     <>
