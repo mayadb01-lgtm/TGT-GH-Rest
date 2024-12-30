@@ -29,9 +29,16 @@ const SummaryTable = ({
     finalRows[finalRows.length] = {
       id: `Total ${title}`,
       roomNo: "",
-      rate: finalRows.reduce((sum, row) => sum + row.rate, 0),
+      rate: finalRows?.reduce(
+        (acc, row) => Number(acc) + (isNaN(row.rate) ? 0 : Number(row.rate)),
+        0
+      ),
       fullname: "",
-      noOfPeople: "",
+      noOfPeople: finalRows?.reduce(
+        (acc, row) =>
+          Number(acc) + (isNaN(row.noOfPeople) ? 0 : Number(row.noOfPeople)),
+        0
+      ),
     };
   }
 

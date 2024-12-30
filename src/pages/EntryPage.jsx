@@ -127,7 +127,9 @@ const EntryPage = () => {
   }, [dayData, nightData, extraDayData, extraNightData, pendingJamaRows]);
 
   const calculateTotal = (entries) =>
-    entries ? entries.reduce((sum, row) => sum + row.rate, 0) : 0;
+    entries
+      ? entries.reduce((sum, row) => Number(sum) + Number(row.rate), 0)
+      : 0;
 
   const modeRows = [
     {
@@ -178,7 +180,7 @@ const EntryPage = () => {
   ];
 
   modeRows[5].totals = modeRows.reduce(
-    (sum, row, idx) => (idx < 5 ? sum + row.totals : sum),
+    (sum, row, idx) => (idx < 5 ? Number(sum) + Number(row.totals) : sum),
     0
   );
 
