@@ -249,8 +249,14 @@ const TableComponent = ({
     id: `${period}-totals`,
     roomNo: "Totals",
     cost: "",
-    rate: rows?.reduce((sum, row) => sum + row.rate, 0),
-    noOfPeople: rows?.reduce((sum, row) => sum + row.noOfPeople, 0),
+    rate: rows?.reduce(
+      (sum, row) => sum + (isNaN(row.rate) ? 0 : Number(row.rate)),
+      0
+    ),
+    noOfPeople: rows?.reduce(
+      (sum, row) => sum + (isNaN(row.noOfPeople) ? 0 : Number(row.noOfPeople)),
+      0
+    ),
     type: "",
     modeOfPayment: "",
     fullname: "",
@@ -599,6 +605,7 @@ const TableComponent = ({
               hover
               sx={{
                 width: "100%",
+                backgroundColor: "#00d639",
                 "& .MuiTableRow-root": {
                   hight: "24px",
                   padding: "0px",
@@ -612,9 +619,9 @@ const TableComponent = ({
                 },
               }}
             >
-              <TableCell className="light-gray">{totalsRow.roomNo}</TableCell>
-              <TableCell className="light-gray">{totalsRow.cost}</TableCell>
-              <TableCell className="orange">
+              <TableCell>{totalsRow.roomNo}</TableCell>
+              <TableCell>{totalsRow.cost}</TableCell>
+              <TableCell>
                 <TextField
                   type="number"
                   value={totalsRow.rate}
@@ -628,7 +635,7 @@ const TableComponent = ({
                   {totalsRow.rate}
                 </TextField>
               </TableCell>
-              <TableCell className="orange">
+              <TableCell>
                 <TextField
                   type="number"
                   value={totalsRow.noOfPeople}
@@ -642,14 +649,12 @@ const TableComponent = ({
                   {totalsRow.noOfPeople}
                 </TextField>
               </TableCell>
-              <TableCell className="blue">{totalsRow.checkInTime}</TableCell>
-              <TableCell className="blue">{totalsRow.checkOutTime}</TableCell>
-              <TableCell className="orange">{totalsRow.type}</TableCell>
-              <TableCell className="orange">
-                {totalsRow.modeOfPayment}
-              </TableCell>
-              <TableCell className="blue">{totalsRow.fullname}</TableCell>
-              <TableCell className="blue">{totalsRow.mobileNumber}</TableCell>
+              <TableCell>{totalsRow.checkInTime}</TableCell>
+              <TableCell>{totalsRow.checkOutTime}</TableCell>
+              <TableCell>{totalsRow.type}</TableCell>
+              <TableCell>{totalsRow.modeOfPayment}</TableCell>
+              <TableCell>{totalsRow.fullname}</TableCell>
+              <TableCell>{totalsRow.mobileNumber}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
