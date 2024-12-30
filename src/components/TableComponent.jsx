@@ -1,13 +1,25 @@
 import { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers";
 import { useDispatch, useSelector } from "react-redux";
 import { getEntriesByDate } from "../redux/actions/entryAction";
-import DropdownCell from "./DropdownCell";
-import { initializeRows } from "../utils/utils";
+import { initializeRows, paymentColors } from "../utils/utils";
+import {
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Input,
+  TextField,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import "./TableComponent.css";
 
 const TableComponent = ({
   title,
@@ -251,540 +263,397 @@ const TableComponent = ({
     onSubmit(rows);
   }, [onSubmit, rows, selectedDate]);
 
+  const tableComponentColumns = [
+    {
+      headerName: "Room",
+      headerBackColor: "light-gray",
+    },
+    {
+      headerName: "Price",
+      headerBackColor: "light-gray",
+    },
+    {
+      headerName: "Rate",
+      headerBackColor: "orange",
+    },
+    {
+      headerName: "People",
+      headerBackColor: "orange",
+    },
+    {
+      headerName: "Check In",
+      headerBackColor: "blue",
+    },
+    {
+      headerName: "Check Out",
+      headerBackColor: "blue",
+    },
+    {
+      headerName: "Type",
+      headerBackColor: "orange",
+    },
+    {
+      headerName: "Payment",
+      headerBackColor: "orange",
+    },
+    {
+      headerName: "Full Name",
+      headerBackColor: "blue",
+    },
+    {
+      headerName: "Mobile",
+      headerBackColor: "blue",
+    },
+  ];
+
   return (
     <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>
-      <DataGrid
-        rows={[...rows, totalsRow]}
-        columns={[
-          {
-            field: "roomNo",
-            headerName: "Room",
-            width: 50,
-            editable: false,
-            type: "number",
-            cellClassName: "light-gray",
-            headerClassName: "light-gray",
-            renderEditCell: (params) => (
-              <input
-                type="number"
-                value={params.value}
-                className="light-gray"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value > 0 && value <= 11) {
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "roomNo",
-                      value: value,
-                    });
-                  }
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />
-            ),
-          },
-          {
-            field: "cost",
-            headerName: "Price",
-            width: 50,
-            editable: false,
-            type: "number",
-            cellClassName: "light-gray",
-            headerClassName: "light-gray",
-            valueFormatter: (params) => {
-              params.value;
-            },
-            renderEditCell: (params) => (
-              <input
-                type="number"
-                value={params.value}
-                className="light-gray"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "cost",
-                      value: value,
-                    });
-                  }
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />
-            ),
-          },
-          {
-            field: "rate",
-            headerName: "Rate",
-            width: 80,
-            editable: true,
-            type: "number",
-            cellClassName: "orange",
-            headerClassName: "orange",
-            valueFormatter: (params) => {
-              params.value;
-            },
-            renderEditCell: (params) => (
-              <input
-                type="number"
-                value={params.value}
-                className="orange"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "rate",
-                      value: value,
-                    });
-                  }
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />
-            ),
-          },
-          {
-            field: "noOfPeople",
-            headerName: "People",
-            width: 55,
-            editable: true,
-            type: "number",
-            cellClassName: "orange",
-            headerClassName: "orange",
-            valueFormatter: (params) => {
-              params.value;
-            },
-            renderEditCell: (params) => (
-              <input
-                type="number"
-                value={params.value}
-                className="orange"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "noOfPeople",
-                      value: value,
-                    });
-                  }
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />
-            ),
-          },
-          {
-            field: "checkInTime",
-            headerName: "Check In",
-            width: 120,
-            editable: true,
-            cellClassName: "blue",
-            headerClassName: "blue",
-            renderEditCell: (params) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                  value={params.value ? dayjs(params.value, "hh:mm A") : null}
-                  onChange={(newValue) => {
-                    const formattedTime = newValue
-                      ? dayjs(newValue).format("hh:mm A")
-                      : null;
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "checkInTime",
-                      value: formattedTime,
-                    });
-                  }}
-                  renderInput={(props) => (
-                    <input
-                      {...props}
-                      style={{
-                        fontSize: "12px",
-                        height: "24px",
-                        textAlign: "center",
-                        width: "100%",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "4px",
-                        outline: "none",
-                      }}
-                      placeholder="Select Time"
-                      className="blue"
-                    />
-                  )}
-                  ampm
+      <TableContainer component={Paper} sx={{ maxHeight: 600, boxShadow: 3 }}>
+        <Table size="small" stickyHeader>
+          <TableHead>
+            <TableRow sx={{ border: "1px solid #000" }}>
+              {tableComponentColumns.map((column, index) => (
+                <TableCell
+                  key={index}
+                  className={column.headerBackColor}
                   sx={{
-                    "& .MuiInputBase-root": {
-                      height: "24px",
-                      fontSize: "14px",
-                      color: "white",
-                    },
-                    "& .MuiInputBase-root input": {
-                      textAlign: "center",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    border: "1px solid #fff",
+                    height: "24px",
+                    padding: "0px",
+                    fontSize: "12px",
                   }}
-                />
-              </LocalizationProvider>
-            ),
-            renderCell: (params) => (
-              <div
-                style={{
-                  fontSize: "12px",
-                  textAlign: "start",
-                  lineHeight: "24px",
+                >
+                  {column.headerName}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row, index) => (
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  width: "100%",
+                  "& .MuiTableRow-root": {
+                    hight: "24px",
+                    padding: "0px",
+                    fontSize: "12px",
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "2px 8px",
+                  },
+                  "& .MuiTableCell-root": {
+                    padding: "2px 8px",
+                  },
                 }}
               >
-                {params.value || ""}
-              </div>
-            ),
-          },
-          {
-            field: "checkOutTime",
-            headerName: "Check Out",
-            width: 120,
-            editable: true,
-            cellClassName: "blue",
-            headerClassName: "blue",
-            renderEditCell: (params) => (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <MobileTimePicker
-                  value={params.value ? dayjs(params.value, "hh:mm A") : null}
-                  onChange={(newValue) => {
-                    const formattedTime = newValue
-                      ? dayjs(newValue).format("hh:mm A")
-                      : null;
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "checkOutTime",
-                      value: formattedTime,
-                    });
-                  }}
-                  renderInput={(props) => (
-                    <input
-                      {...props}
-                      style={{
-                        fontSize: "12px",
-                        height: "24px",
+                <TableCell width={"5%"} className="light-gray">
+                  <TextField
+                    type="number"
+                    value={row.roomNo}
+                    fullWidth
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value > 0 && value <= 11) {
+                        handleRowEdit({ ...row, roomNo: value });
+                      }
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
                         textAlign: "center",
-                        width: "100%",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "4px",
-                        outline: "none",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"8%"} className="light-gray">
+                  <TextField
+                    type="number"
+                    value={row.cost}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value >= 0) {
+                        handleRowEdit({ ...row, cost: value });
+                      }
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        textAlign: "center",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"8%"} className="orange">
+                  <TextField
+                    type="number"
+                    value={row.rate}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value >= 0) {
+                        handleRowEdit({ ...row, rate: value });
+                      }
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        textAlign: "center",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"8%"} className="orange">
+                  <TextField
+                    type="number"
+                    value={row.noOfPeople}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value >= 0) {
+                        handleRowEdit({ ...row, noOfPeople: value });
+                      }
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        textAlign: "center",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"12%"} className="blue">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <MobileTimePicker
+                      value={
+                        row.checkInTime
+                          ? dayjs(row.checkInTime, "hh:mm A")
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        const formattedTime = newValue
+                          ? dayjs(newValue).format("hh:mm A")
+                          : null;
+                        handleRowEdit({ ...row, checkInTime: formattedTime });
                       }}
-                      placeholder="Select Time"
-                      className="blue"
+                      renderInput={(props) => (
+                        <Input
+                          {...props}
+                          placeholder="Select Time"
+                          className="blue"
+                        />
+                      )}
+                      sx={{
+                        "& .MuiInputBase-root": {
+                          height: "24px",
+                          fontSize: "12px",
+                          textAlign: "center",
+                        },
+                      }}
+                      ampm
                     />
-                  )}
-                  ampm
+                  </LocalizationProvider>
+                </TableCell>
+                <TableCell width={"12%"} className="blue">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <MobileTimePicker
+                      value={
+                        row.checkOutTime
+                          ? dayjs(row.checkOutTime, "hh:mm A")
+                          : null
+                      }
+                      onChange={(newValue) => {
+                        const formattedTime = newValue
+                          ? dayjs(newValue).format("hh:mm A")
+                          : null;
+                        handleRowEdit({ ...row, checkOutTime: formattedTime });
+                      }}
+                      renderInput={(props) => (
+                        <Input
+                          {...props}
+                          placeholder="Select Time"
+                          className="blue"
+                        />
+                      )}
+                      sx={{
+                        "& .MuiInputBase-root": {
+                          height: "24px",
+                          fontSize: "12px",
+                          padding: "0px",
+                        },
+                      }}
+                      ampm
+                    />
+                  </LocalizationProvider>
+                </TableCell>
+                <TableCell width={"10%"} className="orange">
+                  <Select
+                    value={row.type || "Select"}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleRowEdit({ ...row, type: value });
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "12px",
+                      },
+                    }}
+                  >
+                    {[
+                      "Select",
+                      "Single",
+                      "Couple",
+                      "Family",
+                      "Group",
+                      "Employee",
+                      "Other",
+                    ].map((type, index) => (
+                      <MenuItem
+                        key={index}
+                        value={type}
+                        className="orange"
+                        sx={{
+                          fontSize: "12px",
+                        }}
+                      >
+                        {type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </TableCell>
+                <TableCell width={"10%"} className="orange">
+                  <Select
+                    value={row.modeOfPayment || "Select"}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleRowEdit({ ...row, modeOfPayment: value });
+                    }}
+                    sx={{
+                      backgroundColor:
+                        paymentColors[row.modeOfPayment] || "transparent",
+                      "& .MuiInputBase-input": {
+                        fontSize: "12px",
+                      },
+                    }}
+                  >
+                    {["Select", "Cash", "Card", "PPS", "PPC", "UnPaid"].map(
+                      (mode, index) => (
+                        <MenuItem
+                          key={index}
+                          value={mode}
+                          sx={{
+                            fontSize: "12px",
+                            backgroundColor: paymentColors[mode],
+                            color: "#fff",
+                            ":hover": {
+                              backgroundColor: "#b6b6b6",
+                              color: "#000",
+                            },
+                          }}
+                        >
+                          {mode}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                </TableCell>
+                <TableCell width={"15%"} className="blue">
+                  <TextField
+                    type="text"
+                    value={row.fullname}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleRowEdit({ ...row, fullname: value });
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        textAlign: "center",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell width={"12%"} className="blue">
+                  <TextField
+                    type="number"
+                    value={row.mobileNumber}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 10) {
+                        handleRowEdit({ ...row, mobileNumber: value });
+                      }
+                    }}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        textAlign: "center",
+                        fontSize: "12px",
+                      },
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+            {/* Totals Row */}
+            <TableRow
+              hover
+              sx={{
+                width: "100%",
+                "& .MuiTableRow-root": {
+                  hight: "24px",
+                  padding: "0px",
+                  fontSize: "12px",
+                },
+                "& .MuiInputBase-input": {
+                  padding: "2px 8px",
+                },
+                "& .MuiTableCell-root": {
+                  padding: "2px 8px",
+                },
+              }}
+            >
+              <TableCell className="light-gray">{totalsRow.roomNo}</TableCell>
+              <TableCell className="light-gray">{totalsRow.cost}</TableCell>
+              <TableCell className="orange">
+                <TextField
+                  type="number"
+                  value={totalsRow.rate}
                   sx={{
-                    "& .MuiInputBase-root": {
-                      height: "24px",
-                      fontSize: "14px",
-                      color: "white",
-                    },
-                    "& .MuiInputBase-root input": {
+                    "& .MuiInputBase-input": {
                       textAlign: "center",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#3f51b5",
+                      fontSize: "12px",
                     },
                   }}
-                />
-              </LocalizationProvider>
-            ),
-            renderCell: (params) => (
-              <div
-                style={{
-                  fontSize: "12px",
-                  textAlign: "start",
-                  lineHeight: "24px",
-                }}
-              >
-                {params.value || ""}
-              </div>
-            ),
-          },
-          {
-            field: "type",
-            headerName: "Type",
-            width: 100,
-            cellClassName: "orange",
-            headerClassName: "orange",
-            renderCell: (params) => {
-              if (params.row.id.includes("totals")) {
-                return <div>{params.row.type}</div>;
-              }
-              return (
-                <DropdownCell
-                  value={params.row.type}
-                  options={[
-                    "Select",
-                    "Single",
-                    "Couple",
-                    "Family",
-                    "Employee",
-                    "NRI",
-                    "Foreigner",
-                    "Other",
-                  ]}
-                  onChange={(value) =>
-                    handleRowEdit({ ...params.row, type: value })
-                  }
-                />
-              );
-            },
-          },
-          {
-            field: "modeOfPayment",
-            headerName: "Payment",
-            width: 100,
-            cellClassName: "orange",
-            headerClassName: "orange",
-            renderCell: (params) => {
-              if (params.row.id.includes("totals")) {
-                return <div>{params.row.modeOfPayment}</div>;
-              }
-              return (
-                <DropdownCell
-                  value={params.row.modeOfPayment}
-                  options={["Select", "Card", "PPC", "PPS", "Cash", "UnPaid"]}
-                  onChange={(value) =>
-                    handleRowEdit({ ...params.row, modeOfPayment: value })
-                  }
-                />
-              );
-            },
-          },
-          {
-            field: "fullname",
-            headerName: "Full Name",
-            width: 150,
-            editable: true,
-            cellClassName: "blue",
-            headerClassName: "blue",
-            handleRowEdit: (params) => {
-              <input
-                type="text"
-                value={params.value}
-                className="blue"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  params.api.setEditCellValue({
-                    id: params.id,
-                    field: "fullname",
-                    value: value,
-                  });
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />;
-            },
-          },
-          {
-            field: "mobileNumber",
-            headerName: "Mobile",
-            width: 120,
-            editable: true,
-            type: "number",
-            cellClassName: "blue",
-            headerClassName: "blue",
-            valueFormatter: (params) => {
-              params.value;
-            },
-            renderEditCell: (params) => (
-              <input
-                type="number"
-                value={params.value}
-                className="blue"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value.length <= 10) {
-                    params.api.setEditCellValue({
-                      id: params.id,
-                      field: "mobileNumber",
-                      value: value,
-                    });
-                  }
-                }}
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  width: "100%",
-                  border: "none",
-                  borderRadius: "6px",
-                  padding: "4px",
-                  outline: "none",
-                }}
-              />
-            ),
-          },
-        ]}
-        editMode="row"
-        disableColumnMenu
-        disableColumnSorting
-        pageSize={5}
-        rowsPerPageOptions={[5, 10, 20]}
-        processRowUpdate={handleRowEdit}
-        disableSelectionOnClick
-        onProcessRowUpdateError={(params) => {
-          console.error(params);
-        }}
-        showCellVerticalBorder
-        rowHeight={25}
-        style={{
-          color: "white",
-        }}
-        sx={{
-          "& .MuiDataGrid-columnHeader": {
-            maxHeight: "25px",
-            fontStyle: "normal",
-            fontWeight: "bold",
-            padding: "0px",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            display: "none",
-          },
-          fontSize: "12px",
-          "& .MuiDataGrid-scrollbar": {
-            display: "none",
-          },
-          "& .MuiInputBase-input": {
-            fontSize: "12px",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-            display: "flex",
-            justifyContent: "center",
-          },
-          "& .MuiDataGrid-cell": {
-            display: "flex",
-            justifyContent: "center",
-            padding: "0px",
-          },
-          "& .MuiDataGrid-columnHeaderTitleContainer": {
-            display: "flex",
-            justifyContent: "center",
-          },
-          "& .MuiDataGrid-row--editing": {
-            boxShadow: "none",
-          },
-          "& .MuiDataGrid-cell--editing": {
-            boxShadow: "none",
-          },
-          ".orange": {
-            backgroundColor: "rgb(247,180,38)",
-            color: "white",
-          },
-          ".blue": {
-            backgroundColor: "rgb(30,97,255)",
-            color: "white",
-          },
-          ".light-gray": {
-            backgroundColor: "rgb(164,169,175)",
-            color: "white",
-          },
-          ".green": {
-            backgroundColor: "rgb(38,177,76)",
-            color: "white",
-          },
-          "& .orange.orange": {
-            backgroundColor: "rgb(247,180,38)",
-            color: "white",
-          },
-          "& .blue.blue": {
-            backgroundColor: "rgb(30,97,255)",
-            color: "white",
-          },
-          "& .light-gray.light-gray": {
-            backgroundColor: "rgb(164,169,175)",
-            color: "white",
-          },
-          "& .green.green": {
-            backgroundColor: "rgb(38,177,76)",
-            color: "white",
-          },
-          "& .MuiFormControl-root": {
-            color: "white",
-          },
-          "& .MuiNativeSelect-select": {
-            color: "white",
-            // padding: "0px",
-          },
-          "& .MuiNativeSelect-select select": {
-            padding: "0px",
-          },
-          "& .MuiNativeSelect-select option": {
-            color: "black",
-          },
-        }}
-        getRowClassName={(params) => {
-          if (params.id.includes("totals")) {
-            return "green";
-          }
-          return "";
-        }}
-        getCellClassName={(params) => {
-          if (params.id.includes("totals")) {
-            return "green";
-          }
-          return "";
-        }}
-        disableColumnResize
-      />
+                >
+                  {totalsRow.rate}
+                </TextField>
+              </TableCell>
+              <TableCell className="orange">
+                <TextField
+                  type="number"
+                  value={totalsRow.noOfPeople}
+                  sx={{
+                    "& .MuiInputBase-input": {
+                      textAlign: "center",
+                      fontSize: "12px",
+                    },
+                  }}
+                >
+                  {totalsRow.noOfPeople}
+                </TextField>
+              </TableCell>
+              <TableCell className="blue">{totalsRow.checkInTime}</TableCell>
+              <TableCell className="blue">{totalsRow.checkOutTime}</TableCell>
+              <TableCell className="orange">{totalsRow.type}</TableCell>
+              <TableCell className="orange">
+                {totalsRow.modeOfPayment}
+              </TableCell>
+              <TableCell className="blue">{totalsRow.fullname}</TableCell>
+              <TableCell className="blue">{totalsRow.mobileNumber}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

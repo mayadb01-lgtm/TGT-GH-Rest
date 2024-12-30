@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
+import { paymentColors } from "../utils/utils";
 
 dayjs.locale("en-gb");
 
@@ -158,7 +159,6 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 },
                 "& .MuiTableCell-root": {
                   padding: "2px 8px",
-                  border: "1px solid #ddd",
                   textAlign: "center",
                 },
               }}
@@ -321,17 +321,25 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                   fullWidth
                   renderValue={(value) => value}
                   sx={{
+                    backgroundColor:
+                      paymentColors[row.modeOfPayment] || "transparent",
                     "& .MuiInputBase-input": {
                       fontSize: "12px",
                     },
                   }}
                 >
-                  {["Cash", "Card", "PPS", "PPC"].map((mode) => (
+                  {["Select", "Cash", "Card", "PPS", "PPC"].map((mode) => (
                     <MenuItem
                       key={mode}
                       value={mode}
                       sx={{
                         fontSize: "12px",
+                        backgroundColor: paymentColors[mode],
+                        color: "#fff",
+                        ":hover": {
+                          backgroundColor: "#b6b6b6",
+                          color: "#000",
+                        },
                       }}
                     >
                       {mode}
