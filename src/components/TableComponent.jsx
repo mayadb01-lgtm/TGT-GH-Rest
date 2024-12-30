@@ -266,43 +266,43 @@ const TableComponent = ({
   const tableComponentColumns = [
     {
       headerName: "Room",
-      headerBackColor: "light-gray",
+      headerBackColor: "rgb(164, 169, 175)",
     },
     {
       headerName: "Price",
-      headerBackColor: "light-gray",
+      headerBackColor: "rgb(164, 169, 175)",
     },
     {
       headerName: "Rate",
-      headerBackColor: "orange",
+      headerBackColor: "rgb(247, 180, 38)",
     },
     {
       headerName: "People",
-      headerBackColor: "orange",
+      headerBackColor: "rgb(247, 180, 38)",
     },
     {
       headerName: "Check In",
-      headerBackColor: "blue",
+      headerBackColor: "rgb(157, 186, 255)",
     },
     {
       headerName: "Check Out",
-      headerBackColor: "blue",
+      headerBackColor: "rgb(157, 186, 255)",
     },
     {
       headerName: "Type",
-      headerBackColor: "orange",
+      headerBackColor: "rgb(247, 180, 38)",
     },
     {
       headerName: "Payment",
-      headerBackColor: "orange",
+      headerBackColor: "rgb(247, 180, 38)",
     },
     {
       headerName: "Full Name",
-      headerBackColor: "blue",
+      headerBackColor: "rgb(157, 186, 255)",
     },
     {
       headerName: "Mobile",
-      headerBackColor: "blue",
+      headerBackColor: "rgb(157, 186, 255)",
     },
   ];
 
@@ -315,11 +315,11 @@ const TableComponent = ({
               {tableComponentColumns.map((column, index) => (
                 <TableCell
                   key={index}
-                  className={column.headerBackColor}
                   sx={{
                     fontWeight: "bold",
                     textAlign: "center",
                     border: "1px solid #fff",
+                    backgroundColor: column.headerBackColor || "transparent",
                     height: "24px",
                     padding: "0px",
                     fontSize: "12px",
