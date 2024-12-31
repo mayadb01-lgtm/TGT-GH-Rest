@@ -10,6 +10,7 @@ const entrySchemaObj = new Schema(
     type: {
       type: String,
       enum: [
+        "Select",
         "Single",
         "Couple",
         "Family",

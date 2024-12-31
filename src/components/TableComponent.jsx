@@ -507,6 +507,7 @@ const TableComponent = ({
                     }}
                   >
                     {[
+                      "Select",
                       "Single",
                       "Couple",
                       "Family",
