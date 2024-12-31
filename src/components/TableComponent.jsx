@@ -507,12 +507,13 @@ const TableComponent = ({
                     }}
                   >
                     {[
-                      "Select",
                       "Single",
                       "Couple",
                       "Family",
-                      "Group",
                       "Employee",
+                      "NRI",
+                      "Foreigner",
+                      "Group",
                       "Other",
                     ].map((type, index) => (
                       <MenuItem

@@ -16,6 +16,7 @@ const entrySchemaObj = new Schema(
         "Employee",
         "NRI",
         "Foreigner",
+        "Group",
         "Other",
       ],
     },
