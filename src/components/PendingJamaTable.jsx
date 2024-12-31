@@ -98,6 +98,29 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
       .map((entry) => entry.rate);
   };
 
+  const getOtherFields = (date, roomNo, fullname, mobileNumber, rate) => {
+    return unpaidEntries.find(
+      (entry) =>
+        entry.date === date &&
+        entry.roomNo === roomNo &&
+        entry.fullname.toLowerCase() === fullname.toLowerCase() &&
+        entry.mobileNumber === mobileNumber &&
+        entry.rate === rate
+    );
+  };
+
+  // Set Other Fields from date, roomNo, fullname, mobileNumber, rate
+
+  const getCreateDate = (date, roomNo, fullname, mobileNumber, rate) => {
+    const entry = getOtherFields(date, roomNo, fullname, mobileNumber, rate);
+    return entry?.createDate;
+  };
+
+  const get_id = (date, roomNo, fullname, mobileNumber, rate) => {
+    const entry = getOtherFields(date, roomNo, fullname, mobileNumber, rate);
+    return entry?._id;
+  };
+
   const handleRowEdit = (id, field, value) => {
     setPendingJamaRows((prevRows) =>
       prevRows.map((row) =>
@@ -109,6 +132,40 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
           : row
       )
     );
+    const row = pendingJamaRows.find((row) => row.id === id);
+    if (
+      row.date &&
+      row.roomNo &&
+      row.fullname &&
+      row.mobileNumber &&
+      row.rate
+    ) {
+      const createDate = getCreateDate(
+        row.date,
+        row.roomNo,
+        row.fullname,
+        row.mobileNumber,
+        row.rate
+      );
+      const _id = get_id(
+        row.date,
+        row.roomNo,
+        row.fullname,
+        row.mobileNumber,
+        row.rate
+      );
+      setPendingJamaRows((prevRows) =>
+        prevRows.map((prevRow) =>
+          prevRow.id === id
+            ? {
+                ...prevRow,
+                createDate,
+                _id,
+              }
+            : prevRow
+        )
+      );
+    }
   };
 
   return (

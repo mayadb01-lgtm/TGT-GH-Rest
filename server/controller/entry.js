@@ -63,6 +63,30 @@ router.post("/create-entry", async (req, res) => {
       }
     }
 
+    const unpaidEntries = parsedEntries.filter(
+      (entry) => entry.period === "UnPaid"
+    );
+    console.log("unpaidEntries", unpaidEntries);
+
+    for (const entry of unpaidEntries) {
+      const updatedEntry = await Entry.findOneAndUpdate(
+        {
+          "entry.createDate": entry.createDate,
+          "entry.roomNo": entry.roomNo,
+          "entry.mobileNumber": entry.mobileNumber,
+        },
+        {
+          $set: {
+            "entry.$.isPaid": true,
+            "entry.$.paidDate": new Date().toLocaleDateString("en-gb"),
+            "entry.$.updatedDateTime": new Date().toString(),
+          },
+        },
+        { new: true }
+      );
+      console.log("updatedEntry", updatedEntry);
+    }
+
     // Create a new Entry document
     const newEntry = new Entry({
       entry: parsedEntries,
@@ -188,7 +212,9 @@ router.get("/get-unpaid-entries", async (req, res) => {
     const entries = await Entry.find({});
 
     const unpaidEntries = entries.flatMap((entry) =>
-      entry.entry.filter((item) => item.modeOfPayment === "UnPaid")
+      entry.entry.filter(
+        (item) => item.modeOfPayment === "UnPaid" && !item.isPaid
+      )
     );
 
     res.status(200).json({

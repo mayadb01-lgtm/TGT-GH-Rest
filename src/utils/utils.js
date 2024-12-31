@@ -37,6 +37,11 @@ export const initializePendingJamaRows = () => {
     modeOfPayment: "",
     period: "UnPaid",
     createDate: "",
+    _id: "",
+    cost: 0,
+    checkInTime: "",
+    checkOutTime: "",
+    noOfPeople: 0,
   }));
 };
 
@@ -53,7 +58,7 @@ export const finalModeColumns = [
   { field: "totals", headerName: "Total", width: "160" },
 ];
 
-export const processEntries = (data, period, selectedDate, updatedDate) => {
+export const processEntries = (data, period, selectedDate, currentDateTime) => {
   return data
     .filter(
       (row) =>
@@ -66,7 +71,8 @@ export const processEntries = (data, period, selectedDate, updatedDate) => {
       ...row,
       period,
       date: selectedDate,
-      createDate: updatedDate,
+      createDate: selectedDate,
+      updatedDateTime: currentDateTime,
     }))
     .sort((a, b) => a.roomNo - b.roomNo);
 };
@@ -84,6 +90,7 @@ export const processUpdateEntries = (data, period, selectedDate) => {
       ...row,
       period,
       date: selectedDate,
+      updatedDateTime: currentDateTime,
     }))
     .sort((a, b) => a.roomNo - b.roomNo);
 };
@@ -107,3 +114,5 @@ export const initializeRows = (period, rowsLength, roomCosts) => {
     createDate: "",
   }));
 };
+
+export const currentDateTime = new Date().toString();

@@ -27,6 +27,7 @@ import {
   finalModeColumns,
   processEntries,
   processUpdateEntries,
+  currentDateTime,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
 import { EntrySection, PaymentSummary } from "../utils/util";
@@ -231,25 +232,25 @@ const EntryPage = () => {
         dayData,
         "day",
         selectedDate,
-        selectedDate
+        currentDateTime
       );
       const nightEntries = processEntries(
         nightData,
         "night",
         selectedDate,
-        selectedDate
+        currentDateTime
       );
       const extraDayEntries = processEntries(
         extraDayData,
         "extraDay",
         selectedDate,
-        selectedDate
+        currentDateTime
       );
       const extraNightEntries = processEntries(
         extraNightData,
         "extraNight",
         selectedDate,
-        selectedDate
+        currentDateTime
       );
 
       // Handle Pending Jama Entries
@@ -269,8 +270,6 @@ const EntryPage = () => {
           ...row,
           period: row.period,
           date: row.date,
-          createDate: selectedDate,
-          updatedDate: selectedDate,
         }));
       }
 
@@ -310,9 +309,6 @@ const EntryPage = () => {
         setPendingJamaRows,
         setSelectedDate
       );
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 3000);
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -363,7 +359,6 @@ const EntryPage = () => {
           ...row,
           period: row.period,
           date: row.date,
-          updatedDate: selectedDate,
         }));
 
         console.log("Pending Jama Entries", pendingJamaEntries);
@@ -406,9 +401,6 @@ const EntryPage = () => {
           setPendingJamaRows,
           setSelectedDate
         );
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 3000);
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
