@@ -35,6 +35,7 @@ import {
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
 import { EntrySection, PaymentSummary } from "../utils/util";
+import PendingJamaGrid from "../components/PendingJamaGrid";
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
@@ -571,6 +572,49 @@ const EntryPage = () => {
                   pendingJamaRows={pendingJamaRows}
                   setPendingJamaRows={setPendingJamaRows}
                 />
+              </AccordionDetails>
+            </Accordion>
+            {/* View UnPaid Entries Till Date */}
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                style={{
+                  backgroundColor: "#d2d2d2",
+                  borderBottom: "1px solid #e0e0e0",
+                  minHeight: "0",
+                  height: "40px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  flex={1}
+                  justifyContent={"space-between"}
+                >
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "14px",
+                    }}
+                  >
+                    View UnPaid Entries Till Date
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "14px",
+                    }}
+                  >
+                    Aashirvad Guest House
+                  </Typography>
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails style={{ margin: "0", padding: "0" }}>
+                <PendingJamaGrid />
               </AccordionDetails>
             </Accordion>
           </Box>
