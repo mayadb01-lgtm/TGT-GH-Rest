@@ -2,15 +2,11 @@ import { useState, useMemo, useEffect } from "react";
 import {
   Typography,
   Box,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Stack,
   TextField,
   CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -34,7 +30,7 @@ import {
   currentDateTime,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
-import { EntrySection, PaymentSummary } from "../utils/util";
+import { AccordionSection, EntrySection, PaymentSummary } from "../utils/util";
 import PendingJamaGrid from "../components/PendingJamaGrid";
 dayjs.locale("en-gb");
 
@@ -528,95 +524,24 @@ const EntryPage = () => {
               setExtraDayData={setExtraDayData}
               setExtraNightData={setExtraNightData}
             />
-            {/* Custom Entry - UnPaid Entries */}
-            <Accordion defaultExpanded>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                style={{
-                  backgroundColor: "#e32aff",
-                  borderBottom: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Pending Jama Entries
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <PendingJamaTable
-                  pendingJamaRows={pendingJamaRows}
-                  setPendingJamaRows={setPendingJamaRows}
-                />
-              </AccordionDetails>
-            </Accordion>
-            {/* View UnPaid Entries Till Date */}
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                style={{
-                  backgroundColor: "#d2d2d2",
-                  borderBottom: "1px solid #e0e0e0",
-                  minHeight: "0",
-                  height: "40px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  flex={1}
-                  justifyContent={"space-between"}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    View UnPaid Entries Till Date
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: "14px",
-                    }}
-                  >
-                    Aashirvad Guest House
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails style={{ margin: "0", padding: "0" }}>
-                <PendingJamaGrid />
-              </AccordionDetails>
-            </Accordion>
+            <AccordionSection
+              bgColor="#e32aff"
+              title="Pending Jama Entries"
+              subtitle="Aashirvad Guest House"
+            >
+              <PendingJamaTable
+                pendingJamaRows={pendingJamaRows}
+                setPendingJamaRows={setPendingJamaRows}
+              />
+            </AccordionSection>
+
+            <AccordionSection
+              bgColor="#d2d2d2"
+              title="View UnPaid Entries Till Date"
+              subtitle="Aashirvad Guest House"
+            >
+              <PendingJamaGrid />
+            </AccordionSection>
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}

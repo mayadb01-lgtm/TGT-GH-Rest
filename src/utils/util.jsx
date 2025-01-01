@@ -318,3 +318,42 @@ export const PaymentSummary = ({
     </Grid>
   </Grid>
 );
+
+const accordionStyles = {
+  borderBottom: "1px solid #e0e0e0",
+  minHeight: "0",
+  height: "40px",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+};
+
+const titleStyles = {
+  fontWeight: 500,
+  fontSize: "14px",
+};
+
+export const AccordionSection = ({ bgColor, title, subtitle, children }) => (
+  <Accordion>
+    <AccordionSummary
+      expandIcon={<ExpandMoreIcon />}
+      style={{ ...accordionStyles, backgroundColor: bgColor }}
+    >
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        flex={1}
+        justifyContent="space-between"
+      >
+        <Typography variant="h6" sx={titleStyles}>
+          {title}
+        </Typography>
+        <Typography variant="h6" sx={titleStyles}>
+          {subtitle}
+        </Typography>
+      </Stack>
+    </AccordionSummary>
+    <AccordionDetails style={{ margin: 0, padding: 0 }}>
+      {children}
+    </AccordionDetails>
+  </Accordion>
+);
