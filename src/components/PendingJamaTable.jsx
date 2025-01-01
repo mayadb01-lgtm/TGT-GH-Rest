@@ -257,7 +257,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "roomNo", e.target.value)
                   }
                   fullWidth
-                  renderValue={(value) => value}
+                  // renderValue={(value) => value}
                   sx={{
                     "& .MuiTableCell-root": {
                       // padding: "0px",
@@ -315,7 +315,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "mobileNumber", e.target.value)
                   }
                   fullWidth
-                  renderValue={(value) => value}
+                  // renderValue={(value) => value}
                   sx={{
                     "& .MuiInputBase-input": {
                       fontSize: "12px",
@@ -344,7 +344,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "rate", e.target.value)
                   }
                   fullWidth
-                  renderValue={(value) => value}
+                  // renderValue={(value) => value}
                   sx={{
                     "& .MuiInputBase-input": {
                       fontSize: "12px",

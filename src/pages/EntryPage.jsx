@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -17,7 +17,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { createEntry, updateEntryByDate } from "../redux/actions/entryAction";
+import {
+  createEntry,
+  getEntriesByDate,
+  updateEntryByDate,
+} from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 import {
   initializePendingJamaRows,
@@ -46,6 +50,12 @@ const EntryPage = () => {
   const [pendingJamaRows, setPendingJamaRows] = useState(
     initializePendingJamaRows
   );
+
+  useEffect(() => {
+    if (selectedDate && isAdminAuthenticated) {
+      dispatch(getEntriesByDate(selectedDate));
+    }
+  }, [selectedDate, isAdminAuthenticated, dispatch]);
 
   let processedEntries = useMemo(() => {
     // Cash
