@@ -4,7 +4,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers";
 import { useSelector } from "react-redux";
-import { initializeRows, paymentColors } from "../utils/utils";
+import { initializeRows, paymentColors, typeColors } from "../utils/utils";
 import {
   TableContainer,
   Paper,
@@ -224,12 +224,6 @@ const TableComponent = ({
                     type="number"
                     value={row.roomNo}
                     fullWidth
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value > 0 && value <= 11) {
-                        handleRowEdit({ ...row, roomNo: value });
-                      }
-                    }}
                     sx={{
                       "& .MuiInputBase-input": {
                         textAlign: "center",
@@ -242,12 +236,6 @@ const TableComponent = ({
                   <TextField
                     type="number"
                     value={row.cost}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value >= 0) {
-                        handleRowEdit({ ...row, cost: value });
-                      }
-                    }}
                     sx={{
                       "& .MuiInputBase-input": {
                         textAlign: "center",
@@ -364,6 +352,8 @@ const TableComponent = ({
                       handleRowEdit({ ...row, type: value });
                     }}
                     sx={{
+                      backgroundColor:
+                        typeColors[row.type] || typeColors["Select"], // Default color for 'Select'
                       "& .MuiInputBase-input": {
                         fontSize: "12px",
                       },
@@ -383,9 +373,14 @@ const TableComponent = ({
                       <MenuItem
                         key={index}
                         value={type}
-                        className="orange"
                         sx={{
                           fontSize: "12px",
+                          backgroundColor: typeColors[type],
+                          color: "#fff",
+                          ":hover": {
+                            backgroundColor: "#b6b6b6",
+                            color: "#000",
+                          },
                         }}
                       >
                         {type}

@@ -4,7 +4,19 @@ export const paymentColors = {
   PPS: "rgb(134, 165, 55)",
   Cash: "rgb(44, 190, 132)",
   UnPaid: "rgb(234,138,122)",
-  Select: "rgb(48, 123, 161)",
+  Select: "transparent",
+};
+
+export const typeColors = {
+  Select: "transparent",
+  Single: "rgb(44, 190, 132)",
+  Couple: "rgb(75, 144, 127)",
+  Family: "rgb(199, 133, 189)",
+  Employee: "rgb(134, 165, 55)",
+  NRI: "rgb(234,138,122)",
+  Foreigner: "rgb(230, 100, 100)",
+  Group: "rgb(100, 150, 200)",
+  Other: "rgb(255, 170, 50)",
 };
 
 export const processEntriesByPaymentMode = (data, mode) => {
