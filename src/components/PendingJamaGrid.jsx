@@ -31,12 +31,38 @@ const PendingJamaGrid = () => {
           { field: "id", headerName: "Index", width: 70 },
           { field: "createDate", headerName: "Created Date", width: 130 },
           { field: "roomNo", headerName: "Room No", width: 130 },
-          { field: "fullname", headerName: "Full Name", width: 130 },
-          { field: "mobileNumber", headerName: "Mobile No", width: 130 },
+          { field: "fullname", headerName: "Full Name", width: 180 },
+          { field: "mobileNumber", headerName: "Mobile No", width: 150 },
           { field: "rate", headerName: "Rate", width: 130 },
           { field: "modeOfPayment", headerName: "Mode of Payment", width: 130 },
         ]}
-        pageSize={5}
+        rowHeight={35}
+        sx={{
+          fontSize: "12px",
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-columnHeaderTitleContainer": {
+            display: "flex",
+            justifyContent: "center",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            maxHeight: "35px",
+            fontWeight: "bold",
+            border: "0.5px solid #f0f0f0",
+          },
+          "& .MuiDataGrid-row": {
+            maxHeight: "35px",
+          },
+          "& .MuiDataGrid-cell": {
+            maxHeight: "35px",
+            textAlign: "center",
+            border: "0.5px solid #f0f0f0",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            display: "none",
+          },
+        }}
       />
     </div>
   );
