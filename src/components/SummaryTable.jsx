@@ -78,7 +78,7 @@ const SummaryTable = ({
             disableColumnMenu
             disableColumnSorting
             showColumnVerticalBorder
-            disableColumnResize
+            // disableColumnResize
             sx={{
               "& .MuiDataGrid-columnHeader": {
                 maxHeight: "25px",

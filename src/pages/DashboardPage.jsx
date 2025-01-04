@@ -29,8 +29,6 @@ const NAVIGATION = [
     to: "/dashboard",
   },
   { kind: "divider" },
-  { kind: "link", title: "Profile", to: "/profile" },
-  { kind: "link", title: "Log out", to: "/logout" },
   { kind: "link", title: "Home", to: "/" },
 ];
 
@@ -80,6 +78,9 @@ const DashboardContent = () => {
     { field: "checkInTime", headerName: "Check In Time", width: 130 },
     { field: "checkOutTime", headerName: "Check Out Time", width: 130 },
     { field: "date", headerName: "Date", width: 130 },
+    { field: "period", headerName: "Period", width: 130 },
+    { field: "createDate", headerName: "Created At", width: 130 },
+    { field: "updateDate", headerName: "Updated At", width: 130 },
   ];
 
   if (loading) {
