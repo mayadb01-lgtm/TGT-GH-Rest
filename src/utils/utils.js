@@ -4,6 +4,7 @@ export const paymentColors = {
   PPS: "rgb(134, 165, 55)",
   Cash: "rgb(44, 190, 132)",
   UnPaid: "rgb(234,138,122)",
+  Summary: "rgb(31, 123, 0)",
   Select: "transparent",
 };
 

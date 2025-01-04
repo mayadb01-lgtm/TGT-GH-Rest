@@ -267,7 +267,7 @@ export const PaymentSummary = ({
             nightRows: [],
             extraDayRows: [],
             extraNightRows: [],
-            colorKey: "Select",
+            colorKey: "Summary",
           },
         ]}
         columns={modeColumns}
