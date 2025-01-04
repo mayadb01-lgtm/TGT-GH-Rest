@@ -11,7 +11,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createEntry,
@@ -557,7 +557,6 @@ const EntryPage = () => {
           handleCancelClick={handleCancelClick}
         />
       </Grid>
-      <Toaster position="top-center" />
     </>
   );
 };

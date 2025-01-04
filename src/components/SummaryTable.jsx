@@ -50,17 +50,13 @@ const SummaryTable = ({
         fontSize: "12px",
       }}
     >
-      <Stack direction="row" spacing={1} style={{ gap: "8px" }}>
-        {" "}
-        {/* Compact spacing */}
-        <Box style={{ margin: "2px 0", padding: "0", width: "100%" }}>
+      <Stack direction="row">
+        <Box style={{ margin: "0", padding: "0", width: "100%" }}>
           {" "}
-          {/* Width 50% for side-by-side layout */}
           <Typography
             variant="subtitle2"
             fontWeight={500}
             style={{
-              marginBottom: "4px",
               padding: "4px",
             }}
           >
@@ -72,7 +68,7 @@ const SummaryTable = ({
             pageSize={5}
             rowsPerPageOptions={[5, 10, 20]}
             style={{
-              fontSize: "12px",
+              fontSize: "10px",
               height: "220px",
               width: "100%",
               backgroundColor: color,
@@ -87,12 +83,36 @@ const SummaryTable = ({
               "& .MuiDataGrid-columnHeader": {
                 maxHeight: "25px",
                 backgroundColor: color,
+                fontWeight: "bold",
+                border: "0.5px solid #f0f0f0",
+              },
+              "& .MuiDataGrid-cell": {
+                border: "0.5px solid #f0f0f0",
               },
               "& .MuiDataGrid-footerContainer": {
                 display: "none",
               },
-              "& .MuiDataGrid-scrollbar": {
+              "& .MuiDataGrid-scrollbar--horizontal": {
                 display: "none",
+              },
+              "& .MuiDataGrid-scrollbar--vertical": {
+                width: "12px",
+                "&::-webkit-scrollbar": {
+                  width: "10px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#888",
+                  borderRadius: "10px",
+                  border: "3px solid transparent",
+                  backgroundClip: "content-box",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {
+                  backgroundColor: "#555",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "10px",
+                },
               },
             }}
           />

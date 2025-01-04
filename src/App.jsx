@@ -137,7 +137,7 @@ const App = () => {
             }
           />
         </Routes>
-        <Toaster position="top-center" />
+        <Toaster position="top-right" reverseOrder={true} />
       </Router>
     </AppProvider>
   );

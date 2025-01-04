@@ -159,7 +159,7 @@ export const EntrySection = ({
 export const SummaryGrid = ({ entries, columns, colors }) => (
   <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
     <Box>
-      <Stack direction="column" spacing={0.5} sx={{ padding: "0 8px" }}>
+      <Stack direction="column" spacing={0.5} sx={{ padding: "4px" }}>
         {entries.map((entry, index) => (
           <SummaryTable
             key={index}
