@@ -32,7 +32,7 @@ const AdminLoginPage = () => {
 
   useEffect(() => {
     if (isAdminAuthenticated) {
-      navigate("/admin");
+      navigate("/");
     }
   }, [isAdminAuthenticated, navigate]);
 

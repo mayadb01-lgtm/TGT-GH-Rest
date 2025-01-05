@@ -38,9 +38,7 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (isAdminAuthenticated) {
-      navigate("/admin");
-    } else if (isAuthenticated) {
+    if (isAdminAuthenticated || isAuthenticated) {
       navigate("/");
     }
   }, [isAdminAuthenticated, isAuthenticated, navigate]);

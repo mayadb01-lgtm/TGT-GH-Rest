@@ -99,7 +99,7 @@ const Navbar = () => {
             to={isAdminAuthenticated ? "/admin" : "/"}
             style={{ color: "white", textDecoration: "none", fontWeight: 600 }}
           >
-            Guest House
+            Home
           </Link>
         </Typography>
         <Stack

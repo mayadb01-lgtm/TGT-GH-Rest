@@ -24,6 +24,8 @@ import { createTheme } from "@mui/material/styles";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { useDemoRouter } from "@toolpad/core/internal";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import Home from "./pages/Home.jsx";
+import RestEntryPage from "./pages/restaurant/RestEntryPage.jsx";
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -93,6 +95,15 @@ const App = () => {
           <Route
             path="/"
             element={
+              <>
+                <Navbar />
+                <Home />
+              </>
+            }
+          />
+          <Route
+            path="/hotel"
+            element={
               <ProtectedRoute>
                 <Navbar />
                 <EntryPage />
@@ -100,11 +111,29 @@ const App = () => {
             }
           />
           <Route
-            path="/admin"
+            path="/restaurant"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <RestEntryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/hotel"
             element={
               <ProtectedAdminRoute>
                 <Navbar />
                 <EntryPage />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/restaurant"
+            element={
+              <ProtectedAdminRoute>
+                <Navbar />
+                <RestEntryPage />
               </ProtectedAdminRoute>
             }
           />
@@ -137,7 +166,7 @@ const App = () => {
             }
           />
         </Routes>
-        <Toaster position="top-right" reverseOrder={true} />
+        <Toaster position="top-center" reverseOrder={true} />
       </Router>
     </AppProvider>
   );

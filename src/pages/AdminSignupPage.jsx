@@ -30,7 +30,7 @@ const AdminSignupPage = () => {
 
   useEffect(() => {
     if (isAdminAuthenticated) {
-      navigate("/admin");
+      navigate("/");
     }
   }, [isAdminAuthenticated, navigate]);
 
