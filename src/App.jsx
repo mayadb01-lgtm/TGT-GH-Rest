@@ -5,7 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import { useLayoutEffect } from "react";
 import Store from "./redux/store.js";
@@ -83,8 +83,6 @@ const App = () => {
       to: "/dashboard",
     },
     { kind: "divider" },
-    { kind: "link", title: "Profile", to: "/profile" },
-    { kind: "link", title: "Log out", to: "/logout" },
     { kind: "link", title: "Home", to: "/" },
   ];
 

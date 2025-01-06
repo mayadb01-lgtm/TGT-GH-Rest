@@ -95,6 +95,9 @@ const SummaryTable = ({
               "& .MuiDataGrid-scrollbar--horizontal": {
                 display: "none",
               },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "600",
+              },
               "& .MuiDataGrid-scrollbar--vertical": {
                 width: "12px",
                 "&::-webkit-scrollbar": {

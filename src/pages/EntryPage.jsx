@@ -11,7 +11,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createEntry,
@@ -470,7 +470,6 @@ const EntryPage = () => {
         justifyContent="center"
         alignItems="start"
       >
-        {/* Left Side: Day and Night Entry Tables */}
         <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box style={{ margin: "0", padding: "0" }}>
@@ -557,6 +556,7 @@ const EntryPage = () => {
           handleCancelClick={handleCancelClick}
         />
       </Grid>
+      <Toaster position="top-center" reverseOrder={true} />
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { Stack, Typography, Paper } from "@mui/material";
+import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -48,6 +49,16 @@ const Home = () => {
           <Link
             to={item.path}
             style={{ textDecoration: "none", color: "inherit" }}
+            onClick={() => {
+              toast.promise(
+                new Promise((resolve) => setTimeout(resolve, 500)),
+                {
+                  loading: "Please wait...",
+                  success: "Welcome to the " + item.title + " page",
+                  error: "Error accessing the " + item.title + " page",
+                }
+              );
+            }}
           >
             <Typography variant="h4" gutterBottom>
               {item.title}

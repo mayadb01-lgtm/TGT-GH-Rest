@@ -1,3 +1,4 @@
+import { Box, CircularProgress } from "@mui/material";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -16,7 +17,17 @@ const ProtectedRoute = ({ children }) => {
     }
   }, [loading, navigate, location, isAuthenticated]);
 
-  if (loading) return null;
+  if (loading) return;
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+    }}
+  >
+    <CircularProgress />
+  </Box>;
 
   return isAuthenticated ? children : null;
 };

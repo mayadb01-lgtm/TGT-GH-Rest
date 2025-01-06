@@ -96,7 +96,7 @@ const Navbar = () => {
       >
         <Typography variant="h6" component="div">
           <Link
-            to={isAdminAuthenticated ? "/admin" : "/"}
+            to={"/"}
             style={{ color: "white", textDecoration: "none", fontWeight: 600 }}
           >
             Home
