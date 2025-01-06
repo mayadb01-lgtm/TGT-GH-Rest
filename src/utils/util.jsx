@@ -294,7 +294,7 @@ export const PaymentSummary = ({
               color="secondary"
               sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
             >
-              Update
+              Edit
             </Button>
           )}
           <Button

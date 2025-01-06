@@ -68,7 +68,7 @@ const SummaryTable = ({
             pageSize={5}
             rowsPerPageOptions={[5, 10, 20]}
             style={{
-              fontSize: "10px",
+              fontSize: "12px",
               height: "220px",
               width: "100%",
               backgroundColor: color,

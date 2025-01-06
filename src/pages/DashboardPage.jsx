@@ -70,7 +70,7 @@ const DashboardContent = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "roomNo", headerName: "Room No", width: 130 },
-    { field: "cost", headerName: "Cost", width: 90 },
+    { field: "price", headerName: "Cost", width: 90 },
     { field: "rate", headerName: "Rate", width: 90 },
     { field: "noOfPeople", headerName: "People", width: 130 },
     { field: "type", headerName: "Type", width: 130 },
