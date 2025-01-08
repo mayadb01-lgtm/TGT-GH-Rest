@@ -550,15 +550,13 @@ const TableComponent = ({
             ))}
             {/* Totals Row */}
             <TableRow
-              hover
               sx={{
                 width: "100%",
-                fontWeight: "600",
                 backgroundColor: "#c8fad6",
+                fontSize: "12px",
                 "& .MuiTableRow-root": {
                   hight: "24px",
                   padding: "0px",
-                  fontSize: "12px",
                 },
                 "& .MuiInputBase-input": {
                   padding: "2px 8px",
@@ -584,6 +582,7 @@ const TableComponent = ({
                     "& .MuiInputBase-input": {
                       textAlign: "center",
                       fontSize: "12px",
+                      fontWeight: "600",
                     },
                   }}
                 >
@@ -598,6 +597,7 @@ const TableComponent = ({
                     "& .MuiInputBase-input": {
                       textAlign: "center",
                       fontSize: "12px",
+                      fontWeight: "600",
                     },
                   }}
                 >

@@ -41,7 +41,7 @@ const App = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "100vh",
-          backgroundColor: "#c6c6c6",
+          backgroundColor: "#545454",
         }}
       >
         <CircularProgress />

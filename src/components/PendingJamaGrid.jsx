@@ -6,6 +6,13 @@ const PendingJamaGrid = () => {
   const { unpaidEntries } = useSelector((state) => state.entry);
   const [pendingJamaGridRows, setPendingJamaGridRows] = useState([]);
 
+  const setPeriod = {
+    day: "Day",
+    night: "Night",
+    extraDay: "Extra Day",
+    extraNight: "Extra Night",
+  };
+
   useEffect(() => {
     if (unpaidEntries.length > 0) {
       const rows = unpaidEntries.map((entry, index) => {
@@ -17,6 +24,7 @@ const PendingJamaGrid = () => {
           mobileNumber: entry.mobileNumber,
           rate: entry.rate,
           modeOfPayment: entry.modeOfPayment,
+          period: setPeriod[entry.period],
         };
       });
       setPendingJamaGridRows(rows);
@@ -38,13 +46,14 @@ const PendingJamaGrid = () => {
       <DataGrid
         rows={[...pendingJamaGridRows, totalRow]}
         columns={[
-          { field: "id", headerName: "Index", width: 70 },
-          { field: "createDate", headerName: "Created Date", width: 130 },
-          { field: "roomNo", headerName: "Room No", width: 130 },
+          { field: "id", headerName: "Index", width: 80 },
+          { field: "createDate", headerName: "Created Date", width: 100 },
+          { field: "roomNo", headerName: "Room No", width: 80 },
           { field: "fullname", headerName: "Full Name", width: 180 },
           { field: "mobileNumber", headerName: "Mobile No", width: 150 },
-          { field: "rate", headerName: "Rate", width: 130 },
-          { field: "modeOfPayment", headerName: "Mode of Payment", width: 130 },
+          { field: "rate", headerName: "Rate", width: 80 },
+          { field: "modeOfPayment", headerName: "Mode of Payment", width: 100 },
+          { field: "period", headerName: "Period", width: 100 },
         ]}
         rowHeight={35}
         sx={{
@@ -80,6 +89,7 @@ const PendingJamaGrid = () => {
         getRowClassName={(params) =>
           params.row.id === "Total" ? "total-row" : ""
         }
+        disableColumnSorting
       />
     </div>
   );

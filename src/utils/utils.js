@@ -60,10 +60,10 @@ export const initializePendingJamaRows = () => {
 
 // modeSummaryColumn for DataGrid SummaryTable
 export const modeSummaryColumn = [
-  { field: "id", headerName: "Day/Night", width: 100 },
+  { field: "id", headerName: "Day/Night", width: 90 },
   { field: "rate", headerName: "Rate", width: 40 },
-  { field: "fullname", headerName: "Full Name", width: 110 },
-  { field: "noOfPeople", headerName: "People", width: 80 },
+  { field: "fullname", headerName: "Full Name", width: 100 },
+  { field: "noOfPeople", headerName: "People", width: 67 },
 ];
 
 export const finalModeColumns = [
