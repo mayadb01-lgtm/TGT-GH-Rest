@@ -23,10 +23,20 @@ const PendingJamaGrid = () => {
     }
   }, [unpaidEntries]);
 
+  const totalRow = {
+    id: "Total",
+    createDate: "",
+    roomNo: "",
+    fullname: "",
+    mobileNumber: "",
+    rate: pendingJamaGridRows.reduce((acc, curr) => acc + curr.rate, 0),
+    modeOfPayment: "",
+  };
+
   return (
     <div>
       <DataGrid
-        rows={pendingJamaGridRows}
+        rows={[...pendingJamaGridRows, totalRow]}
         columns={[
           { field: "id", headerName: "Index", width: 70 },
           { field: "createDate", headerName: "Created Date", width: 130 },
@@ -50,6 +60,7 @@ const PendingJamaGrid = () => {
             maxHeight: "35px",
             fontWeight: "bold",
             border: "0.5px solid #f0f0f0",
+            backgroundColor: "#f1f1f1",
           },
           "& .MuiDataGrid-row": {
             maxHeight: "35px",
@@ -62,7 +73,13 @@ const PendingJamaGrid = () => {
           "& .MuiDataGrid-footerContainer": {
             display: "none",
           },
+          "& .total-row": {
+            fontWeight: "bold",
+          },
         }}
+        getRowClassName={(params) =>
+          params.row.id === "Total" ? "total-row" : ""
+        }
       />
     </div>
   );

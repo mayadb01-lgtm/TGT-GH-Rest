@@ -19,7 +19,7 @@ const Home = () => {
         {
           path: isAdminAuthenticated ? "/admin/hotel" : "/hotel",
           title: "Hotel",
-          desc: "Luxurious hotels at great prices",
+          desc: "Hotel TGT",
           bg: "#fec86a",
         },
         {

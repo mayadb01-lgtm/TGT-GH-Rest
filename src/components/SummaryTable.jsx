@@ -71,8 +71,6 @@ const SummaryTable = ({
               fontSize: "12px",
               height: "220px",
               width: "100%",
-              backgroundColor: color,
-              color: "white",
             }}
             rowHeight={25}
             disableColumnMenu
@@ -80,14 +78,12 @@ const SummaryTable = ({
             showColumnVerticalBorder
             // disableColumnResize
             sx={{
+              backgroundColor: "#fff",
               "& .MuiDataGrid-columnHeader": {
                 maxHeight: "25px",
                 backgroundColor: color,
                 fontWeight: "bold",
-                border: "0.5px solid #f0f0f0",
-              },
-              "& .MuiDataGrid-cell": {
-                border: "0.5px solid #f0f0f0",
+                color: "white",
               },
               "& .MuiDataGrid-footerContainer": {
                 display: "none",

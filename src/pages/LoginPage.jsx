@@ -7,7 +7,7 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
@@ -18,6 +18,8 @@ const LoginPage = () => {
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const referrer = location.state?.from;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,7 +41,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAdminAuthenticated || isAuthenticated) {
-      navigate("/");
+      if (referrer) {
+        navigate ? navigate(referrer) : navigate("/");
+      } else {
+        navigate("/");
+      }
     }
   }, [isAdminAuthenticated, isAuthenticated, navigate]);
 

@@ -133,47 +133,31 @@ const TableComponent = ({
   }, [onSubmit, rows, selectedDate]);
 
   const tableComponentColumns = [
-    {
-      headerName: "Room",
-      headerBackColor: "rgb(164, 169, 175)",
-    },
-    {
-      headerName: "Price",
-      headerBackColor: "rgb(164, 169, 175)",
-    },
-    {
-      headerName: "Rate",
-      headerBackColor: "rgb(247, 180, 38)",
-    },
-    {
-      headerName: "People",
-      headerBackColor: "rgb(247, 180, 38)",
-    },
-    {
-      headerName: "Check In",
-      headerBackColor: "rgb(157, 186, 255)",
-    },
-    {
-      headerName: "Check Out",
-      headerBackColor: "rgb(157, 186, 255)",
-    },
-    {
-      headerName: "Type",
-      headerBackColor: "rgb(247, 180, 38)",
-    },
-    {
-      headerName: "Payment",
-      headerBackColor: "rgb(247, 180, 38)",
-    },
-    {
-      headerName: "Full Name",
-      headerBackColor: "rgb(157, 186, 255)",
-    },
-    {
-      headerName: "Mobile",
-      headerBackColor: "rgb(157, 186, 255)",
-    },
+    "Room",
+    "Price",
+    "Rate",
+    "People",
+    "Check In",
+    "Check Out",
+    "Type",
+    "Payment",
+    "Full Name",
+    "Mobile",
   ];
+
+  const updateRowHighlight = (row) => {
+    if (
+      row.modeOfPayment &&
+      row.type &&
+      row.cost &&
+      row.rate &&
+      row.noOfPeople
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   return (
     <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>
@@ -188,13 +172,16 @@ const TableComponent = ({
                     fontWeight: "bold",
                     textAlign: "center",
                     border: "1px solid #fff",
-                    backgroundColor: column.headerBackColor || "transparent",
+                    backgroundColor:
+                      period?.includes("Day") || period?.includes("extraDay")
+                        ? "#fdf6ee"
+                        : "#eafcf9",
                     height: "24px",
                     padding: "0px",
                     fontSize: "12px",
                   }}
                 >
-                  {column.headerName}
+                  {column}
                 </TableCell>
               ))}
             </TableRow>
@@ -219,7 +206,13 @@ const TableComponent = ({
                   },
                 }}
               >
-                <TableCell width={"5%"} className="light-gray">
+                <TableCell
+                  width={"5%"}
+                  className={"cell - whites"}
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="number"
                     value={row.roomNo}
@@ -232,7 +225,13 @@ const TableComponent = ({
                     }}
                   />
                 </TableCell>
-                <TableCell width={"8%"} className="light-gray">
+                <TableCell
+                  width={"8%"}
+                  className="cell-white"
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="number"
                     value={row.cost}
@@ -244,7 +243,17 @@ const TableComponent = ({
                     }}
                   />
                 </TableCell>
-                <TableCell width={"8%"} className="orange">
+                <TableCell
+                  width={"8%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "orange"
+                      : "green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="number"
                     value={row.rate}
@@ -262,7 +271,17 @@ const TableComponent = ({
                     }}
                   />
                 </TableCell>
-                <TableCell width={"8%"} className="orange">
+                <TableCell
+                  width={"8%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "orange"
+                      : "green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="number"
                     value={row.noOfPeople}
@@ -280,7 +299,17 @@ const TableComponent = ({
                     }}
                   />
                 </TableCell>
-                <TableCell width={"12%"} className="blue">
+                <TableCell
+                  width={"12%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "light-orange"
+                      : "light-green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MobileTimePicker
                       value={
@@ -298,7 +327,7 @@ const TableComponent = ({
                         <Input
                           {...props}
                           placeholder="Select Time"
-                          className="blue"
+                          className="light-orange"
                         />
                       )}
                       sx={{
@@ -312,7 +341,17 @@ const TableComponent = ({
                     />
                   </LocalizationProvider>
                 </TableCell>
-                <TableCell width={"12%"} className="blue">
+                <TableCell
+                  width={"12%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "light-orange"
+                      : "light-green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MobileTimePicker
                       value={
@@ -330,7 +369,7 @@ const TableComponent = ({
                         <Input
                           {...props}
                           placeholder="Select Time"
-                          className="blue"
+                          className="light-orange"
                         />
                       )}
                       sx={{
@@ -344,7 +383,17 @@ const TableComponent = ({
                     />
                   </LocalizationProvider>
                 </TableCell>
-                <TableCell width={"10%"} className="orange">
+                <TableCell
+                  width={"10%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "orange"
+                      : "green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <Select
                     value={row.type || "Select"}
                     onChange={(e) => {
@@ -352,6 +401,9 @@ const TableComponent = ({
                       handleRowEdit({ ...row, type: value });
                     }}
                     sx={{
+                      width: "100%",
+                      color:
+                        row.type && row.type !== "Select" ? "white" : "black",
                       backgroundColor:
                         typeColors[row.type] || typeColors["Select"], // Default color for 'Select'
                       "& .MuiInputBase-input": {
@@ -388,19 +440,35 @@ const TableComponent = ({
                     ))}
                   </Select>
                 </TableCell>
-                <TableCell width={"10%"} className="orange">
+                <TableCell
+                  width={"10%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "orange"
+                      : "green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <Select
                     value={row.modeOfPayment || "Select"}
+                    defaultValue="Select"
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, modeOfPayment: value });
                     }}
                     sx={{
+                      width: "100%",
                       backgroundColor:
                         paymentColors[row.modeOfPayment] || "transparent",
                       "& .MuiInputBase-input": {
                         fontSize: "12px",
                       },
+                      color:
+                        row.modeOfPayment && row.modeOfPayment !== "Select"
+                          ? "white"
+                          : "black",
                     }}
                   >
                     {["Select", "Cash", "Card", "PPS", "PPC", "UnPaid"].map(
@@ -424,7 +492,17 @@ const TableComponent = ({
                     )}
                   </Select>
                 </TableCell>
-                <TableCell width={"15%"} className="blue">
+                <TableCell
+                  width={"15%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "light-orange"
+                      : "light-green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="text"
                     value={row.fullname}
@@ -440,7 +518,17 @@ const TableComponent = ({
                     }}
                   />
                 </TableCell>
-                <TableCell width={"12%"} className="blue">
+                <TableCell
+                  width={"12%"}
+                  className={
+                    period?.includes("Day") || period?.includes("extraDay")
+                      ? "light-orange"
+                      : "light-green"
+                  }
+                  sx={{
+                    backgroundColor: updateRowHighlight(row) && "#e1e1e1",
+                  }}
+                >
                   <TextField
                     type="number"
                     value={row.mobileNumber}
@@ -465,7 +553,8 @@ const TableComponent = ({
               hover
               sx={{
                 width: "100%",
-                backgroundColor: "#00d639",
+                fontWeight: "600",
+                backgroundColor: "#c8fad6",
                 "& .MuiTableRow-root": {
                   hight: "24px",
                   padding: "0px",
@@ -479,7 +568,13 @@ const TableComponent = ({
                 },
               }}
             >
-              <TableCell>{totalsRow.roomNo}</TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                {totalsRow.roomNo}
+              </TableCell>
               <TableCell>{totalsRow.cost}</TableCell>
               <TableCell>
                 <TextField

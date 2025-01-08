@@ -62,8 +62,8 @@ export const initializePendingJamaRows = () => {
 export const modeSummaryColumn = [
   { field: "id", headerName: "Day/Night", width: 100 },
   { field: "rate", headerName: "Rate", width: 40 },
-  { field: "fullname", headerName: "Full Name", width: 130 },
-  { field: "noOfPeople", headerName: "People", width: 40 },
+  { field: "fullname", headerName: "Full Name", width: 110 },
+  { field: "noOfPeople", headerName: "People", width: 80 },
 ];
 
 export const finalModeColumns = [
@@ -121,8 +121,8 @@ export const initializeRows = (period, rowsLength, roomCosts) => {
     modeOfPayment: "",
     fullname: `${period} - ${i + 1} Name`,
     mobileNumber: 1234567890,
-    checkInTime: "11:00 AM",
-    checkOutTime: "10:00 AM",
+    checkInTime: "",
+    checkOutTime: "",
     period: period,
     createDate: "",
   }));

@@ -1,9 +1,18 @@
 .orange {
-  background-color: rgb(247, 180, 38);
+  background-color: #fce5c6;
 }
-.blue {
-  background-color: rgb(157, 186, 255);
+
+.green {
+  background-color: #c5fcf5;
 }
-.light-gray {
-  background-color: rgb(164, 169, 175);
+
+.light-green {
+  background-color: #eafcf9;
+}
+
+.light-orange {
+  background-color: #fcf6ee;
+}
+.cell-white {
+  background-color: #fff;
 }

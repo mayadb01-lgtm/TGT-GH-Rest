@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createEntry,
   getEntriesByDate,
+  getUnPaidEntries,
   updateEntryByDate,
 } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
@@ -316,6 +317,7 @@ const EntryPage = () => {
         setPendingJamaRows,
         setSelectedDate
       );
+      dispatch(getUnPaidEntries());
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -408,6 +410,7 @@ const EntryPage = () => {
           setPendingJamaRows,
           setSelectedDate
         );
+        dispatch(getUnPaidEntries());
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
@@ -469,6 +472,9 @@ const EntryPage = () => {
         display="flex"
         justifyContent="center"
         alignItems="start"
+        sx={{
+          backgroundColor: "#f4f6f5",
+        }}
       >
         <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
@@ -523,11 +529,7 @@ const EntryPage = () => {
               setExtraDayData={setExtraDayData}
               setExtraNightData={setExtraNightData}
             />
-            <AccordionSection
-              bgColor="#e32aff"
-              title="Pending Jama Entries"
-              subtitle="Aashirvad Guest House"
-            >
+            <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
               <PendingJamaTable
                 pendingJamaRows={pendingJamaRows}
                 setPendingJamaRows={setPendingJamaRows}
@@ -537,7 +539,6 @@ const EntryPage = () => {
             <AccordionSection
               bgColor="#d2d2d2"
               title="View UnPaid Entries Till Date"
-              subtitle="Aashirvad Guest House"
             >
               <PendingJamaGrid />
             </AccordionSection>

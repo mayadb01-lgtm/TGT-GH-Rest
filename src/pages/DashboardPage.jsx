@@ -37,7 +37,10 @@ const demoTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: "data-toolpad-color-scheme",
   },
-  colorSchemes: { light: true, dark: true },
+  colorSchemes: {
+    light: true,
+    // dark: true
+  },
   breakpoints: {
     values: {
       xs: 0,
@@ -70,7 +73,7 @@ const DashboardContent = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "roomNo", headerName: "Room No", width: 130 },
-    { field: "price", headerName: "Cost", width: 90 },
+    { field: "cost", headerName: "Price", width: 90 },
     { field: "rate", headerName: "Rate", width: 90 },
     { field: "noOfPeople", headerName: "People", width: 130 },
     { field: "type", headerName: "Type", width: 130 },
@@ -97,6 +100,12 @@ const DashboardContent = () => {
       </Box>
     );
   }
+
+  const totalsRow = {
+    id: "Total",
+    rate: entries.reduce((acc, curr) => acc + curr.rate, 0),
+    noOfPeople: entries.reduce((acc, curr) => acc + curr.noOfPeople, 0),
+  };
 
   return (
     <Box
@@ -130,9 +139,19 @@ const DashboardContent = () => {
         </LocalizationProvider>
       </Stack>
       <DataGrid
-        rows={entries.map((entry, index) => ({ ...entry, id: index + 1 }))}
+        rows={[...entries, totalsRow].map((entry, index) => ({
+          ...entry,
+        }))}
         columns={columns}
         pageSize={5}
+        getRowClassName={(params) =>
+          params.row.id === "Total" ? "total-row" : ""
+        }
+        sx={{
+          "& .total-row": {
+            fontWeight: "bold",
+          },
+        }}
       />
     </Box>
   );
@@ -170,7 +189,7 @@ const DashboardPage = () => {
 
   const CustomAppTitle = () => (
     <Typography variant="h6" color="textPrimary">
-      Ashirwad Admin Dashboard
+      TGT Admin Dashboard
     </Typography>
   );
 

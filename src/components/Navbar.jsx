@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -23,6 +23,7 @@ const Navbar = () => {
   const { isAuthenticated } = useSelector((state) => state.user);
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleLogout = () => {
     if (isAuthenticated) dispatch(logoutUser());
@@ -53,6 +54,12 @@ const Navbar = () => {
         <Button color="inherit" component={Link} to="/login">
           Login
         </Button>
+        <Button color="inherit" component={Link} to="/admin-login">
+          Admin Login
+        </Button>
+        <Button color="inherit" component={Link} to="/admin-signup">
+          Admin Signup
+        </Button>
       </>
     );
 
@@ -76,6 +83,12 @@ const Navbar = () => {
         <ListItem button component={Link} to="/login">
           <ListItemText primary="Login" />
         </ListItem>
+        <ListItem button component={Link} to="/admin-login">
+          <ListItemText primary="Admin Login" />
+        </ListItem>
+        <ListItem button component={Link} to="/admin-signup">
+          <ListItemText primary="Admin Signup" />
+        </ListItem>
       </>
     );
 
@@ -83,7 +96,7 @@ const Navbar = () => {
     <AppBar
       position="static"
       sx={{
-        backgroundColor: isAdminAuthenticated ? "#f44336" : "#1976d2",
+        backgroundColor: "#5f7174",
         height: 40,
         display: "flex",
         justifyContent: "center",
@@ -99,7 +112,9 @@ const Navbar = () => {
             to={"/"}
             style={{ color: "white", textDecoration: "none", fontWeight: 600 }}
           >
-            Home
+            {location.pathname === "/"
+              ? "Hotel TGT"
+              : "Entry - GH Daily Report"}
           </Link>
         </Typography>
         <Stack

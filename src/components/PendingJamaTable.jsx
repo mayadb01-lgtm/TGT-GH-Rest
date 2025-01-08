@@ -187,7 +187,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 key={index}
                 sx={{
                   fontWeight: "bold",
-                  backgroundColor: "#e32aff",
+                  backgroundColor: "#eefcc8",
                   textAlign: "center",
                   border: "1px solid #fff",
                   height: "24px",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, TextField, Button, Typography, Paper } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginAdmin } from "../redux/actions/adminAction"; // Action for admin login
 import toast from "react-hot-toast";
@@ -10,6 +10,8 @@ const AdminLoginPage = () => {
   const { loading, isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const referrer = location.state?.from;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +34,11 @@ const AdminLoginPage = () => {
 
   useEffect(() => {
     if (isAdminAuthenticated) {
-      navigate("/");
+      if (referrer) {
+        navigate ? navigate(referrer) : navigate("/");
+      } else {
+        navigate("/");
+      }
     }
   }, [isAdminAuthenticated, navigate]);
 

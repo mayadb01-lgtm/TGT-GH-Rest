@@ -56,12 +56,6 @@ export const EntryAccordion = ({
           >
             {title}
           </Typography>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 500, fontSize: "14px" }}
-          >
-            Aashirvad Guest House
-          </Typography>
         </Stack>
       </AccordionSummary>
       <AccordionDetails style={{ margin: 0, padding: 0 }}>
@@ -117,28 +111,28 @@ export const EntrySection = ({
         title: "Day Entries",
         period: "Day",
         onSubmit: setDayData,
-        bgColor: "#00a6ff",
+        bgColor: "#FAC172",
         panel: "panel1",
       },
       {
         title: "Night Entries",
         period: "Night",
         onSubmit: setNightData,
-        bgColor: "#6a6a6a",
+        bgColor: "#89D5C9",
         panel: "panel2",
       },
       {
         title: "Extra Day Entries",
         period: "extraDay",
         onSubmit: setExtraDayData,
-        bgColor: "#00a6ff",
+        bgColor: "#FAC172",
         panel: "panel3",
       },
       {
         title: "Extra Night Entries",
         period: "extraNight",
         onSubmit: setExtraNightData,
-        bgColor: "#6a6a6a",
+        bgColor: "#89D5C9",
         panel: "panel4",
       },
     ].map(({ title, period, onSubmit, bgColor, panel }) => (
