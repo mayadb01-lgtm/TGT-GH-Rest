@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   Paper,
 } from "@mui/material";
 
-const columns = ["ID", "Name", "Mobile Number", "Category"];
+const columns = ["ID", "Amount", "Name", "Mobile Number", "Category"];
 
 const categories = [
   { title: "Category 1" },
@@ -30,38 +30,39 @@ const fullNameOptions = [
 
 const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
 
-const generateInitialData = () =>
-  Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    fullname: "",
-    mobileNumber: "",
-    category: "",
-  }));
-
-const ExpensesTable = () => {
-  const [tableData, setTableData] = useState(generateInitialData);
-
-  const handleUpdateRow = useCallback((index, key, value) => {
-    setTableData((prevData) =>
-      prevData.map((row, i) =>
-        i === index ? { ...row, [key]: value || "" } : row
-      )
-    );
-  }, []);
-
-  // Const Calculation Rows
-
-  // Total of All Amounts
-  // const totalExpensesAmount = useMemo(() => {
-  //   return tableData.reduce((total, row) => total + Number(row.amount), 0);
-  // }, [tableData]);
+const ExpensesTable = ({
+  restExpensesData,
+  setRestExpensesData,
+  selectedDate,
+  totalExpenses,
+  totalUpad,
+  totalPending,
+  totalCard,
+  setTotalCard,
+  totalPP,
+  setTotalPP,
+  totalCash,
+  setTotalCash,
+  grandTotal,
+  extraAmount,
+}) => {
+  const handleUpdateRow = useCallback(
+    (index, key, value) => {
+      setRestExpensesData((prevData) =>
+        prevData.map((row, i) =>
+          i === index ? { ...row, [key]: value || "" } : row
+        )
+      );
+    },
+    [setRestExpensesData]
+  );
 
   const handleAddRow = useCallback(() => {
-    setTableData((prevData) => [
+    setRestExpensesData((prevData) => [
       ...prevData,
       { id: prevData.length + 1, fullname: "", mobileNumber: "", category: "" },
     ]);
-  }, []);
+  }, [setRestExpensesData]);
 
   const renderAutocomplete = (options, rowKey, index, currentValue) => (
     <Autocomplete
@@ -75,6 +76,63 @@ const ExpensesTable = () => {
       isOptionEqualToValue={(option, value) => option.title === value.title}
     />
   );
+
+  // Calculation Rows at End of Table
+  // 1. Total Expenses
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total Expenses
+  // 2. Total Upad
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total Upad
+  // 3. Total Pending
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total Pending
+  // 4. Total Card
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total Card
+  // 5. Total PP
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total PP
+  // 6. Total Cash
+  // Row Amount Column = Value
+  // Other Columns Merge and Text = Total Cash
+  // 7. Grand Total
+  // Row Amount Column = Value
+
+  const calculationRows = [
+    {
+      label: "Total Expenses",
+      amount: totalExpenses,
+    },
+    {
+      label: "Total Upad",
+      amount: totalUpad,
+    },
+    {
+      label: "Total Pending",
+      amount: totalPending,
+    },
+    {
+      label: "Total Card",
+      amount: totalCard,
+    },
+    {
+      label: "Total PP",
+      amount: totalPP,
+    },
+    {
+      label: "Total Cash",
+      amount: totalCash,
+    },
+    {
+      label: "Grand Total",
+      amount: grandTotal,
+    },
+    {
+      label: "Extra Amount",
+      amount: extraAmount,
+    },
+  ];
 
   return (
     <TableContainer
@@ -92,9 +150,20 @@ const ExpensesTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tableData.map((row, index) => (
+          {restExpensesData.map((row, index) => (
             <TableRow key={row.id}>
               <TableCell>{row.id}</TableCell>
+              <TableCell>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  value={row.amount || ""}
+                  onChange={(e) =>
+                    handleUpdateRow(index, "amount", e.target.value)
+                  }
+                />
+              </TableCell>
               <TableCell>
                 {renderAutocomplete(
                   fullNameOptions,
@@ -118,6 +187,33 @@ const ExpensesTable = () => {
                   index,
                   row.category
                 )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableBody>
+          {calculationRows.map((row, index) => (
+            <TableRow key={index}>
+              <TableCell></TableCell>
+              <TableCell colSpan={2}>{row.label}</TableCell>
+              <TableCell>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  type="number"
+                  value={row.amount}
+                  onChange={(e) => {
+                    if (row.label === "Total Cash") {
+                      setTotalCash(e.target.value);
+                    } else if (row.label === "Total Card") {
+                      setTotalCard(e.target.value);
+                    } else if (row.label === "Total PP") {
+                      setTotalPP(e.target.value);
+                    } else {
+                      return;
+                    }
+                  }}
+                />
               </TableCell>
             </TableRow>
           ))}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -15,6 +15,83 @@ const RestEntryPage = () => {
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
   );
+  // Upad
+  const restUpadInitialData = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    amount: 0,
+    fullname: "",
+    mobileNumber: "",
+  }));
+  const [restUpadData, setRestUpadData] = useState(restUpadInitialData);
+  // Pending
+  const restPendingInitialData = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    fullname: "",
+    mobileNumber: "",
+    amount: 0,
+  }));
+  const [restPendingData, setRestPendingData] = useState(
+    restPendingInitialData
+  );
+  // Expenses
+  const restExpensesInitialData = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    amount: 0,
+    fullname: "",
+    mobileNumber: "",
+    category: 0,
+  }));
+  const [restExpensesData, setRestExpensesData] = useState(
+    restExpensesInitialData
+  );
+  const [totalUpad, setTotalUpad] = useState(0);
+  const [totalPending, setTotalPending] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [totalCard, setTotalCard] = useState(0);
+  const [totalPP, setTotalPP] = useState(0);
+  const [totalCash, setTotalCash] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
+  const [extraAmount, setExtraAmount] = useState(0);
+  useMemo(() => {
+    const total = restUpadData.reduce((acc, row) => {
+      return acc + Number(row.amount);
+    }, 0);
+    setTotalUpad(total);
+  }, [restUpadData]);
+
+  useMemo(() => {
+    const total = restPendingData.reduce((acc, row) => {
+      return acc + Number(row.amount);
+    }, 0);
+    setTotalPending(total);
+  }, [restPendingData]);
+
+  useMemo(() => {
+    const total = restExpensesData.reduce((acc, row) => {
+      return acc + Number(row.amount);
+    }, 0);
+    setTotalExpenses(total);
+  }, [restExpensesData]);
+
+  useMemo(() => {
+    const total =
+      totalUpad +
+      totalPending +
+      totalExpenses +
+      extraAmount +
+      totalCard +
+      totalPP +
+      totalCash;
+    setGrandTotal(total);
+  }, [
+    totalUpad,
+    totalPending,
+    totalExpenses,
+    extraAmount,
+    totalCard,
+    totalPP,
+    totalCash,
+  ]);
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate.format("DD-MM-YYYY"));
@@ -84,7 +161,11 @@ const RestEntryPage = () => {
               >
                 Upaad
               </Typography>
-              <RestTableComponent />
+              <RestTableComponent
+                restUpadData={restUpadData}
+                setRestUpadData={setRestUpadData}
+                selectedDate={selectedDate}
+              />
             </Box>
           </Grid>
           {/* Pending */}
@@ -96,7 +177,11 @@ const RestEntryPage = () => {
               >
                 Pending
               </Typography>
-              <RestRestTable />
+              <RestRestTable
+                restPendingData={restPendingData}
+                setRestPendingData={setRestPendingData}
+                selectedDate={selectedDate}
+              />
             </Box>
           </Grid>
         </Grid>
@@ -109,7 +194,22 @@ const RestEntryPage = () => {
               >
                 Expenses
               </Typography>
-              <RestExpensesTable />
+              <RestExpensesTable
+                restExpensesData={restExpensesData}
+                setRestExpensesData={setRestExpensesData}
+                selectedDate={selectedDate}
+                totalExpenses={totalExpenses}
+                totalUpad={totalUpad}
+                totalPending={totalPending}
+                totalCard={totalCard}
+                setTotalCard={setTotalCard}
+                totalPP={totalPP}
+                setTotalPP={setTotalPP}
+                totalCash={totalCash}
+                setTotalCash={setTotalCash}
+                grandTotal={grandTotal}
+                extraAmount={extraAmount}
+              />
             </Box>
           </Grid>
         </Grid>

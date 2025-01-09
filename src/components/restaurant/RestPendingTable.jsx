@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,18 +12,13 @@ import {
   Box,
 } from "@mui/material";
 
-const TABLE_COLUMNS = ["ID", "Name", "Mobile Number"];
+const TABLE_COLUMNS = ["ID", "Amount", "Name", "Mobile Number"];
 
-const RestRestTable = () => {
-  const initialData = Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    fullname: "",
-    mobileNumber: "",
-    amount: "",
-  }));
-
-  const [tableData, setTableData] = useState(initialData);
-
+const RestRestTable = ({
+  restPendingData,
+  setRestPendingData,
+  selectedDate,
+}) => {
   const fullNameOptions = [
     { title: "John Doe" },
     { title: "Jane Doe" },
@@ -38,19 +32,19 @@ const RestRestTable = () => {
   ];
 
   const handleAddRow = () => {
-    setTableData((prevData) => [
+    setRestPendingData((prevData) => [
       ...prevData,
       {
         id: prevData.length + 1,
         fullname: "",
         mobileNumber: "",
-        amount: "",
+        amount: 0,
       },
     ]);
   };
 
   const handleUpdateRow = (index, key, value) => {
-    setTableData((prevData) =>
+    setRestPendingData((prevData) =>
       prevData.map((row, i) =>
         i === index ? { ...row, [key]: value || "" } : row
       )
@@ -88,15 +82,15 @@ const RestRestTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableData.map((row, index) => (
+            {restPendingData.map((row, index) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell>
                   <TextField
                     variant="outlined"
                     size="small"
-                    fullWidth
-                    value={row.amount}
+                    type="number"
+                    value={row.amount || ""}
                     onChange={(e) =>
                       handleUpdateRow(index, "amount", e.target.value)
                     }

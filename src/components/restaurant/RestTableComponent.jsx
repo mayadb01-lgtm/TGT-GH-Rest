@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -12,13 +12,7 @@ import {
   Paper,
 } from "@mui/material";
 
-const tableColumns = ["ID", "Name", "Mobile Number"];
-
-const initialData = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
-  fullname: "",
-  mobileNumber: "",
-}));
+const tableColumns = ["ID", "Amount", "Name", "Mobile Number"];
 
 const fullNameOptions = [
   { title: "John Doe" },
@@ -32,6 +26,16 @@ const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
 const EditableRow = ({ row, index, onUpdateRow }) => (
   <TableRow>
     <TableCell>{row.id}</TableCell>
+    <TableCell>
+      <TextField
+        variant="outlined"
+        size="small"
+        value={row.amount || ""}
+        onChange={(event, value) =>
+          onUpdateRow(index, "amount", value ? value.title : "")
+        }
+      />
+    </TableCell>
     <TableCell>
       <Autocomplete
         options={fullNameOptions}
@@ -70,23 +74,25 @@ const EditableRow = ({ row, index, onUpdateRow }) => (
   </TableRow>
 );
 
-const RestTableComponent = () => {
-  const [tableData, setTableData] = useState(initialData);
-
+const RestTableComponent = ({
+  restUpadData,
+  setRestUpadData,
+  selectedDate,
+}) => {
   const handleAddRow = () => {
-    setTableData((prevData) => [
+    setRestUpadData((prevData) => [
       ...prevData,
       { id: prevData.length + 1, fullname: "", mobileNumber: "" },
     ]);
   };
 
   const handleUpdateRow = (index, key, value) => {
-    setTableData((prevData) =>
+    setRestUpadData((prevData) =>
       prevData.map((row, i) => (i === index ? { ...row, [key]: value } : row))
     );
   };
 
-  const memoizedTableData = useMemo(() => tableData, [tableData]);
+  const memoizedTableData = useMemo(() => restUpadData, [restUpadData]);
 
   return (
     <div>
