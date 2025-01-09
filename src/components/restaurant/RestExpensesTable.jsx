@@ -1,4 +1,4 @@
-import  { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -145,7 +145,7 @@ const ExpensesTable = ({
           {restExpensesData.map((row, index) => (
             <TableRow key={row.id}>
               <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
-              <TableCell sx={{ width: "25%" }}>
+              <TableCell sx={{ width: "15%" }}>
                 <TextField
                   variant="outlined"
                   size="small"
@@ -156,7 +156,7 @@ const ExpensesTable = ({
                   }
                 />
               </TableCell>
-              <TableCell sx={{ width: "40%" }}>
+              <TableCell sx={{ width: "25%" }}>
                 {renderAutocomplete(
                   fullNameOptions,
                   "fullname",
@@ -164,7 +164,7 @@ const ExpensesTable = ({
                   row.fullname
                 )}
               </TableCell>
-              <TableCell sx={{ width: "30%" }}>
+              <TableCell sx={{ width: "20%" }}>
                 {renderAutocomplete(
                   mobileNumberOptions,
                   "mobileNumber",
@@ -172,7 +172,7 @@ const ExpensesTable = ({
                   row.mobileNumber
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ width: "30%" }}>
                 {renderAutocomplete(
                   categories,
                   "category",

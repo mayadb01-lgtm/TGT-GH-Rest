@@ -107,7 +107,7 @@ const RestEntryPage = () => {
         alignItems="start"
         padding={"8px 32px"}
       >
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.9, xl: 5.9 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4.5, xl: 4.5 }}>
           {/* Select Date */}
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box style={{ margin: "0", padding: "0" }}>
@@ -186,7 +186,7 @@ const RestEntryPage = () => {
             </Box>
           </Grid>
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.9, xl: 5.9 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box>
               <Typography
