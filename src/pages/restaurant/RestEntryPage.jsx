@@ -6,7 +6,8 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import RestTableComponent from "../../components/restaurant/RestTableComponent";
-import RestExpensesTable from "./RestExpensesTable";
+import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
+import RestRestTable from "../../components/restaurant/RestPendingTable";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
@@ -26,9 +27,10 @@ const RestEntryPage = () => {
         display="flex"
         justifyContent="space-between"
         alignItems="start"
-        padding={"8px 16px"}
+        padding={"8px 32px"}
       >
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.8, xl: 5.8 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.9, xl: 5.9 }}>
+          {/* Select Date */}
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box style={{ margin: "0", padding: "0" }}>
               {/* Date Picker */}
@@ -73,17 +75,32 @@ const RestEntryPage = () => {
               </Stack>
             </Box>
           </Grid>
-          <Box>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 500, fontSize: "14px" }}
-            >
-              Upaad
-            </Typography>
-            <RestTableComponent />
-          </Box>
+          {/* Upad */}
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 500, fontSize: "14px" }}
+              >
+                Upaad
+              </Typography>
+              <RestTableComponent />
+            </Box>
+          </Grid>
+          {/* Pending */}
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Box>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 500, fontSize: "14px" }}
+              >
+                Pending
+              </Typography>
+              <RestRestTable />
+            </Box>
+          </Grid>
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.8, xl: 5.8 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5.9, xl: 5.9 }}>
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box>
               <Typography
