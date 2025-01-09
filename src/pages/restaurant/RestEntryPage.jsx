@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid2";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import RestTableComponent from "../../components/restaurant/RestTableComponent";
+import RestUpadTable from "../../components/restaurant/RestUpadTable";
 import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
 import RestRestTable from "../../components/restaurant/RestPendingTable";
 dayjs.locale("en-gb");
@@ -161,7 +161,7 @@ const RestEntryPage = () => {
               >
                 Upaad
               </Typography>
-              <RestTableComponent
+              <RestUpadTable
                 restUpadData={restUpadData}
                 setRestUpadData={setRestUpadData}
                 selectedDate={selectedDate}

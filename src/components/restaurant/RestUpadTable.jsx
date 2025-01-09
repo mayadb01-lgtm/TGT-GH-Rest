@@ -74,11 +74,7 @@ const EditableRow = ({ row, index, onUpdateRow }) => (
   </TableRow>
 );
 
-const RestTableComponent = ({
-  restUpadData,
-  setRestUpadData,
-  selectedDate,
-}) => {
+const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
   const handleAddRow = () => {
     setRestUpadData((prevData) => [
       ...prevData,
@@ -135,4 +131,4 @@ const RestTableComponent = ({
   );
 };
 
-export default RestTableComponent;
+export default RestUpadTable;
