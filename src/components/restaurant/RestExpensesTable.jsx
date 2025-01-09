@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import  { useCallback, useMemo } from "react";
+import PropTypes from "prop-types";
 import {
   Table,
   TableBody,
@@ -12,28 +13,9 @@ import {
   Paper,
 } from "@mui/material";
 
-const columns = ["ID", "Amount", "Name", "Mobile Number", "Category"];
-
-const categories = [
-  { title: "Category 1" },
-  { title: "Category 2" },
-  { title: "Category 3" },
-  { title: "Category 4" },
-];
-
-const fullNameOptions = [
-  { title: "John Doe" },
-  { title: "Jane Doe" },
-  { title: "John Smith" },
-  { title: "Jane Smith" },
-];
-
-const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
-
 const ExpensesTable = ({
   restExpensesData,
   setRestExpensesData,
-  selectedDate,
   totalExpenses,
   totalUpad,
   totalPending,
@@ -46,6 +28,63 @@ const ExpensesTable = ({
   grandTotal,
   extraAmount,
 }) => {
+  // Column headers
+  const columns = useMemo(
+    () => ["ID", "Amount", "Name", "Mobile Number", "Category"],
+    []
+  );
+
+  // Dropdown options
+  const categories = useMemo(
+    () => [
+      { title: "Category 1" },
+      { title: "Category 2" },
+      { title: "Category 3" },
+      { title: "Category 4" },
+    ],
+    []
+  );
+
+  const fullNameOptions = useMemo(
+    () => [
+      { title: "John Doe" },
+      { title: "Jane Doe" },
+      { title: "John Smith" },
+      { title: "Jane Smith" },
+    ],
+    []
+  );
+
+  const mobileNumberOptions = useMemo(
+    () => [{ title: "1234567890" }, { title: "0987654321" }],
+    []
+  );
+
+  // Calculation rows
+  const calculationRows = useMemo(
+    () => [
+      { label: "Total Expenses", amount: totalExpenses },
+      { label: "Total Upad", amount: totalUpad },
+      { label: "Total Pending", amount: totalPending },
+      { label: "Total Card", amount: totalCard },
+      { label: "Total PP", amount: totalPP },
+      { label: "Total Cash", amount: totalCash },
+      { label: "Grand Total", amount: grandTotal },
+      { label: "Extra Amount", amount: extraAmount },
+    ],
+    [
+      totalExpenses,
+      totalUpad,
+      totalPending,
+      totalCard,
+      totalPP,
+      totalCash,
+      grandTotal,
+      extraAmount,
+    ]
+  );
+
+  // Update row data
   const handleUpdateRow = useCallback(
     (index, key, value) => {
       setRestExpensesData((prevData) =>
@@ -57,103 +96,56 @@ const ExpensesTable = ({
     [setRestExpensesData]
   );
 
+  // Add a new row
   const handleAddRow = useCallback(() => {
     setRestExpensesData((prevData) => [
       ...prevData,
-      { id: prevData.length + 1, fullname: "", mobileNumber: "", category: "" },
+      {
+        id: prevData.length + 1,
+        amount: "",
+        fullname: "",
+        mobileNumber: "",
+        category: "",
+      },
     ]);
   }, [setRestExpensesData]);
 
-  const renderAutocomplete = (options, rowKey, index, currentValue) => (
-    <Autocomplete
-      options={options}
-      getOptionLabel={(option) => option.title || ""}
-      value={options.find((option) => option.title === currentValue) || null}
-      onChange={(e, value) => handleUpdateRow(index, rowKey, value?.title)}
-      renderInput={(params) => (
-        <TextField {...params} variant="outlined" size="small" />
-      )}
-      isOptionEqualToValue={(option, value) => option.title === value.title}
-    />
+  // Render autocomplete field
+  const renderAutocomplete = useCallback(
+    (options, rowKey, index, currentValue) => (
+      <Autocomplete
+        options={options}
+        getOptionLabel={(option) => option.title || ""}
+        value={options.find((option) => option.title === currentValue) || null}
+        onChange={(e, value) => handleUpdateRow(index, rowKey, value?.title)}
+        renderInput={(params) => (
+          <TextField {...params} variant="outlined" size="small" />
+        )}
+        isOptionEqualToValue={(option, value) => option.title === value?.title}
+      />
+    ),
+    [handleUpdateRow]
   );
 
-  // Calculation Rows at End of Table
-  // 1. Total Expenses
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total Expenses
-  // 2. Total Upad
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total Upad
-  // 3. Total Pending
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total Pending
-  // 4. Total Card
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total Card
-  // 5. Total PP
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total PP
-  // 6. Total Cash
-  // Row Amount Column = Value
-  // Other Columns Merge and Text = Total Cash
-  // 7. Grand Total
-  // Row Amount Column = Value
-
-  const calculationRows = [
-    {
-      label: "Total Expenses",
-      amount: totalExpenses,
-    },
-    {
-      label: "Total Upad",
-      amount: totalUpad,
-    },
-    {
-      label: "Total Pending",
-      amount: totalPending,
-    },
-    {
-      label: "Total Card",
-      amount: totalCard,
-    },
-    {
-      label: "Total PP",
-      amount: totalPP,
-    },
-    {
-      label: "Total Cash",
-      amount: totalCash,
-    },
-    {
-      label: "Grand Total",
-      amount: grandTotal,
-    },
-    {
-      label: "Extra Amount",
-      amount: extraAmount,
-    },
-  ];
-
   return (
-    <TableContainer
-      component={Paper}
-      sx={{ maxHeight: "100%", boxShadow: 3, marginTop: 2 }}
-    >
+    <TableContainer component={Paper} sx={{ boxShadow: 3, marginTop: 2 }}>
       <Table size="small" stickyHeader>
+        {/* Table Header */}
         <TableHead>
           <TableRow>
-            {columns.map((column, index) => (
-              <TableCell key={index} sx={{ fontWeight: "bold" }}>
+            {columns.map((column) => (
+              <TableCell key={column} sx={{ fontWeight: "bold" }}>
                 {column}
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
+          {/* Dynamic Rows */}
           {restExpensesData.map((row, index) => (
             <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
-              <TableCell>
+              <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
+              <TableCell sx={{ width: "25%" }}>
                 <TextField
                   variant="outlined"
                   size="small"
@@ -164,7 +156,7 @@ const ExpensesTable = ({
                   }
                 />
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ width: "40%" }}>
                 {renderAutocomplete(
                   fullNameOptions,
                   "fullname",
@@ -172,7 +164,7 @@ const ExpensesTable = ({
                   row.fullname
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell sx={{ width: "30%" }}>
                 {renderAutocomplete(
                   mobileNumberOptions,
                   "mobileNumber",
@@ -190,27 +182,29 @@ const ExpensesTable = ({
               </TableCell>
             </TableRow>
           ))}
-        </TableBody>
-        <TableBody>
+          {/* Calculation Rows */}
           {calculationRows.map((row, index) => (
             <TableRow key={index}>
-              <TableCell></TableCell>
               <TableCell colSpan={2}>{row.label}</TableCell>
-              <TableCell>
+              <TableCell colSpan={3}>
                 <TextField
                   variant="outlined"
                   size="small"
                   type="number"
-                  value={row.amount}
+                  value={row.amount || ""}
                   onChange={(e) => {
-                    if (row.label === "Total Cash") {
-                      setTotalCash(e.target.value);
-                    } else if (row.label === "Total Card") {
-                      setTotalCard(e.target.value);
-                    } else if (row.label === "Total PP") {
-                      setTotalPP(e.target.value);
-                    } else {
-                      return;
+                    switch (row.label) {
+                      case "Total Cash":
+                        setTotalCash(Number(e.target.value));
+                        break;
+                      case "Total Card":
+                        setTotalCard(Number(e.target.value));
+                        break;
+                      case "Total PP":
+                        setTotalPP(Number(e.target.value));
+                        break;
+                      default:
+                        break;
                     }
                   }}
                 />
@@ -229,6 +223,22 @@ const ExpensesTable = ({
       </Button>
     </TableContainer>
   );
+};
+
+ExpensesTable.propTypes = {
+  restExpensesData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  setRestExpensesData: PropTypes.func.isRequired,
+  totalExpenses: PropTypes.number.isRequired,
+  totalUpad: PropTypes.number.isRequired,
+  totalPending: PropTypes.number.isRequired,
+  totalCard: PropTypes.number.isRequired,
+  setTotalCard: PropTypes.func.isRequired,
+  totalPP: PropTypes.number.isRequired,
+  setTotalPP: PropTypes.func.isRequired,
+  totalCash: PropTypes.number.isRequired,
+  setTotalCash: PropTypes.func.isRequired,
+  grandTotal: PropTypes.number.isRequired,
+  extraAmount: PropTypes.number.isRequired,
 };
 
 export default ExpensesTable;

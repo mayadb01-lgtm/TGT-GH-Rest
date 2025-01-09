@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import RestUpadTable from "../../components/restaurant/RestUpadTable";
 import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
-import RestRestTable from "../../components/restaurant/RestPendingTable";
+import RestPendingTable from "../../components/restaurant/RestPendingTable";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
@@ -96,6 +96,7 @@ const RestEntryPage = () => {
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate.format("DD-MM-YYYY"));
   };
+
   return (
     <>
       <Grid
@@ -156,8 +157,8 @@ const RestEntryPage = () => {
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box>
               <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 500, fontSize: "14px" }}
+                variant="subtitle1"
+                sx={{ fontWeight: 500, fontSize: "18px" }}
               >
                 Upaad
               </Typography>
@@ -172,12 +173,12 @@ const RestEntryPage = () => {
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box>
               <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 500, fontSize: "14px" }}
+                variant="subtitle1"
+                sx={{ fontWeight: 500, fontSize: "18px" }}
               >
                 Pending
               </Typography>
-              <RestRestTable
+              <RestPendingTable
                 restPendingData={restPendingData}
                 setRestPendingData={setRestPendingData}
                 selectedDate={selectedDate}
@@ -189,8 +190,8 @@ const RestEntryPage = () => {
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box>
               <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 500, fontSize: "14px" }}
+                variant="subtitle1"
+                sx={{ fontWeight: 500, fontSize: "18px" }}
               >
                 Expenses
               </Typography>

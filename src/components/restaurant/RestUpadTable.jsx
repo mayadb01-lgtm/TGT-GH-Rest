@@ -23,62 +23,68 @@ const fullNameOptions = [
 
 const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
 
-const EditableRow = ({ row, index, onUpdateRow }) => (
-  <TableRow>
-    <TableCell>{row.id}</TableCell>
-    <TableCell>
-      <TextField
-        variant="outlined"
-        size="small"
-        value={row.amount || ""}
-        onChange={(event, value) =>
-          onUpdateRow(index, "amount", value ? value.title : "")
-        }
-      />
-    </TableCell>
-    <TableCell>
-      <Autocomplete
-        options={fullNameOptions}
-        getOptionLabel={(option) => option.title}
-        value={
-          fullNameOptions.find((option) => option.title === row.fullname) ||
-          null
-        }
-        onChange={(event, value) =>
-          onUpdateRow(index, "fullname", value ? value.title : "")
-        }
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" size="small" />
-        )}
-        disableClearable
-      />
-    </TableCell>
-    <TableCell>
-      <Autocomplete
-        options={mobileNumberOptions}
-        getOptionLabel={(option) => option.title}
-        value={
-          mobileNumberOptions.find(
-            (option) => option.title === row.mobileNumber
-          ) || null
-        }
-        onChange={(event, value) =>
-          onUpdateRow(index, "mobileNumber", value ? value.title : "")
-        }
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" size="small" />
-        )}
-        disableClearable
-      />
-    </TableCell>
-  </TableRow>
-);
+const EditableRow = ({ row, index, onUpdateRow }) => {
+  const handleInputChange = (key, value) => {
+    onUpdateRow(index, key, value);
+  };
+
+  return (
+    <TableRow>
+      <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
+      <TableCell sx={{ width: "25%" }}>
+        <TextField
+          variant="outlined"
+          type="number"
+          size="small"
+          value={row.amount || ""}
+          onChange={(e) => handleInputChange("amount", e.target.value)}
+          fullWidth
+        />
+      </TableCell>
+      <TableCell sx={{ width: "40%" }}>
+        <Autocomplete
+          options={fullNameOptions}
+          getOptionLabel={(option) => option.title}
+          value={
+            fullNameOptions.find((option) => option.title === row.fullname) ||
+            null
+          }
+          onChange={(event, value) =>
+            handleInputChange("fullname", value?.title || "")
+          }
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" size="small" fullWidth />
+          )}
+          disableClearable
+        />
+      </TableCell>
+      <TableCell sx={{ width: "30%" }}>
+        <Autocomplete
+          options={mobileNumberOptions}
+          getOptionLabel={(option) => option.title}
+          value={
+            mobileNumberOptions.find(
+              (option) => option.title === row.mobileNumber
+            ) || null
+          }
+          onChange={(event, value) =>
+            handleInputChange("mobileNumber", value?.title || "")
+          }
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" size="small" fullWidth />
+          )}
+          disableClearable
+        />
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
   const handleAddRow = () => {
     setRestUpadData((prevData) => [
       ...prevData,
-      { id: prevData.length + 1, fullname: "", mobileNumber: "" },
+      { id: prevData.length + 1, amount: "", fullname: "", mobileNumber: "" },
     ]);
   };
 
@@ -94,13 +100,13 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
     <div>
       <TableContainer
         component={Paper}
-        sx={{ maxHeight: "100%", boxShadow: 3, marginTop: 2 }}
+        sx={{ maxHeight: "100%", boxShadow: 3, mt: 2 }}
       >
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
-              {tableColumns.map((column, index) => (
-                <TableCell key={index} sx={{ fontWeight: "bold" }}>
+              {tableColumns.map((column) => (
+                <TableCell key={column} sx={{ fontWeight: "bold" }}>
                   {column}
                 </TableCell>
               ))}
@@ -121,8 +127,7 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
           variant="contained"
           color="primary"
           onClick={handleAddRow}
-          sx={{ margin: 2 }}
-          s
+          sx={{ m: 2 }}
         >
           Add Row
         </Button>

@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import PropTypes from "prop-types";
 import {
   Table,
   TableBody,
@@ -9,27 +11,22 @@ import {
   Autocomplete,
   TextField,
   Button,
-  Box,
 } from "@mui/material";
 
 const TABLE_COLUMNS = ["ID", "Amount", "Name", "Mobile Number"];
 
-const RestRestTable = ({
-  restPendingData,
-  setRestPendingData,
-  selectedDate,
-}) => {
-  const fullNameOptions = [
-    { title: "John Doe" },
-    { title: "Jane Doe" },
-    { title: "John Smith" },
-    { title: "Jane Smith" },
-  ];
+const fullNameOptions = [
+  { title: "John Doe" },
+  { title: "Jane Doe" },
+  { title: "John Smith" },
+  { title: "Jane Smith" },
+];
 
-  const mobileNumberOptions = [
-    { title: "1234567890" },
-    { title: "0987654321" },
-  ];
+const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
+
+const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
+  const memoizedFullNameOptions = useMemo(() => fullNameOptions, []);
+  const memoizedMobileNumberOptions = useMemo(() => mobileNumberOptions, []);
 
   const handleAddRow = () => {
     setRestPendingData((prevData) => [
@@ -62,14 +59,15 @@ const RestRestTable = ({
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" fullWidth />
       )}
+      disableClearable
     />
   );
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <div>
       <TableContainer
         component={Paper}
-        sx={{ maxHeight: "100%", boxShadow: 3, marginTop: 2 }}
+        sx={{ maxHeight: "100%", boxShadow: 3, mt: 2 }}
       >
         <Table stickyHeader size="small">
           <TableHead>
@@ -84,8 +82,8 @@ const RestRestTable = ({
           <TableBody>
             {restPendingData.map((row, index) => (
               <TableRow key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>
+                <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
+                <TableCell sx={{ width: "25%" }}>
                   <TextField
                     variant="outlined"
                     size="small"
@@ -96,17 +94,17 @@ const RestRestTable = ({
                     }
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: "40%" }}>
                   {renderAutocompleteCell(
-                    fullNameOptions,
+                    memoizedFullNameOptions,
                     row,
                     index,
                     "fullname"
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: "30%" }}>
                   {renderAutocompleteCell(
-                    mobileNumberOptions,
+                    memoizedMobileNumberOptions,
                     row,
                     index,
                     "mobileNumber"
@@ -125,8 +123,20 @@ const RestRestTable = ({
           Add Row
         </Button>
       </TableContainer>
-    </Box>
+    </div>
   );
 };
 
-export default RestRestTable;
+RestPendingTable.propTypes = {
+  restPendingData: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      fullname: PropTypes.string,
+      mobileNumber: PropTypes.string,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    })
+  ).isRequired,
+  setRestPendingData: PropTypes.func.isRequired,
+};
+
+export default RestPendingTable;
