@@ -1,10 +1,25 @@
-import { Stack, Typography, Paper } from "@mui/material";
+import { Stack, Typography, Paper, Avatar } from "@mui/material";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
+  const { isAdminAuthenticated, admin } = useSelector((state) => state.admin);
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+
+  const services = [
+    {
+      path: isAdminAuthenticated ? "/admin/hotel" : "/hotel",
+      title: "Hotel Management",
+      bg: "#fec86a",
+    },
+    {
+      path: isAdminAuthenticated ? "/admin/restaurant" : "/restaurant",
+      title: "Restaurant Management",
+      bg: "#ff6a6a",
+    },
+    // Add more services as needed
+  ];
 
   return (
     <Stack
@@ -13,22 +28,37 @@ const Home = () => {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
+        bgcolor: "#f4f4f9",
       }}
     >
-      {[
-        {
-          path: isAdminAuthenticated ? "/admin/hotel" : "/hotel",
-          title: "Hotel",
-          desc: "Hotel TGT",
-          bg: "#fec86a",
-        },
-        {
-          path: isAdminAuthenticated ? "/admin/restaurant" : "/restaurant",
-          title: "Restaurant",
-          desc: "Dine at the finest restaurants",
-          bg: "#ff6a6a",
-        },
-      ].map((item, index) => (
+      {/* Welcome Section */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={2}
+        sx={{ textAlign: "center" }}
+      >
+        <Avatar
+          sx={{
+            bgcolor: isAdminAuthenticated ? "#ff6a6a" : "#1976d2",
+            width: 56,
+            height: 56,
+          }}
+        >
+          {isAdminAuthenticated ? admin?.name?.charAt(0).toUpperCase() : "A"}
+          {isAuthenticated ? user?.name?.charAt(0).toUpperCase() : "U"}
+        </Avatar>
+        <Typography variant="h5">
+          Welcome, {isAdminAuthenticated ? admin?.name : user?.name}!
+        </Typography>
+      </Stack>
+      <Typography variant="body1" color="text.secondary">
+        Welcome to the TGT Business Management System. Choose a service to
+        manage your operations efficiently.
+      </Typography>
+
+      {/* Service Cards */}
+      {services.map((service, index) => (
         <Paper
           key={index}
           elevation={4}
@@ -38,7 +68,7 @@ const Home = () => {
             maxWidth: "600px",
             borderRadius: 4,
             textAlign: "center",
-            bgcolor: item.bg,
+            bgcolor: service.bg,
             transition: "transform 0.3s ease, box-shadow 0.3s ease",
             "&:hover": {
               transform: "translateY(-5px)",
@@ -47,24 +77,21 @@ const Home = () => {
           }}
         >
           <Link
-            to={item.path}
+            to={service.path}
             style={{ textDecoration: "none", color: "inherit" }}
             onClick={() => {
               toast.promise(
                 new Promise((resolve) => setTimeout(resolve, 500)),
                 {
-                  loading: "Please wait...",
-                  success: "Welcome to the " + item.title + " page",
-                  error: "Error accessing the " + item.title + " page",
+                  loading: "Redirecting...",
+                  success: `Welcome to the ${service.title} page!`,
+                  error: `Error accessing the ${service.title} page.`,
                 }
               );
             }}
           >
             <Typography variant="h4" gutterBottom>
-              {item.title}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {item.desc}
+              {service.title}
             </Typography>
           </Link>
         </Paper>
