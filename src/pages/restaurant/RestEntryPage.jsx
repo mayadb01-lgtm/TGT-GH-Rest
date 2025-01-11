@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -158,7 +158,14 @@ const RestEntryPage = () => {
             <Box>
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 500, fontSize: "18px" }}
+                sx={{
+                  fontWeight: 500,
+                  fontSize: "18px",
+                  backgroundColor: "#e8e2fd",
+                  padding: "4px 16px",
+                  borderRadius: "4px",
+                  width: "fit-content",
+                }}
               >
                 Upaad
               </Typography>
@@ -174,7 +181,15 @@ const RestEntryPage = () => {
             <Box>
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 500, fontSize: "18px" }}
+                sx={{
+                  fontWeight: 500,
+                  fontSize: "18px",
+                  backgroundColor: "#e5ffe0",
+                  margin: "16px 0",
+                  padding: "4px 16px",
+                  borderRadius: "4px",
+                  width: "fit-content",
+                }}
               >
                 Pending
               </Typography>
@@ -191,7 +206,14 @@ const RestEntryPage = () => {
             <Box>
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 500, fontSize: "18px" }}
+                sx={{
+                  fontWeight: 500,
+                  fontSize: "18px",
+                  backgroundColor: "#ffe1f2",
+                  padding: "4px 16px",
+                  borderRadius: "4px",
+                  width: "fit-content",
+                }}
               >
                 Expenses
               </Typography>
@@ -211,6 +233,26 @@ const RestEntryPage = () => {
                 grandTotal={grandTotal}
                 extraAmount={extraAmount}
               />
+              <Box
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  marginTop: "16px",
+                }}
+              >
+                <Button
+                  style={{
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                    padding: "8px 16px",
+                    borderRadius: "4px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Submit
+                </Button>
+              </Box>
             </Box>
           </Grid>
         </Grid>
