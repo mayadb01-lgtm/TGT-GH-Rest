@@ -181,7 +181,6 @@ export const PaymentSummary = ({
   paymentColors,
   modeRows,
   modeColumns,
-  isAdminAuthenticated,
   handleEntryEdit,
   handleEntrySubmit,
   handleCancelClick,
@@ -281,16 +280,14 @@ export const PaymentSummary = ({
           Submit Entries
         </Typography>
         <Stack direction="row" spacing={1}>
-          {isAdminAuthenticated && (
-            <Button
-              onClick={handleEntryEdit}
-              variant="contained"
-              color="secondary"
-              sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
-            >
-              Edit
-            </Button>
-          )}
+          <Button
+            onClick={handleEntryEdit}
+            variant="contained"
+            color="secondary"
+            sx={{ px: 3, "&:hover": { backgroundColor: "secondary" } }}
+          >
+            Edit
+          </Button>
           <Button
             onClick={handleEntrySubmit}
             variant="contained"

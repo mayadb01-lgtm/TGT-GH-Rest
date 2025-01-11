@@ -50,10 +50,8 @@ const EntryPage = () => {
   );
 
   useEffect(() => {
-    if (selectedDate && isAdminAuthenticated) {
-      dispatch(getEntriesByDate(selectedDate));
-    }
-  }, [selectedDate, isAdminAuthenticated, dispatch]);
+    dispatch(getEntriesByDate(selectedDate));
+  }, [selectedDate, dispatch]);
 
   let processedEntries = useMemo(() => {
     // Cash
@@ -226,6 +224,8 @@ const EntryPage = () => {
     setExtraNightData([]);
     setPendingJamaRows(initializePendingJamaRows);
     setSelectedDate(dayjs().format("DD-MM-YYYY"));
+    dispatch(getUnPaidEntries());
+    dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
   };
 
   const handleEntrySubmit = async () => {
@@ -317,7 +317,6 @@ const EntryPage = () => {
         setPendingJamaRows,
         setSelectedDate
       );
-      dispatch(getUnPaidEntries());
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -410,7 +409,6 @@ const EntryPage = () => {
           setPendingJamaRows,
           setSelectedDate
         );
-        dispatch(getUnPaidEntries());
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
@@ -551,7 +549,6 @@ const EntryPage = () => {
           paymentColors={paymentColors}
           modeRows={modeRows}
           modeColumns={finalModeColumns}
-          isAdminAuthenticated={isAdminAuthenticated}
           handleEntrySubmit={handleEntrySubmit}
           handleEntryEdit={handleEntryEdit}
           handleCancelClick={handleCancelClick}

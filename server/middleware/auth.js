@@ -15,11 +15,20 @@ export const isAuthenticated = async (req, res, next) => {
       });
     }
 
-    if (admin_token) {
+    if (admin_token && token) {
+      res.clearCookie("token");
+      res.clearCookie("admin_token");
+      return res.status(401).json({
+        success: false,
+        message: "Due to inactivity, please login again",
+      });
+    }
+
+    if (admin_token && !token) {
       const decoded = jwt.verify(admin_token, process.env.JWT_SECRET_KEY);
       req.user = await Admin.findById(decoded.id);
       return next();
-    } else if (token) {
+    } else if (!admin_token && token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
       req.user = await User.findById(decoded.id);
       next();

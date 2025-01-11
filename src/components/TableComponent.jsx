@@ -48,7 +48,7 @@ const TableComponent = ({
   };
 
   useEffect(() => {
-    if (selectedDate && isAdminAuthenticated && entries.length > 0) {
+    if (selectedDate && entries.length > 0) {
       // Reset rows to initial state before updating
       let initialRows = initializeRows(period, rowsLength, roomCosts);
 
