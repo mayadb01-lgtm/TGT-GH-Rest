@@ -82,15 +82,17 @@ export const DatePickerComponent = ({
       views={["year", "month", "day"]}
       value={dayjs(selectedDate, "DD-MM-YYYY")}
       onChange={handleDateChange}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          variant="outlined"
-          size="small"
-          error={false}
-          helperText={null}
-        />
-      )}
+      slots={{
+        textField: (params) => (
+          <TextField
+            {...params}
+            variant="outlined"
+            size="small"
+            error={false}
+            helperText={null}
+          />
+        ),
+      }}
       sx={{ "& .MuiInputBase-input": { padding: 1 } }}
       disableFuture={!isAdminAuthenticated}
       disablePast={!isAdminAuthenticated}

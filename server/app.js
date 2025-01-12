@@ -8,7 +8,11 @@ import dotenv from "dotenv";
 
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:5173", "https://guesthouse-seven.vercel.app"],
+    origin: [
+      process.env.CLIENT_URL,
+      "http://localhost:5173",
+      "https://guesthouse-seven.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -29,10 +33,12 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 import user from "./controller/user.js";
 import admin from "./controller/admin.js";
 import entry from "./controller/entry.js";
+import restEntry from "./controller/restEntry.js";
 
 // Use routes
 app.use("/api/v1/user", user);
 app.use("/api/v1/admin", admin);
 app.use("/api/v1/entry", entry);
+app.use("/api/v1/restEntry", restEntry);
 
 export default app;

@@ -11,17 +11,9 @@ import {
   Button,
   Paper,
 } from "@mui/material";
+import { fullNameOptions, mobileNumberOptions } from "../../utils/utils";
 
 const tableColumns = ["ID", "Amount", "Name", "Mobile Number"];
-
-const fullNameOptions = [
-  { title: "John Doe" },
-  { title: "Jane Doe" },
-  { title: "John Smith" },
-  { title: "Jane Smith" },
-];
-
-const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
 
 const EditableRow = ({ row, index, onUpdateRow }) => {
   const handleInputChange = (key, value) => {
@@ -61,10 +53,11 @@ const EditableRow = ({ row, index, onUpdateRow }) => {
       <TableCell sx={{ width: "30%" }}>
         <Autocomplete
           options={mobileNumberOptions}
-          getOptionLabel={(option) => option.title}
+          type="number"
+          getOptionLabel={(option) => String(option.title) || ""}
           value={
             mobileNumberOptions.find(
-              (option) => option.title === row.mobileNumber
+              (option) => String(option.title) === String(row.mobileNumber)
             ) || null
           }
           onChange={(event, value) =>
@@ -73,7 +66,9 @@ const EditableRow = ({ row, index, onUpdateRow }) => {
           renderInput={(params) => (
             <TextField {...params} variant="outlined" size="small" fullWidth />
           )}
-          disableClearable
+          isOptionEqualToValue={(option, value) =>
+            String(option.title) === String(value.title)
+          }
         />
       </TableCell>
     </TableRow>
@@ -84,7 +79,7 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
   const handleAddRow = () => {
     setRestUpadData((prevData) => [
       ...prevData,
-      { id: prevData.length + 1, amount: "", fullname: "", mobileNumber: "" },
+      { id: prevData.length + 1, amount: 0, fullname: "", mobileNumber: 0 },
     ]);
   };
 

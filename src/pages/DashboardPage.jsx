@@ -125,14 +125,16 @@ const DashboardContent = () => {
           <DatePicker
             value={dayjs(selectedDate, "DD-MM-YYYY")}
             onChange={(newDate) => handleDateChange(newDate)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                variant="outlined"
-                size="small"
-              />
-            )}
+            slots={{
+              textField: (params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                />
+              ),
+            }}
             views={["day", "month", "year"]}
             format="DD-MM-YYYY"
           />

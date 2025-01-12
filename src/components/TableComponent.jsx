@@ -323,13 +323,17 @@ const TableComponent = ({
                           : null;
                         handleRowEdit({ ...row, checkInTime: formattedTime });
                       }}
-                      renderInput={(props) => (
-                        <Input
-                          {...props}
-                          placeholder="Select Time"
-                          className="light-orange"
-                        />
-                      )}
+                      slots={{
+                        textField: (params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            size="small"
+                            placeholder="Select Time"
+                            className="light-orange"
+                          />
+                        ),
+                      }}
                       sx={{
                         "& .MuiInputBase-root": {
                           height: "24px",
@@ -365,13 +369,17 @@ const TableComponent = ({
                           : null;
                         handleRowEdit({ ...row, checkOutTime: formattedTime });
                       }}
-                      renderInput={(props) => (
-                        <Input
-                          {...props}
-                          placeholder="Select Time"
-                          className="light-orange"
-                        />
-                      )}
+                      slots={{
+                        textField: (params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            size="small"
+                            placeholder="Select Time"
+                            className="light-orange"
+                          />
+                        ),
+                      }}
                       sx={{
                         "& .MuiInputBase-root": {
                           height: "24px",

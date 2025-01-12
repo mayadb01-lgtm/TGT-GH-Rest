@@ -8,6 +8,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import RestUpadTable from "../../components/restaurant/RestUpadTable";
 import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
 import RestPendingTable from "../../components/restaurant/RestPendingTable";
+import axios from "axios";
+import toast from "react-hot-toast";
+// import {
+//   categories,
+//   fullNameOptions,
+//   mobileNumberOptions,
+// } from "../../utils/utils";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
@@ -20,15 +27,17 @@ const RestEntryPage = () => {
     id: i + 1,
     amount: 0,
     fullname: "",
-    mobileNumber: "",
+    mobileNumber: 0,
+    createDate: selectedDate,
   }));
   const [restUpadData, setRestUpadData] = useState(restUpadInitialData);
   // Pending
   const restPendingInitialData = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     fullname: "",
-    mobileNumber: "",
+    mobileNumber: 0,
     amount: 0,
+    createDate: selectedDate,
   }));
   const [restPendingData, setRestPendingData] = useState(
     restPendingInitialData
@@ -38,8 +47,9 @@ const RestEntryPage = () => {
     id: i + 1,
     amount: 0,
     fullname: "",
-    mobileNumber: "",
+    mobileNumber: 0,
     category: 0,
+    createDate: selectedDate,
   }));
   const [restExpensesData, setRestExpensesData] = useState(
     restExpensesInitialData
@@ -97,6 +107,128 @@ const RestEntryPage = () => {
     setSelectedDate(newDate.format("DD-MM-YYYY"));
   };
 
+  const restEntryData = useMemo(() => {
+    return {
+      createDate: selectedDate,
+      date: selectedDate,
+      upad: JSON.stringify(restUpadData),
+      pending: JSON.stringify(restPendingData),
+      expenses: JSON.stringify(restExpensesData),
+      extraAmount: extraAmount,
+      totalUpad: totalUpad,
+      totalPending: totalPending,
+      totalExpenses: totalExpenses,
+      totalCard: totalCard,
+      totalPP: totalPP,
+      totalCash: totalCash,
+      grandTotal: grandTotal,
+    };
+  }, [
+    selectedDate,
+    restUpadData,
+    restPendingData,
+    restExpensesData,
+    extraAmount,
+    totalUpad,
+    totalPending,
+    totalExpenses,
+    totalCard,
+    totalPP,
+    totalCash,
+    grandTotal,
+  ]);
+
+  const submitEntryValidation = () => {
+    if (!selectedDate) {
+      toast.error("Please select a date.");
+      return false;
+    }
+
+    if (!restUpadData || restUpadData.length === 0) {
+      toast.error("Upad data is required.");
+      return false;
+    }
+
+    if (!restPendingData || restPendingData.length === 0) {
+      toast.error("Pending data is required.");
+      return false;
+    }
+
+    if (!restExpensesData || restExpensesData.length === 0) {
+      toast.error("Expenses data is required.");
+      return false;
+    }
+
+    if (extraAmount === undefined || extraAmount === null) {
+      toast.error("Extra amount is required.");
+      return false;
+    }
+
+    if (totalUpad === undefined || totalUpad === null) {
+      toast.error("Total Upad is required.");
+      return false;
+    }
+
+    if (totalPending === undefined || totalPending === null) {
+      toast.error("Total Pending is required.");
+      return false;
+    }
+
+    if (totalExpenses === undefined || totalExpenses === null) {
+      toast.error("Total Expenses is required.");
+      return false;
+    }
+
+    if (totalCard === undefined || totalCard === null) {
+      toast.error("Total Card is required.");
+      return false;
+    }
+
+    if (totalPP === undefined || totalPP === null) {
+      toast.error("Total PayPal (PP) is required.");
+      return false;
+    }
+
+    if (totalCash === undefined || totalCash === null) {
+      toast.error("Total Cash is required.");
+      return false;
+    }
+
+    if (grandTotal === undefined || grandTotal === null) {
+      toast.error("Grand Total is required.");
+      return false;
+    }
+
+    // Validation successful
+    return true;
+  };
+
+  const createRestEntry = async () => {
+    if (!submitEntryValidation()) {
+      return; // Stop execution if validation fails
+    }
+    console.log("restEntryData", restEntryData);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/create-entry`,
+        restEntryData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Rest Entry Created Successfully", res);
+      toast.success("Rest Entry Created Successfully");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while creating the entry."
+      );
+    }
+  };
+
   return (
     <>
       <Grid
@@ -132,15 +264,17 @@ const RestEntryPage = () => {
                     views={["year", "month", "day"]}
                     value={dayjs(selectedDate, "DD-MM-YYYY")}
                     onChange={(newDate) => handleDateChange(newDate)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        size="small"
-                        error={false}
-                        helperText={null}
-                      />
-                    )}
+                    slots={{
+                      textField: (params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          size="small"
+                          error={false}
+                          helperText={null}
+                        />
+                      ),
+                    }}
                     sx={{
                       "& .MuiInputBase-input": {
                         padding: 1,
@@ -249,6 +383,10 @@ const RestEntryPage = () => {
                     border: "none",
                     cursor: "pointer",
                   }}
+                  onClick={createRestEntry}
+                  // onClick={() => {
+                  //   console.log(restEntryData);
+                  // }}
                 >
                   Submit
                 </Button>

@@ -51,6 +51,7 @@ const EntryPage = () => {
 
   useEffect(() => {
     dispatch(getEntriesByDate(selectedDate));
+    dispatch(getUnPaidEntries());
   }, [selectedDate, dispatch]);
 
   let processedEntries = useMemo(() => {
@@ -498,15 +499,17 @@ const EntryPage = () => {
                     views={["year", "month", "day"]}
                     value={dayjs(selectedDate, "DD-MM-YYYY")}
                     onChange={(newDate) => handleDateChange(newDate)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        size="small"
-                        error={false}
-                        helperText={null}
-                      />
-                    )}
+                    slots={{
+                      textField: (params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          size="small"
+                          error={false}
+                          helperText={null}
+                        />
+                      ),
+                    }}
                     sx={{
                       "& .MuiInputBase-input": {
                         padding: 1,

@@ -129,3 +129,49 @@ export const initializeRows = (period, rowsLength, roomCosts) => {
 };
 
 export const currentDateTime = new Date().toString();
+
+export const fullNameOptions = [
+  { title: "John Doe" },
+  { title: "Jane Doe" },
+  { title: "John Smith" },
+  { title: "Jane Smith" },
+];
+
+export const mobileNumberOptions = [
+  { title: 1234567890 },
+  { title: 9876543210 },
+  { title: 1111111111 },
+  { title: 2222222222 },
+];
+
+export const categories = [
+  { title: "Category 1" },
+  { title: "Category 2" },
+  { title: "Category 3" },
+  { title: "Category 4" },
+];
+
+// const restUpadInitialData = Array.from({ length: 10 }, (_, i) => ({
+//   id: i + 1,
+//   fullname: fullNameOptions[0].title,
+//   mobileNumber: mobileNumberOptions[0].title,
+//   amount: Math.floor(Math.random() * (1000 - 100 + 1) + 100),
+//   createDate: selectedDate,
+// }));
+
+// const restPendingInitialData = Array.from({ length: 10 }, (_, i) => ({
+//   id: i + 1,
+//   fullname: fullNameOptions[1].title,
+//   mobileNumber: mobileNumberOptions[1].title,
+//   amount: Math.floor(Math.random() * (1000 - 100 + 1) + 100),
+//   createDate: selectedDate,
+// }));
+
+// const restExpensesInitialData = Array.from({ length: 10 }, (_, i) => ({
+//   id: i + 1,
+//   amount: Math.floor(Math.random() * (1000 - 100 + 1) + 100),
+//   fullname: fullNameOptions[3].title,
+//   mobileNumber: mobileNumberOptions[2].title,
+//   category: categories[3].title,
+//   createDate: selectedDate,
+// }));

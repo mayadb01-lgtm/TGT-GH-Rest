@@ -239,13 +239,10 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                       const formattedDate = dayjs(newDate).format("DD-MM-YYYY");
                       handleRowEdit(row.id, "date", formattedDate);
                     }}
-                    renderInput={(params) => (
-                      <TextField {...params} size="small" fullWidth />
-                    )}
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        fontSize: "12px",
-                      },
+                    slots={{
+                      textField: (params) => (
+                        <TextField {...params} size="small" fullWidth />
+                      ),
                     }}
                   />
                 </LocalizationProvider>

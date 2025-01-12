@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -12,29 +11,18 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import { fullNameOptions, mobileNumberOptions } from "../../utils/utils";
 
 const TABLE_COLUMNS = ["ID", "Amount", "Name", "Mobile Number"];
 
-const fullNameOptions = [
-  { title: "John Doe" },
-  { title: "Jane Doe" },
-  { title: "John Smith" },
-  { title: "Jane Smith" },
-];
-
-const mobileNumberOptions = [{ title: "1234567890" }, { title: "0987654321" }];
-
 const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
-  const memoizedFullNameOptions = useMemo(() => fullNameOptions, []);
-  const memoizedMobileNumberOptions = useMemo(() => mobileNumberOptions, []);
-
   const handleAddRow = () => {
     setRestPendingData((prevData) => [
       ...prevData,
       {
         id: prevData.length + 1,
         fullname: "",
-        mobileNumber: "",
+        mobileNumber: 0,
         amount: 0,
       },
     ]);
@@ -96,19 +84,33 @@ const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
                 </TableCell>
                 <TableCell sx={{ width: "40%" }}>
                   {renderAutocompleteCell(
-                    memoizedFullNameOptions,
+                    fullNameOptions,
                     row,
                     index,
                     "fullname"
                   )}
                 </TableCell>
                 <TableCell sx={{ width: "30%" }}>
-                  {renderAutocompleteCell(
-                    memoizedMobileNumberOptions,
-                    row,
-                    index,
-                    "mobileNumber"
-                  )}
+                  <Autocomplete
+                    options={mobileNumberOptions}
+                    type="number"
+                    getOptionLabel={(option) => String(option.title) || ""}
+                    value={
+                      mobileNumberOptions.find(
+                        (option) =>
+                          String(option.title) === String(row.mobileNumber)
+                      ) || ""
+                    }
+                    onChange={(event, value) =>
+                      handleUpdateRow(index, "mobileNumber", value?.title || "")
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} variant="outlined" size="small" />
+                    )}
+                    isOptionEqualToValue={(option, value) =>
+                      String(option.title) === String(value?.title)
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -132,7 +134,7 @@ RestPendingTable.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       fullname: PropTypes.string,
-      mobileNumber: PropTypes.string,
+      mobileNumber: PropTypes.number,
       amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })
   ).isRequired,
