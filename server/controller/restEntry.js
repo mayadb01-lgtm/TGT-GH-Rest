@@ -40,4 +40,31 @@ router.post("/create-entry", async (req, res) => {
   }
 });
 
+// Get Entry By Date
+router.get("/get-entry/:date", async (req, res) => {
+  try {
+    const createDate = req.params.date;
+    const entry = await RestEntry.findOne({
+      createDate,
+    });
+
+    if (!entry) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: entry,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export default router;

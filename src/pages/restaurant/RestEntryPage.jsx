@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -8,8 +8,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import RestUpadTable from "../../components/restaurant/RestUpadTable";
 import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
 import RestPendingTable from "../../components/restaurant/RestPendingTable";
-import axios from "axios";
 import toast from "react-hot-toast";
+import {
+  createRestEntry,
+  getRestEntryByDate,
+} from "../../redux/actions/restEntryAction";
 // import {
 //   categories,
 //   fullNameOptions,
@@ -18,6 +21,8 @@ import toast from "react-hot-toast";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
+  const dispatch = useDispatch();
+  const { restEntries } = useSelector((state) => state.restEntry);
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
@@ -102,6 +107,29 @@ const RestEntryPage = () => {
     totalPP,
     totalCash,
   ]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      dispatch(getRestEntryByDate(selectedDate));
+    }
+  }, [dispatch, selectedDate]);
+
+  useEffect(() => {
+    if (selectedDate && restEntries && restEntries.grandTotal > 0) {
+      resetForm();
+      setRestUpadData(restEntries.upad);
+      setRestPendingData(restEntries.pending);
+      setRestExpensesData(restEntries.expenses);
+      setExtraAmount(restEntries.extraAmount);
+      setTotalUpad(restEntries.totalUpad);
+      setTotalPending(restEntries.totalPending);
+      setTotalExpenses(restEntries.totalExpenses);
+      setTotalCard(restEntries.totalCard);
+      setTotalPP(restEntries.totalPP);
+      setTotalCash(restEntries.totalCash);
+      setGrandTotal(restEntries.grandTotal);
+    }
+  }, [selectedDate, restEntries]);
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate.format("DD-MM-YYYY"));
@@ -203,24 +231,29 @@ const RestEntryPage = () => {
     return true;
   };
 
-  const createRestEntry = async () => {
+  const resetForm = () => {
+    setRestUpadData(restUpadInitialData);
+    setRestPendingData(restPendingInitialData);
+    setRestExpensesData(restExpensesInitialData);
+    setExtraAmount(0);
+    setTotalUpad(0);
+    setTotalPending(0);
+    setTotalExpenses(0);
+    setTotalCard(0);
+    setTotalPP(0);
+    setTotalCash(0);
+    setGrandTotal(0);
+    dispatch(getRestEntryByDate(dayjs().format("DD-MM-YYYY")));
+  };
+
+  const handleCreateRestEntry = async () => {
     if (!submitEntryValidation()) {
       return; // Stop execution if validation fails
     }
-    console.log("restEntryData", restEntryData);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/create-entry`,
-        restEntryData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Rest Entry Created Successfully", res);
-      toast.success("Rest Entry Created Successfully");
+      dispatch(createRestEntry(restEntryData));
+      resetForm();
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -383,7 +416,7 @@ const RestEntryPage = () => {
                     border: "none",
                     cursor: "pointer",
                   }}
-                  onClick={createRestEntry}
+                  onClick={handleCreateRestEntry}
                   // onClick={() => {
                   //   console.log(restEntryData);
                   // }}

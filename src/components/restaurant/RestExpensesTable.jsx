@@ -152,7 +152,7 @@ const ExpensesTable = ({
                     mobileNumberOptions.find(
                       (option) =>
                         String(option.title) === String(row.mobileNumber)
-                    ) || ""
+                    ) || null
                   }
                   onChange={(event, value) =>
                     handleUpdateRow(index, "mobileNumber", value?.title || "")
