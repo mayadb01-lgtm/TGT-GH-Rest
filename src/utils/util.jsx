@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Stack,
+  styled,
   TextField,
   Typography,
 } from "@mui/material";
@@ -350,3 +351,46 @@ export const AccordionSection = ({ bgColor, title, subtitle, children }) => (
     </AccordionDetails>
   </Accordion>
 );
+
+// Loader
+const GradientSpinner = styled("div")({
+  width: "80px",
+  height: "80px",
+  border: "8px solid",
+  borderColor: "rgba(255, 255, 255, 0.3) transparent transparent transparent",
+  borderRadius: "50%",
+  animation: "spin 1.2s linear infinite",
+  background: "linear-gradient(135deg, #6e8efb, #a777e3)",
+  maskImage: "radial-gradient(circle, transparent 60%, black 61%)",
+  WebkitMaskImage: "radial-gradient(circle, transparent 60%, black 61%)",
+  "@keyframes spin": {
+    "0%": { transform: "rotate(0deg)" },
+    "100%": { transform: "rotate(360deg)" },
+  },
+});
+
+const ModernLoader = ({
+  userLoading,
+  adminLoading,
+  entryLoading,
+  restEntryLoading,
+}) => {
+  if (userLoading || adminLoading || entryLoading || restEntryLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+          background: "transparent",
+        }}
+      >
+        <GradientSpinner />
+      </Box>
+    );
+  }
+  return null;
+};
+
+export default ModernLoader;

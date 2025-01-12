@@ -12,7 +12,6 @@ import Store from "./redux/store.js";
 import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { Box, CircularProgress } from "@mui/material";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
 import AdminSignupPage from "./pages/AdminSignupPage.jsx";
 import { loadAdmin } from "./redux/actions/adminAction.js";
@@ -21,34 +20,27 @@ import UserResetPasswordPage from "./pages/UserResetPasswordPage.jsx";
 import "./App.css";
 import Home from "./pages/Home.jsx";
 import RestEntryPage from "./pages/restaurant/RestEntryPage.jsx";
+import ModernLoader from "./utils/util.jsx";
 
 const App = () => {
   const { loading: userLoading } = useSelector((state) => state.user);
   const { loading: adminLoading } = useSelector((state) => state.admin);
+  const { loading: entryLoading } = useSelector((state) => state.entry);
+  const { loading: restEntryLoading } = useSelector((state) => state.restEntry);
 
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadAdmin());
   }, []);
 
-  if (userLoading || adminLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          backgroundColor: "#545454",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Router>
+      <ModernLoader
+        userLoading={userLoading}
+        adminLoading={adminLoading}
+        entryLoading={entryLoading}
+        restEntryLoading={restEntryLoading}
+      />
       <Routes>
         <Route
           path="/"

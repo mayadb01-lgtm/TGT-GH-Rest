@@ -2,7 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   isAdminAuthenticated: false,
-  loading: true,
+  loading: false,
   admin: null,
   error: null,
 };

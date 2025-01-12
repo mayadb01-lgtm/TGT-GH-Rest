@@ -2,7 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   restEntries: [],
-  loading: true,
+  loading: false,
   error: null,
 };
 

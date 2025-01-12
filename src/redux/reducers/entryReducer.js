@@ -3,7 +3,7 @@ import { createReducer } from "@reduxjs/toolkit";
 const initialState = {
   entries: [],
   unpaidEntries: [],
-  loading: true,
+  loading: false,
   error: null,
 };
 
