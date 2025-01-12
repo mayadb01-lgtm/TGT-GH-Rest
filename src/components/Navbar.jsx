@@ -92,6 +92,21 @@ const Navbar = () => {
       </>
     );
 
+  const navbarHeading = () => {
+    switch (location.pathname) {
+      case "/admin/restaurant":
+        return "TGT Restaurant - Admin";
+      case "/restaurant":
+        return "TGT Restaurant";
+      case "/admin/hotel":
+        return "TGT Hotel - Admin";
+      case "/hotel":
+        return "TGT Hotel";
+      default:
+        return "TGT Business";
+    }
+  };
+
   return (
     <AppBar
       position="static"
@@ -112,9 +127,7 @@ const Navbar = () => {
             to={"/"}
             style={{ color: "white", textDecoration: "none", fontWeight: 600 }}
           >
-            {location.pathname === "/"
-              ? "Hotel TGT"
-              : "Entry - GH Daily Report"}
+            {navbarHeading()}
           </Link>
         </Typography>
         <Stack
