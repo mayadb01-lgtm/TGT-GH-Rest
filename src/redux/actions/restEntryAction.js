@@ -43,3 +43,29 @@ export const getRestEntryByDate = (date) => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Update Restaurant Entry by Date
+export const updateRestEntryByDate =
+  (date, restEntryData) => async (dispatch) => {
+    try {
+      dispatch({ type: "UpdateRestEntryRequest" });
+      const { data } = await axios.put(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/update-entry/${date}`,
+        restEntryData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Rest Entry updated successfully", data);
+      dispatch({ type: "UpdateRestEntrySuccess", payload: data.data });
+      toast.success("Rest Entry updated successfully");
+    } catch (error) {
+      dispatch({
+        type: "UpdateRestEntryFailure",
+        payload: error.response.data.message,
+      });
+      toast.error(error.response.data.message);
+    }
+  };

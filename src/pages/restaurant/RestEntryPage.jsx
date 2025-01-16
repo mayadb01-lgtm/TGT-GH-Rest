@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import {
   createRestEntry,
   getRestEntryByDate,
+  updateRestEntryByDate,
 } from "../../redux/actions/restEntryAction";
 // import {
 //   categories,
@@ -262,6 +263,22 @@ const RestEntryPage = () => {
     }
   };
 
+  const handleEditRestEntry = async () => {
+    if (!submitEntryValidation()) {
+      return; // Stop execution if validation fails
+    }
+
+    try {
+      dispatch(updateRestEntryByDate(selectedDate, restEntryData));
+      resetForm();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while updating the entry."
+      );
+    }
+  };
+
   return (
     <>
       <Grid
@@ -272,7 +289,7 @@ const RestEntryPage = () => {
         alignItems="start"
         padding={"8px 32px"}
       >
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4.5, xl: 4.5 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4.8, xl: 4.8 }}>
           {/* Select Date */}
           <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Box style={{ margin: "0", padding: "0" }}>
@@ -408,18 +425,26 @@ const RestEntryPage = () => {
                 }}
               >
                 <Button
-                  style={{
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    padding: "8px 16px",
-                    borderRadius: "4px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
+                  variant="contained"
+                  color="error"
+                  sx={{ mx: 1, "&:hover": { backgroundColor: "#e57373" } }}
+                  onClick={resetForm}
+                >
+                  Reset
+                </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{ mx: 1, "&:hover": { backgroundColor: "secondary" } }}
+                  onClick={handleEditRestEntry}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  sx={{ mx: 1, "&:hover": { backgroundColor: "#81c784" } }}
                   onClick={handleCreateRestEntry}
-                  // onClick={() => {
-                  //   console.log(restEntryData);
-                  // }}
                 >
                   Submit
                 </Button>
