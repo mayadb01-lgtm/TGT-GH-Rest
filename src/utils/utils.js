@@ -119,8 +119,8 @@ export const initializeRows = (period, rowsLength, roomCosts) => {
     noOfPeople: 0,
     type: "",
     modeOfPayment: "",
-    fullname: `${period} - ${i + 1} Name`,
-    mobileNumber: 1234567890,
+    fullname: "",
+    mobileNumber: 0,
     checkInTime: "",
     checkOutTime: "",
     period: period,
@@ -175,3 +175,20 @@ export const categories = [
 //   category: categories[3].title,
 //   createDate: selectedDate,
 // }));
+
+export const initializeReservationData = () => {
+  return Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    reservationId: Date.now() + i,
+    fullname: "",
+    mobileNumber: 0,
+    noOfPeople: 0,
+    checkInTime: "",
+    checkOutTime: "",
+    advancePayment: 0,
+    advancePaymentDate: "",
+    rate: 0,
+    modeOfPayment: "",
+    period: "reservation",
+  }));
+};

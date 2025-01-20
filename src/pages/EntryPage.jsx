@@ -29,10 +29,12 @@ import {
   processEntries,
   processUpdateEntries,
   currentDateTime,
+  initializeReservationData,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
 import { AccordionSection, EntrySection, PaymentSummary } from "../utils/util";
 import PendingJamaGrid from "../components/PendingJamaGrid";
+import ReservationTable from "../components/ReservationTable";
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
@@ -47,6 +49,9 @@ const EntryPage = () => {
   );
   const [pendingJamaRows, setPendingJamaRows] = useState(
     initializePendingJamaRows
+  );
+  const [reservationData, setReservationData] = useState(
+    initializeReservationData
   );
 
   useEffect(() => {
@@ -63,6 +68,9 @@ const EntryPage = () => {
     const pendingJamaCash = pendingJamaRows.filter(
       (row) => row.modeOfPayment === "Cash" && row.period === "UnPaid"
     );
+    const reservationCash = reservationData.filter(
+      (row) => row.modeOfPayment === "Cash" && row.period === "reservation"
+    );
     // Card
     const cardDay = processEntriesByPaymentMode(dayData, "Card");
     const cardNight = processEntriesByPaymentMode(nightData, "Card");
@@ -70,6 +78,9 @@ const EntryPage = () => {
     const cardExtraNight = processEntriesByPaymentMode(extraNightData, "Card");
     const pendingJamaCard = pendingJamaRows.filter(
       (row) => row.modeOfPayment === "Card" && row.period === "UnPaid"
+    );
+    const reservationCard = reservationData.filter(
+      (row) => row.modeOfPayment === "Card" && row.period === "reservation"
     );
     // PPS
     const ppsDay = processEntriesByPaymentMode(dayData, "PPS");
@@ -79,6 +90,9 @@ const EntryPage = () => {
     const pendingJamaPPS = pendingJamaRows.filter(
       (row) => row.modeOfPayment === "PPS" && row.period === "UnPaid"
     );
+    const reservationPPS = reservationData.filter(
+      (row) => row.modeOfPayment === "PPS" && row.period === "reservation"
+    );
     // PPC
     const ppcDay = processEntriesByPaymentMode(dayData, "PPC");
     const ppcNight = processEntriesByPaymentMode(nightData, "PPC");
@@ -86,6 +100,9 @@ const EntryPage = () => {
     const ppcExtraNight = processEntriesByPaymentMode(extraNightData, "PPC");
     const pendingJamaPPC = pendingJamaRows.filter(
       (row) => row.modeOfPayment === "PPC" && row.period === "UnPaid"
+    );
+    const reservationPPC = reservationData.filter(
+      (row) => row.modeOfPayment === "PPC" && row.period === "reservation"
     );
     // UnPaid
     const unpaidDay = processEntriesByPaymentMode(dayData, "UnPaid");
@@ -95,6 +112,9 @@ const EntryPage = () => {
       extraNightData,
       "UnPaid"
     );
+    const reservationUnPaid = reservationData.filter(
+      (row) => row.modeOfPayment === "UnPaid" && row.period === "reservation"
+    );
 
     return {
       cash: {
@@ -103,6 +123,7 @@ const EntryPage = () => {
         extraDay: cashExtraDay ? cashExtraDay : [],
         extraNight: cashExtraNight ? cashExtraNight : [],
         pendingJamaCash: pendingJamaCash ? pendingJamaCash : [],
+        reservationCash: reservationCash ? reservationCash : [],
       },
       card: {
         day: cardDay ? cardDay : [],
@@ -110,6 +131,7 @@ const EntryPage = () => {
         extraDay: cardExtraDay ? cardExtraDay : [],
         extraNight: cardExtraNight ? cardExtraNight : [],
         pendingJamaCard: pendingJamaCard ? pendingJamaCard : [],
+        reservationCard: reservationCard ? reservationCard : [],
       },
       pps: {
         day: ppsDay ? ppsDay : [],
@@ -117,6 +139,7 @@ const EntryPage = () => {
         extraDay: ppsExtraDay ? ppsExtraDay : [],
         extraNight: ppsExtraNight ? ppsExtraNight : [],
         pendingJamaPPS: pendingJamaPPS ? pendingJamaPPS : [],
+        reservationPPS: reservationPPS ? reservationPPS : [],
       },
       ppc: {
         day: ppcDay ? ppcDay : [],
@@ -124,15 +147,24 @@ const EntryPage = () => {
         extraDay: ppcExtraDay ? ppcExtraDay : [],
         extraNight: ppcExtraNight ? ppcExtraNight : [],
         pendingJamaPPC: pendingJamaPPC ? pendingJamaPPC : [],
+        reservationPPC: reservationPPC ? reservationPPC : [],
       },
       unpaid: {
         day: unpaidDay ? unpaidDay : [],
         night: unpaidNight ? unpaidNight : [],
         extraDay: unpaidExtraDay ? unpaidExtraDay : [],
         extraNight: unpaidExtraNight ? unpaidExtraNight : [],
+        reservationUnPaid: reservationUnPaid ? reservationUnPaid : [],
       },
     };
-  }, [dayData, nightData, extraDayData, extraNightData, pendingJamaRows]);
+  }, [
+    dayData,
+    nightData,
+    extraDayData,
+    extraNightData,
+    pendingJamaRows,
+    reservationData,
+  ]);
 
   const calculateTotal = (entries) =>
     entries
@@ -147,7 +179,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.cash.night) +
         calculateTotal(processedEntries.cash.extraDay) +
         calculateTotal(processedEntries.cash.extraNight) +
-        calculateTotal(processedEntries.cash.pendingJamaCash),
+        calculateTotal(processedEntries.cash.pendingJamaCash) +
+        calculateTotal(processedEntries.cash.reservationCash),
     },
     {
       id: "Card",
@@ -156,7 +189,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.card.night) +
         calculateTotal(processedEntries.card.extraDay) +
         calculateTotal(processedEntries.card.extraNight) +
-        calculateTotal(processedEntries.card.pendingJamaCard),
+        calculateTotal(processedEntries.card.pendingJamaCard) +
+        calculateTotal(processedEntries.card.reservationCard),
     },
     {
       id: "PPS",
@@ -165,7 +199,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.pps.night) +
         calculateTotal(processedEntries.pps.extraDay) +
         calculateTotal(processedEntries.pps.extraNight) +
-        calculateTotal(processedEntries.pps.pendingJamaPPS),
+        calculateTotal(processedEntries.pps.pendingJamaPPS) +
+        calculateTotal(processedEntries.pps.reservationPPS),
     },
     {
       id: "PPC",
@@ -174,7 +209,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.ppc.night) +
         calculateTotal(processedEntries.ppc.extraDay) +
         calculateTotal(processedEntries.ppc.extraNight) +
-        calculateTotal(processedEntries.ppc.pendingJamaPPC),
+        calculateTotal(processedEntries.ppc.pendingJamaPPC) +
+        calculateTotal(processedEntries.ppc.reservationPPC),
     },
     {
       id: "UnPaid",
@@ -182,7 +218,8 @@ const EntryPage = () => {
         calculateTotal(processedEntries.unpaid.day) +
         calculateTotal(processedEntries.unpaid.night) +
         calculateTotal(processedEntries.unpaid.extraDay) +
-        calculateTotal(processedEntries.unpaid.extraNight),
+        calculateTotal(processedEntries.unpaid.extraNight) +
+        calculateTotal(processedEntries.unpaid.pendingJamaUnPaid),
     },
     { id: "Total", totals: 0 },
   ];
@@ -201,6 +238,7 @@ const EntryPage = () => {
         setExtraDayData([]);
         setExtraNightData([]);
         setPendingJamaRows(initializePendingJamaRows);
+        setReservationData(initializeReservationData);
       }
     } else {
       setSelectedDate(newDate.format("DD-MM-YYYY"));
@@ -209,6 +247,7 @@ const EntryPage = () => {
       setExtraDayData([]);
       setExtraNightData([]);
       setPendingJamaRows(initializePendingJamaRows);
+      setReservationData(initializeReservationData);
     }
   };
 
@@ -225,6 +264,7 @@ const EntryPage = () => {
     setExtraNightData([]);
     setPendingJamaRows(initializePendingJamaRows);
     setSelectedDate(dayjs().format("DD-MM-YYYY"));
+    setReservationData(initializeReservationData);
     dispatch(getUnPaidEntries());
     dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
   };
@@ -282,12 +322,30 @@ const EntryPage = () => {
         }));
       }
 
+      const reservationEntryFilteredRows = reservationData.filter(
+        (row) =>
+          row.fullname !== "" &&
+          row.mobileNumber !== "" &&
+          row.modeOfPayment !== "" &&
+          row.noOfPeople !== ""
+      );
+
+      let reservationEntries = [];
+      if (reservationEntryFilteredRows.length > 0) {
+        reservationEntries = reservationEntryFilteredRows.map((row) => ({
+          ...row,
+          period: row.period,
+          date: row.date,
+        }));
+      }
+
       const combinedEntries = [
         ...dayEntries,
         ...nightEntries,
         ...extraDayEntries,
         ...extraNightEntries,
         ...pendingJamaEntries,
+        ...reservationEntries,
       ];
 
       if (combinedEntries.length === 0) {
@@ -316,7 +374,8 @@ const EntryPage = () => {
         setExtraDayData,
         setExtraNightData,
         setPendingJamaRows,
-        setSelectedDate
+        setSelectedDate,
+        setReservationData
       );
     } catch (error) {
       console.error("Error submitting entries:", error);
@@ -373,12 +432,30 @@ const EntryPage = () => {
         console.log("Pending Jama Entries", pendingJamaEntries);
       }
 
+      const reservationEntryFilteredRows = reservationData.filter(
+        (row) =>
+          row.fullname !== "" &&
+          row.mobileNumber !== "" &&
+          row.modeOfPayment !== "" &&
+          row.noOfPeople !== ""
+      );
+
+      let reservationEntries = [];
+      if (reservationEntryFilteredRows.length > 0) {
+        reservationEntries = reservationEntryFilteredRows.map((row) => ({
+          ...row,
+          period: row.period,
+          date: row.date,
+        }));
+      }
+
       const combinedEntries = [
         ...dayEntries,
         ...nightEntries,
         ...extraDayEntries,
         ...extraNightEntries,
         ...pendingJamaEntries,
+        ...reservationEntries,
       ];
 
       if (combinedEntries.length === 0) {
@@ -408,7 +485,8 @@ const EntryPage = () => {
           setExtraDayData,
           setExtraNightData,
           setPendingJamaRows,
-          setSelectedDate
+          setSelectedDate,
+          setReservationData
         );
       } else {
         toast.error("You are not authorized to edit entries.");
@@ -543,6 +621,20 @@ const EntryPage = () => {
             >
               <PendingJamaGrid />
             </AccordionSection>
+            {/* Reservations   */}
+            <AccordionSection bgColor="#d2d2d2" title="Reservations Entry">
+              <ReservationTable
+                reservationData={reservationData}
+                setReservationData={setReservationData}
+              />
+            </AccordionSection>
+
+            {/* <AccordionSection
+              bgColor="#d2d2d2"
+              title="View Pending Reservations"
+            >
+              <ReservationGrid />
+            </AccordionSection> */}
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}
