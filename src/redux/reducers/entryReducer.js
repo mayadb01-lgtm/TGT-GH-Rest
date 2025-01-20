@@ -1,8 +1,21 @@
 import { createReducer } from "@reduxjs/toolkit";
+import dayjs from "dayjs";
+import "dayjs/locale/en-gb";
+import {
+  initializePendingJamaRows,
+  initializeReservationData,
+} from "../../utils/utils";
 
 const initialState = {
   entries: [],
   unpaidEntries: [],
+  dayData: [],
+  nightData: [],
+  extraDayData: [],
+  extraNightData: [],
+  pendingJamaRows: initializePendingJamaRows(),
+  reservationData: initializeReservationData(),
+  selectedDate: dayjs().format("DD-MM-YYYY"),
   loading: false,
   error: null,
 };
@@ -83,6 +96,90 @@ const entryReducer = createReducer(initialState, (builder) => {
       state.unpaidEntries = action.payload;
     })
     .addCase("GetUnPaidEntriesFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // dayData
+    .addCase("UpdateDayDataRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateDayDataSuccess", (state, action) => {
+      state.loading = false;
+      state.dayData = action.payload;
+    })
+    .addCase("UpdateDayDataFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    //   nightData: [],
+    .addCase("UpdateNightDataRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateNightDataSuccess", (state, action) => {
+      state.loading = false;
+      state.nightData = action.payload;
+    })
+    .addCase("UpdateNightDataFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // extraDayData: [],
+    .addCase("UpdateExtraDayDataRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateExtraDayDataSuccess", (state, action) => {
+      state.loading = false;
+      state.extraDayData = action.payload;
+    })
+    .addCase("UpdateExtraDayDataFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // extraNightData: [],
+    .addCase("UpdateExtraNightDataRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateExtraNightDataSuccess", (state, action) => {
+      state.loading = false;
+      state.extraNightData = action.payload;
+    })
+    .addCase("UpdateExtraNightDataFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // pendingJamaRows: [],
+    .addCase("UpdatePendingJamaRowsRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdatePendingJamaRowsSuccess", (state, action) => {
+      state.loading = false;
+      state.pendingJamaRows = action.payload;
+    })
+    .addCase("UpdatePendingJamaRowsFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // reservationData: [],
+    .addCase("UpdateReservationDataRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateReservationDataSuccess", (state, action) => {
+      state.loading = false;
+      state.reservationData = action.payload;
+    })
+    .addCase("UpdateReservationDataFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // Set Selected Date
+    .addCase("UpdateSelectDateRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("UpdateSelectDateSuccess", (state, action) => {
+      state.loading = false;
+      state.selectedDate = action.payload;
+    })
+    .addCase("UpdateSelectDateFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

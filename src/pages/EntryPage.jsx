@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -16,14 +16,19 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createEntry,
   getEntriesByDate,
-  getUnPaidEntries,
+  setDayData,
+  setExtraDayData,
+  setExtraNightData,
+  setNightData,
+  setPendingJamaRows,
+  setReservationData,
+  setSelectedDate,
   updateEntryByDate,
 } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 import {
   initializePendingJamaRows,
   paymentColors,
-  processEntriesByPaymentMode,
   modeSummaryColumn,
   finalModeColumns,
   processEntries,
@@ -40,24 +45,32 @@ dayjs.locale("en-gb");
 const EntryPage = () => {
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
-  const [dayData, setDayData] = useState([]);
-  const [nightData, setNightData] = useState([]);
-  const [extraDayData, setExtraDayData] = useState([]);
-  const [extraNightData, setExtraNightData] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("DD-MM-YYYY")
-  );
-  const [pendingJamaRows, setPendingJamaRows] = useState(
-    initializePendingJamaRows
-  );
-  const [reservationData, setReservationData] = useState(
-    initializeReservationData
-  );
+  const {
+    dayData,
+    nightData,
+    extraDayData,
+    extraNightData,
+    pendingJamaRows,
+    reservationData,
+    selectedDate,
+  } = useSelector((state) => state.entry);
 
   useEffect(() => {
-    dispatch(getEntriesByDate(selectedDate));
-    dispatch(getUnPaidEntries());
-  }, [selectedDate, dispatch]);
+    const fetchData = async () => {
+      try {
+        dispatch(getEntriesByDate(selectedDate));
+      } catch (error) {
+        toast.error("Failed to fetch data");
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [selectedDate]);
+
+  const processEntriesByPaymentMode = async (data, mode) => {
+    if (data?.length === 0) return [];
+    return await data?.filter((row) => row.modeOfPayment === mode);
+  };
 
   let processedEntries = useMemo(() => {
     // Cash
@@ -165,9 +178,10 @@ const EntryPage = () => {
     pendingJamaRows,
     reservationData,
   ]);
+  console.log("Processed Entries", processedEntries);
 
-  const calculateTotal = (entries) =>
-    entries
+  const calculateTotal = async (entries) =>
+    Array.isArray(entries)
       ? entries.reduce((sum, row) => Number(sum) + Number(row.rate), 0)
       : 0;
 
@@ -219,7 +233,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.unpaid.night) +
         calculateTotal(processedEntries.unpaid.extraDay) +
         calculateTotal(processedEntries.unpaid.extraNight) +
-        calculateTotal(processedEntries.unpaid.pendingJamaUnPaid),
+        calculateTotal(processedEntries.unpaid.reservationUnPaid),
     },
     { id: "Total", totals: 0 },
   ];
@@ -230,43 +244,23 @@ const EntryPage = () => {
   );
 
   const handleDateChange = (newDate) => {
-    if (modeRows[5].totals > 0) {
-      if (window.confirm("Are you sure you want to change the date?")) {
-        setSelectedDate(newDate.format("DD-MM-YYYY"));
-        setDayData([]);
-        setNightData([]);
-        setExtraDayData([]);
-        setExtraNightData([]);
-        setPendingJamaRows(initializePendingJamaRows);
-        setReservationData(initializeReservationData);
-      }
-    } else {
-      setSelectedDate(newDate.format("DD-MM-YYYY"));
-      setDayData([]);
-      setNightData([]);
-      setExtraDayData([]);
-      setExtraNightData([]);
-      setPendingJamaRows(initializePendingJamaRows);
-      setReservationData(initializeReservationData);
+    if (
+      modeRows[5]?.totals > 0 &&
+      !window.confirm("Are you sure you want to change the date?")
+    ) {
+      return;
     }
+    setSelectedDate(newDate.format("DD-MM-YYYY"));
+    resetForm();
   };
 
-  const resetForm = (
-    setDayData,
-    setNightData,
-    setExtraDayData,
-    setExtraNightData,
-    setPendingJamaRows
-  ) => {
+  const resetForm = () => {
     setDayData([]);
     setNightData([]);
     setExtraDayData([]);
     setExtraNightData([]);
     setPendingJamaRows(initializePendingJamaRows);
-    setSelectedDate(dayjs().format("DD-MM-YYYY"));
     setReservationData(initializeReservationData);
-    dispatch(getUnPaidEntries());
-    dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
   };
 
   const handleEntrySubmit = async () => {
@@ -368,15 +362,7 @@ const EntryPage = () => {
       console.log("Submitting Entries", combinedEntries);
       dispatch(createEntry(entryObj));
 
-      resetForm(
-        setDayData,
-        setNightData,
-        setExtraDayData,
-        setExtraNightData,
-        setPendingJamaRows,
-        setSelectedDate,
-        setReservationData
-      );
+      resetForm();
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -479,15 +465,7 @@ const EntryPage = () => {
         console.log("Editing Entries", combinedEntries);
         dispatch(updateEntryByDate(selectedDate, entryObj));
 
-        resetForm(
-          setDayData,
-          setNightData,
-          setExtraDayData,
-          setExtraNightData,
-          setPendingJamaRows,
-          setSelectedDate,
-          setReservationData
-        );
+        resetForm();
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
@@ -503,24 +481,10 @@ const EntryPage = () => {
   const handleCancelClick = () => {
     if (modeRows[5].totals > 0) {
       if (window.confirm("Are you sure you want to cancel?")) {
-        resetForm(
-          setDayData,
-          setNightData,
-          setExtraDayData,
-          setExtraNightData,
-          setPendingJamaRows,
-          setSelectedDate
-        );
+        resetForm();
       }
     } else {
-      resetForm(
-        setDayData,
-        setNightData,
-        setExtraDayData,
-        setExtraNightData,
-        setPendingJamaRows,
-        setSelectedDate
-      );
+      resetForm();
     }
   };
 
@@ -601,18 +565,9 @@ const EntryPage = () => {
             </Box>
           </Grid>
           <Box>
-            <EntrySection
-              selectedDate={selectedDate}
-              setDayData={setDayData}
-              setNightData={setNightData}
-              setExtraDayData={setExtraDayData}
-              setExtraNightData={setExtraNightData}
-            />
+            <EntrySection />
             <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
-              <PendingJamaTable
-                pendingJamaRows={pendingJamaRows}
-                setPendingJamaRows={setPendingJamaRows}
-              />
+              <PendingJamaTable />
             </AccordionSection>
 
             <AccordionSection
@@ -623,18 +578,8 @@ const EntryPage = () => {
             </AccordionSection>
             {/* Reservations   */}
             <AccordionSection bgColor="#d2d2d2" title="Reservations Entry">
-              <ReservationTable
-                reservationData={reservationData}
-                setReservationData={setReservationData}
-              />
+              <ReservationTable />
             </AccordionSection>
-
-            {/* <AccordionSection
-              bgColor="#d2d2d2"
-              title="View Pending Reservations"
-            >
-              <ReservationGrid />
-            </AccordionSection> */}
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}

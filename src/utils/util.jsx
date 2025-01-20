@@ -19,6 +19,13 @@ import { roomCosts } from "./utils";
 import TableComponent from "../components/TableComponent";
 import SummaryTable from "../components/SummaryTable";
 import { useState } from "react";
+import {
+  setDayData,
+  setExtraDayData,
+  setExtraNightData,
+  setNightData,
+} from "../redux/actions/entryAction";
+import { useSelector } from "react-redux";
 
 export const EntryAccordion = ({
   title,
@@ -101,57 +108,54 @@ export const DatePickerComponent = ({
   </LocalizationProvider>
 );
 
-export const EntrySection = ({
-  selectedDate,
-  setDayData,
-  setNightData,
-  setExtraDayData,
-  setExtraNightData,
-}) => (
-  <>
-    {[
-      {
-        title: "Day Entries",
-        period: "Day",
-        onSubmit: setDayData,
-        bgColor: "#FAC172",
-        panel: "panel1",
-      },
-      {
-        title: "Night Entries",
-        period: "Night",
-        onSubmit: setNightData,
-        bgColor: "#89D5C9",
-        panel: "panel2",
-      },
-      {
-        title: "Extra Day Entries",
-        period: "extraDay",
-        onSubmit: setExtraDayData,
-        bgColor: "#FAC172",
-        panel: "panel3",
-      },
-      {
-        title: "Extra Night Entries",
-        period: "extraNight",
-        onSubmit: setExtraNightData,
-        bgColor: "#89D5C9",
-        panel: "panel4",
-      },
-    ].map(({ title, period, onSubmit, bgColor, panel }) => (
-      <EntryAccordion
-        key={title}
-        title={title}
-        period={period}
-        selectedDate={selectedDate}
-        roomCosts={roomCosts}
-        onSubmit={onSubmit}
-        bgColor={bgColor}
-        panel={panel}
-      />
-    ))}
-  </>
-);
+export const EntrySection = () => {
+  const { selectedDate } = useSelector((state) => state.entry);
+  return (
+    <>
+      {[
+        {
+          title: "Day Entries",
+          period: "Day",
+          onSubmit: setDayData,
+          bgColor: "#FAC172",
+          panel: "panel1",
+        },
+        {
+          title: "Night Entries",
+          period: "Night",
+          onSubmit: setNightData,
+          bgColor: "#89D5C9",
+          panel: "panel2",
+        },
+        {
+          title: "Extra Day Entries",
+          period: "extraDay",
+          onSubmit: setExtraDayData,
+          bgColor: "#FAC172",
+          panel: "panel3",
+        },
+        {
+          title: "Extra Night Entries",
+          period: "extraNight",
+          onSubmit: setExtraNightData,
+          bgColor: "#89D5C9",
+          panel: "panel4",
+        },
+      ].map(({ title, period, onSubmit, bgColor, panel }) => (
+        <EntryAccordion
+          key={title}
+          title={title}
+          period={period}
+          selectedDate={selectedDate}
+          roomCosts={roomCosts}
+          onSubmit={onSubmit}
+          bgColor={bgColor}
+          panel={panel}
+        />
+      ))}
+    </>
+  );
+};
 
 export const SummaryGrid = ({ entries, columns, colors }) => (
   <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
@@ -386,6 +390,7 @@ const ModernLoader = ({
           background: "transparent",
         }}
       >
+        {entryLoading ? "Loading Entries..." : null}
         <GradientSpinner />
       </Box>
     );

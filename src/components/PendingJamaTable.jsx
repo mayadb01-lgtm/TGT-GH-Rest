@@ -20,11 +20,14 @@ import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
 import { paymentColors } from "../utils/utils";
+import { setPendingJamaRows } from "../redux/actions/entryAction";
 
 dayjs.locale("en-gb");
 
-const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
-  const { entries, unpaidEntries } = useSelector((state) => state.entry);
+const PendingJamaTable = () => {
+  const { entries, unpaidEntries, pendingJamaRows } = useSelector(
+    (state) => state.entry
+  );
 
   useEffect(() => {
     if (entries.length > 0) {
@@ -56,7 +59,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
         });
       }
     }
-  }, [entries, setPendingJamaRows]);
+  }, [entries]);
 
   const getRoomNoList = useMemo(() => {
     const map = new Map();

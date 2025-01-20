@@ -16,12 +16,23 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DeleteOutline } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { setReservationData } from "../redux/actions/entryAction";
 dayjs.locale("en-gb");
 
-const ReservationTable = ({ reservationData, setReservationData }) => {
+const ReservationTable = () => {
+  const { reservationData } = useSelector((state) => state.entry);
+
   const handleRowEdit = (updatedRow) => {
     setReservationData((prevRows) =>
-      prevRows.map((row) => (row.id === updatedRow.id ? updatedRow : row))
+      prevRows.map((row) =>
+        row.id === updatedRow.id
+          ? {
+              ...row,
+              ...updatedRow,
+            }
+          : row
+      )
     );
   };
 

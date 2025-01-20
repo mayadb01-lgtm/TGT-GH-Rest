@@ -20,11 +20,6 @@ export const typeColors = {
   Other: "rgb(255, 170, 50)",
 };
 
-export const processEntriesByPaymentMode = (data, mode) => {
-  if (data?.length === 0) return [];
-  return data?.filter((row) => row.modeOfPayment === mode);
-};
-
 export const roomCosts = {
   1: 1800,
   2: 1800,

@@ -86,3 +86,103 @@ export const getUnPaidEntries = () => async (dispatch) => {
     toast.error(error.response.data.message);
   }
 };
+
+// Internal State Management
+// 1. dayData - for setState of dayData
+export const setDayData = (dayData) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateDayDataRequest" });
+    dispatch({ type: "UpdateDayDataSuccess", payload: dayData });
+  } catch (error) {
+    dispatch({
+      type: "UpdateDayDataFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+// 2. nightData
+export const setNightData = (nightData) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateNightDataRequest" });
+    dispatch({ type: "UpdateNightDataSuccess", payload: nightData });
+  } catch (error) {
+    dispatch({
+      type: "UpdateNightDataFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+// 3. extraDayData
+export const setExtraDayData = (extraDayData) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateExtraDayDataRequest" });
+    dispatch({ type: "UpdateExtraDayDataSuccess", payload: extraDayData });
+  } catch (error) {
+    dispatch({
+      type: "UpdateExtraDayDataFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+// 4. extraNightData
+export const setExtraNightData = (extraNightData) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateExtraNightDataRequest" });
+    dispatch({ type: "UpdateExtraNightDataSuccess", payload: extraNightData });
+  } catch (error) {
+    dispatch({
+      type: "UpdateExtraNightDataFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+// 5. pendingJamaRows
+export const setPendingJamaRows = (pendingJamaRows) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdatePendingJamaRowsRequest" });
+    dispatch({
+      type: "UpdatePendingJamaRowsSuccess",
+      payload: pendingJamaRows,
+    });
+  } catch (error) {
+    dispatch({
+      type: "UpdatePendingJamaRowsFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+
+// 6. reservationData
+export const setReservationData = (reservationData) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateReservationDataRequest" });
+    dispatch({
+      type: "UpdateReservationDataSuccess",
+      payload: reservationData,
+    });
+  } catch (error) {
+    dispatch({
+      type: "UpdateReservationDataFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};
+// 7. setSelectDate
+export const setSelectedDate = (selectDate) => (dispatch) => {
+  try {
+    dispatch({ type: "UpdateSelectDateRequest" });
+    dispatch({ type: "UpdateSelectDateSuccess", payload: selectDate });
+  } catch (error) {
+    dispatch({
+      type: "UpdateSelectDateFailure",
+      payload: error.response.data.message,
+    });
+    toast.error(error.response.data.message);
+  }
+};

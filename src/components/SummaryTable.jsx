@@ -15,14 +15,14 @@ const SummaryTable = ({
   color,
 }) => {
   const finalRows = [
-    ...(dayRows || []),
-    ...(nightRows || []),
-    ...(extraDayRows || []),
-    ...(extraNightRows || []),
-    ...(pendingJamaCash || []),
-    ...(pendingJamaCard || []),
-    ...(pendingJamaPPS || []),
-    ...(pendingJamaPPC || []),
+    ...(Array.isArray(dayRows) ? dayRows : []),
+    ...(Array.isArray(nightRows) ? nightRows : []),
+    ...(Array.isArray(extraDayRows) ? extraDayRows : []),
+    ...(Array.isArray(extraNightRows) ? extraNightRows : []),
+    ...(Array.isArray(pendingJamaCash) ? pendingJamaCash : []),
+    ...(Array.isArray(pendingJamaCard) ? pendingJamaCard : []),
+    ...(Array.isArray(pendingJamaPPS) ? pendingJamaPPS : []),
+    ...(Array.isArray(pendingJamaPPC) ? pendingJamaPPC : []),
   ].filter((row) => row.rate !== 0);
 
   if (finalRows.length > 0) {

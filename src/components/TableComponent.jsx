@@ -13,7 +13,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Input,
   TextField,
   MenuItem,
   Select,
@@ -21,15 +20,13 @@ import {
 import "./TableComponent.css";
 
 const TableComponent = ({
-  title,
   period,
   rowsLength,
   roomCosts,
   onSubmit,
-  selectedDate,
 }) => {
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
-  const { entries } = useSelector((state) => state.entry);
+  const { entries, selectedDate } = useSelector((state) => state.entry);
 
   const [rows, setRows] = useState(
     initializeRows(period, rowsLength, roomCosts)
