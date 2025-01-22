@@ -199,6 +199,7 @@ export const PaymentSummary = ({
             extraDayRows: processedEntries.cash.extraDay,
             extraNightRows: processedEntries.cash.extraNight,
             pendingJamaCash: processedEntries.cash.pendingJamaCash,
+            reservationCash: processedEntries.cash.reservationCash,
             colorKey: "Cash",
           },
           {
@@ -208,6 +209,7 @@ export const PaymentSummary = ({
             extraDayRows: processedEntries.card.extraDay,
             extraNightRows: processedEntries.card.extraNight,
             pendingJamaCard: processedEntries.card.pendingJamaCard,
+            reservationCard: processedEntries.card.reservationCard,
             colorKey: "Card",
           },
         ]}
@@ -223,6 +225,7 @@ export const PaymentSummary = ({
             extraDayRows: processedEntries.pps.extraDay,
             extraNightRows: processedEntries.pps.extraNight,
             pendingJamaPPS: processedEntries.pps.pendingJamaPPS,
+            reservationPPS: processedEntries.pps.reservationPPS,
             colorKey: "PPS",
           },
           {
@@ -232,6 +235,7 @@ export const PaymentSummary = ({
             extraDayRows: processedEntries.ppc.extraDay,
             extraNightRows: processedEntries.ppc.extraNight,
             pendingJamaPPC: processedEntries.ppc.pendingJamaPPC,
+            reservationPPC: processedEntries.ppc.reservationPPC,
             colorKey: "PPC",
           },
         ]}
@@ -249,6 +253,7 @@ export const PaymentSummary = ({
             nightRows: processedEntries.unpaid.night,
             extraDayRows: processedEntries.unpaid.extraDay,
             extraNightRows: processedEntries.unpaid.extraNight,
+            reservationUnPaid: processedEntries.unpaid.reservationUnPaid,
             colorKey: "UnPaid",
           },
         ]}

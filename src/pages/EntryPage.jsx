@@ -44,9 +44,8 @@ const EntryPage = () => {
   const [nightData, setNightData] = useState([]);
   const [extraDayData, setExtraDayData] = useState([]);
   const [extraNightData, setExtraNightData] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("DD-MM-YYYY")
-  );
+  const today = dayjs().format("DD-MM-YYYY");
+  const [selectedDate, setSelectedDate] = useState(today);
   const [pendingJamaRows, setPendingJamaRows] = useState(
     initializePendingJamaRows
   );
@@ -55,8 +54,12 @@ const EntryPage = () => {
   );
 
   useEffect(() => {
-    dispatch(getEntriesByDate(selectedDate));
-    dispatch(getUnPaidEntries());
+    console.log(`Fetching data for selectedDate: ${selectedDate}`);
+    const fetchEntries = async () => {
+      await dispatch(getEntriesByDate(selectedDate));
+      await dispatch(getUnPaidEntries());
+    };
+    fetchEntries();
   }, [selectedDate, dispatch]);
 
   let processedEntries = useMemo(() => {
@@ -252,21 +255,16 @@ const EntryPage = () => {
   };
 
   const resetForm = (
-    setDayData,
-    setNightData,
-    setExtraDayData,
-    setExtraNightData,
-    setPendingJamaRows
   ) => {
     setDayData([]);
     setNightData([]);
     setExtraDayData([]);
     setExtraNightData([]);
     setPendingJamaRows(initializePendingJamaRows);
-    setSelectedDate(dayjs().format("DD-MM-YYYY"));
+    setSelectedDate(today);
     setReservationData(initializeReservationData);
     dispatch(getUnPaidEntries());
-    dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
+    dispatch(getEntriesByDate(today));
   };
 
   const handleEntrySubmit = async () => {
@@ -335,7 +333,7 @@ const EntryPage = () => {
         reservationEntries = reservationEntryFilteredRows.map((row) => ({
           ...row,
           period: row.period,
-          date: row.date,
+          date: selectedDate,
         }));
       }
 
@@ -347,6 +345,8 @@ const EntryPage = () => {
         ...pendingJamaEntries,
         ...reservationEntries,
       ];
+
+      console.log("Combined Entries", combinedEntries);
 
       if (combinedEntries.length === 0) {
         toast.error("No valid entries to submit.");
@@ -368,15 +368,7 @@ const EntryPage = () => {
       console.log("Submitting Entries", combinedEntries);
       dispatch(createEntry(entryObj));
 
-      resetForm(
-        setDayData,
-        setNightData,
-        setExtraDayData,
-        setExtraNightData,
-        setPendingJamaRows,
-        setSelectedDate,
-        setReservationData
-      );
+      resetForm();
     } catch (error) {
       console.error("Error submitting entries:", error);
       toast.error(
@@ -445,9 +437,11 @@ const EntryPage = () => {
         reservationEntries = reservationEntryFilteredRows.map((row) => ({
           ...row,
           period: row.period,
-          date: row.date,
+          date: selectedDate,
         }));
       }
+
+      console.log("reservationEntryFilteredRows", reservationEntryFilteredRows);
 
       const combinedEntries = [
         ...dayEntries,
@@ -457,6 +451,8 @@ const EntryPage = () => {
         ...pendingJamaEntries,
         ...reservationEntries,
       ];
+
+      console.log("Combined Entries", combinedEntries);
 
       if (combinedEntries.length === 0) {
         toast.error("No valid entries to submit.");
@@ -479,15 +475,7 @@ const EntryPage = () => {
         console.log("Editing Entries", combinedEntries);
         dispatch(updateEntryByDate(selectedDate, entryObj));
 
-        resetForm(
-          setDayData,
-          setNightData,
-          setExtraDayData,
-          setExtraNightData,
-          setPendingJamaRows,
-          setSelectedDate,
-          setReservationData
-        );
+        resetForm();
       } else {
         toast.error("You are not authorized to edit entries.");
         console.warn("Unauthorized access.");
@@ -503,24 +491,10 @@ const EntryPage = () => {
   const handleCancelClick = () => {
     if (modeRows[5].totals > 0) {
       if (window.confirm("Are you sure you want to cancel?")) {
-        resetForm(
-          setDayData,
-          setNightData,
-          setExtraDayData,
-          setExtraNightData,
-          setPendingJamaRows,
-          setSelectedDate
-        );
+        resetForm();
       }
     } else {
-      resetForm(
-        setDayData,
-        setNightData,
-        setExtraDayData,
-        setExtraNightData,
-        setPendingJamaRows,
-        setSelectedDate
-      );
+      resetForm();
     }
   };
 
