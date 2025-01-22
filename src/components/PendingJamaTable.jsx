@@ -249,7 +249,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               </TableCell>
               <TableCell width={"5%"}>
                 <Select
-                  value={row.roomNo}
+                  value={row.roomNo ? row.roomNo : ""}
                   onChange={(e) =>
                     handleRowEdit(row.id, "roomNo", e.target.value)
                   }
@@ -280,7 +280,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               </TableCell>
               <TableCell width={"20%"}>
                 <Select
-                  value={row.fullname}
+                  value={row.fullname ? row.fullname : ""}
                   onChange={(e) =>
                     handleRowEdit(row.id, "fullname", e.target.value)
                   }
@@ -307,7 +307,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               </TableCell>
               <TableCell width={"20%"}>
                 <Select
-                  value={row.mobileNumber}
+                  value={row.mobileNumber ? row.mobileNumber : ""}
                   onChange={(e) =>
                     handleRowEdit(row.id, "mobileNumber", e.target.value)
                   }
@@ -336,7 +336,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               </TableCell>
               <TableCell width={"15%"}>
                 <Select
-                  value={row.rate}
+                  value={row.rate ? row.rate : ""}
                   onChange={(e) =>
                     handleRowEdit(row.id, "rate", e.target.value)
                   }
@@ -368,7 +368,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
               </TableCell>
               <TableCell width={"15%"}>
                 <Select
-                  value={row.modeOfPayment}
+                  value={row.modeOfPayment ? row.modeOfPayment : "Select"}
                   onChange={(e) =>
                     handleRowEdit(row.id, "modeOfPayment", e.target.value)
                   }

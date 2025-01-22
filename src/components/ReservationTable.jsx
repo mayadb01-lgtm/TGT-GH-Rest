@@ -308,7 +308,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                 </TableCell>
                 <TableCell width={"10%"}>
                   <Select
-                    value={row.modeOfPayment || "Select"}
+                    value={row.modeOfPayment ? row.modeOfPayment : "Select"}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, modeOfPayment: value });

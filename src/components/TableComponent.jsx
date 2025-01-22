@@ -13,7 +13,6 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Input,
   TextField,
   MenuItem,
   Select,
@@ -21,7 +20,6 @@ import {
 import "./TableComponent.css";
 
 const TableComponent = ({
-  title,
   period,
   rowsLength,
   roomCosts,
@@ -403,7 +401,7 @@ const TableComponent = ({
                   }}
                 >
                   <Select
-                    value={row.type || "Select"}
+                    value={row.type ? row.type : "Select"}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, type: value });
@@ -460,7 +458,7 @@ const TableComponent = ({
                   }}
                 >
                   <Select
-                    value={row.modeOfPayment || "Select"}
+                    value={row.modeOfPayment ? row.modeOfPayment : "Select"}
                     defaultValue="Select"
                     onChange={(e) => {
                       const value = e.target.value;
