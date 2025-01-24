@@ -374,13 +374,8 @@ const GradientSpinner = styled("div")({
   },
 });
 
-const ModernLoader = ({
-  userLoading,
-  adminLoading,
-  entryLoading,
-  restEntryLoading,
-}) => {
-  if (userLoading || adminLoading || entryLoading || restEntryLoading) {
+const ModernLoader = ({ userLoading, adminLoading, entryLoading }) => {
+  if (userLoading || adminLoading || entryLoading) {
     return (
       <Box
         sx={{
@@ -391,6 +386,13 @@ const ModernLoader = ({
           background: "transparent",
         }}
       >
+        {userLoading
+          ? "User Loading"
+          : adminLoading
+            ? "Admin Loading"
+            : entryLoading
+              ? "Entry Loading"
+              : "Loading..."}
         <GradientSpinner />
       </Box>
     );

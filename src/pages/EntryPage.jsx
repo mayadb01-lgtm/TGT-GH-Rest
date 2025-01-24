@@ -4,7 +4,6 @@ import {
   Box,
   Stack,
   TextField,
-  CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -60,7 +59,7 @@ const EntryPage = () => {
       await dispatch(getUnPaidEntries());
     };
     fetchEntries();
-  }, [selectedDate, dispatch]);
+  }, [dispatch, selectedDate]);
 
   let processedEntries = useMemo(() => {
     // Cash
@@ -254,8 +253,7 @@ const EntryPage = () => {
     }
   };
 
-  const resetForm = (
-  ) => {
+  const resetForm = () => {
     setDayData([]);
     setNightData([]);
     setExtraDayData([]);
@@ -498,23 +496,6 @@ const EntryPage = () => {
     }
   };
 
-  if (!selectedDate) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          backgroundColor: "#f4f6f8",
-          padding: 2,
-        }}
-      >
-        <CircularProgress fontSize="large" />
-      </Box>
-    );
-  }
-
   return (
     <>
       <Grid
@@ -549,7 +530,11 @@ const EntryPage = () => {
                 >
                   <DatePicker
                     views={["year", "month", "day"]}
-                    value={dayjs(selectedDate, "DD-MM-YYYY")}
+                    value={
+                      selectedDate
+                        ? dayjs(selectedDate, "DD-MM-YYYY")
+                        : dayjs(today, "DD-MM-YYYY")
+                    }
                     onChange={(newDate) => handleDateChange(newDate)}
                     slots={{
                       textField: (params) => (
@@ -602,13 +587,6 @@ const EntryPage = () => {
                 setReservationData={setReservationData}
               />
             </AccordionSection>
-
-            {/* <AccordionSection
-              bgColor="#d2d2d2"
-              title="View Pending Reservations"
-            >
-              <ReservationGrid />
-            </AccordionSection> */}
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}
