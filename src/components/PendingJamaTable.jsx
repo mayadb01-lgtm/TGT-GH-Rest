@@ -27,6 +27,9 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
   const { entries, unpaidEntries } = useSelector((state) => state.entry);
 
   useEffect(() => {
+    if (entries && entries.length === 0) {
+      setPendingJamaRows(initializePendingJamaRows());
+    }
     if (entries && entries.length > 0) {
       let initialRows = initializePendingJamaRows();
       const filteredEntries = entries.filter(
@@ -57,10 +60,8 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
         updatedRows = updateRowsWithEntries(initialRows, filteredEntries);
       }
       setPendingJamaRows(updatedRows);
-    } else {
-      setPendingJamaRows(initializePendingJamaRows());
     }
-  }, [entries]);
+  }, [entries, setPendingJamaRows]);
 
   const getRoomNoList = useMemo(() => {
     const map = new Map();
@@ -120,11 +121,10 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
     return entry?.createDate;
   };
 
-  const get_id = (date, roomNo, fullname, mobileNumber, rate) => {
-    const entry = getOtherFields(date, roomNo, fullname, mobileNumber, rate);
-    return entry?._id;
-  };
-
+  // const get_id = (date, roomNo, fullname, mobileNumber, rate) => {
+  //   const entry = getOtherFields(date, roomNo, fullname, mobileNumber, rate);
+  //   return entry?._id;
+  // };
   const handleRowEdit = (id, field, value) => {
     setPendingJamaRows((prevRows) =>
       prevRows.map((row) =>
@@ -138,39 +138,42 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
     );
     const row = pendingJamaRows.find((row) => row.id === id);
     if (
+      entries.length === 0 &&
       row.date &&
       row.roomNo &&
       row.fullname &&
       row.mobileNumber &&
       row.rate
     ) {
-      const createDate = getCreateDate(
+      const createDateFound = getCreateDate(
         row.date,
         row.roomNo,
         row.fullname,
         row.mobileNumber,
         row.rate
       );
-      const _id = get_id(
-        row.date,
-        row.roomNo,
-        row.fullname,
-        row.mobileNumber,
-        row.rate
-      );
+      // const _id = get_id(
+      //   row.date,
+      //   row.roomNo,
+      //   row.fullname,
+      //   row.mobileNumber,
+      //   row.rate
+      // );
       setPendingJamaRows((prevRows) =>
         prevRows.map((prevRow) =>
           prevRow.id === id
             ? {
                 ...prevRow,
-                createDate,
-                _id,
+                createDate: prevRow.createDate
+                  ? prevRow.createDate
+                  : createDateFound,
               }
             : prevRow
         )
       );
     }
   };
+  console.log("Pending Jama Rows: ", pendingJamaRows);
 
   return (
     <TableContainer component={Paper} sx={{ maxHeight: 600, boxShadow: 3 }}>
@@ -258,7 +261,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "roomNo", e.target.value)
                   }
                   fullWidth
-                  // renderValue={(value) => value}
+                  renderValue={(value) => value}
                   sx={{
                     "& .MuiTableCell-root": {
                       // padding: "0px",
@@ -316,7 +319,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "mobileNumber", e.target.value)
                   }
                   fullWidth
-                  // renderValue={(value) => value}
+                  renderValue={(value) => value}
                   sx={{
                     "& .MuiInputBase-input": {
                       fontSize: "12px",
@@ -345,7 +348,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                     handleRowEdit(row.id, "rate", e.target.value)
                   }
                   fullWidth
-                  // renderValue={(value) => value}
+                  renderValue={(value) => value}
                   sx={{
                     "& .MuiInputBase-input": {
                       fontSize: "12px",

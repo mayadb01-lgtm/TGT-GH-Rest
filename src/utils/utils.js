@@ -50,7 +50,6 @@ export const initializePendingJamaRows = () => {
     modeOfPayment: "",
     period: "UnPaid",
     createDate: "",
-    _id: "",
     cost: 0,
     checkInTime: "",
     checkOutTime: "",

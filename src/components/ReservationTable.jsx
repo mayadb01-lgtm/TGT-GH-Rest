@@ -43,7 +43,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
     });
 
     setReservationData(updatedRows);
-  }, [entries]);
+  }, [entries, setReservationData]);
 
   const handleRowEdit = (updatedRow) => {
     setReservationData((prevRows) =>

@@ -328,6 +328,7 @@ const EntryPage = () => {
           ...row,
           period: row.period,
           date: row.date,
+          createDate: row.createDate,
         }));
       }
 
@@ -423,7 +424,8 @@ const EntryPage = () => {
           row.fullname !== "" &&
           row.mobileNumber !== "" &&
           row.rate !== 0 &&
-          row.modeOfPayment !== ""
+          row.modeOfPayment !== "" &&
+          row.createDate !== ""
       );
 
       let pendingJamaEntries = [];
@@ -454,8 +456,6 @@ const EntryPage = () => {
         }));
       }
 
-      console.log("reservationEntryFilteredRows", reservationEntryFilteredRows);
-
       const combinedEntries = [
         ...dayEntries,
         ...nightEntries,
@@ -464,8 +464,6 @@ const EntryPage = () => {
         ...pendingJamaEntries,
         ...reservationEntries,
       ];
-
-      console.log("Combined Entries", combinedEntries);
 
       if (combinedEntries.length === 0) {
         toast.error("No valid entries to submit.");
@@ -489,9 +487,6 @@ const EntryPage = () => {
         dispatch(updateEntryByDate(selectedDate, entryObj));
 
         resetForm();
-      } else {
-        toast.error("You are not authorized to edit entries.");
-        console.warn("Unauthorized access.");
       }
     } catch (error) {
       console.error("Error submitting entries:", error);
