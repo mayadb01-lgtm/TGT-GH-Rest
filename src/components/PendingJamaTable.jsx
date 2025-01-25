@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
-import { paymentColors } from "../utils/utils";
+import { initializePendingJamaRows, paymentColors } from "../utils/utils";
 
 dayjs.locale("en-gb");
 
@@ -27,36 +27,40 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
   const { entries, unpaidEntries } = useSelector((state) => state.entry);
 
   useEffect(() => {
-    if (entries.length > 0) {
-      console.log("Entries", entries);
+    if (entries && entries.length > 0) {
+      let initialRows = initializePendingJamaRows();
       const filteredEntries = entries.filter(
         (entry) => entry?.period && entry.period === "UnPaid"
       );
-      if (filteredEntries.length > 0) {
-        setPendingJamaRows((prevRows) => {
-          return prevRows.map((prevRow) => {
-            const entry = filteredEntries.find(
-              (entry) => entry.id == prevRow.id
-            );
-            if (entry) {
-              return {
-                id: prevRow.id,
-                date: entry.date,
-                roomNo: entry.roomNo,
-                fullname: entry.fullname,
-                mobileNumber: entry.mobileNumber,
-                rate: entry.rate,
-                modeOfPayment: entry.modeOfPayment,
-                createDate: entry?.createDate,
-                period: entry?.period,
-              };
-            }
-            return prevRow;
-          });
+      const updateRowsWithEntries = (rows, entries) => {
+        return rows.map((row) => {
+          const entry = entries.find((entry) => entry.id == row.id);
+          if (entry) {
+            return {
+              ...row,
+              id: row.id,
+              date: entry.date,
+              roomNo: entry.roomNo,
+              fullname: entry.fullname,
+              mobileNumber: entry.mobileNumber,
+              rate: entry.rate,
+              modeOfPayment: entry.modeOfPayment,
+              createDate: entry.createDate,
+              period: entry.period,
+            };
+          }
+          return row;
         });
+      };
+      let updatedRows = initialRows;
+      if (filteredEntries.length > 0) {
+        updatedRows = updateRowsWithEntries(initialRows, filteredEntries);
       }
+      setPendingJamaRows(updatedRows);
+    } else {
+      setPendingJamaRows(initializePendingJamaRows());
     }
-  }, [entries, setPendingJamaRows]);
+  }, [entries]);
 
   const getRoomNoList = useMemo(() => {
     const map = new Map();

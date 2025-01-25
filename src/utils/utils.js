@@ -177,7 +177,7 @@ export const categories = [
 // }));
 
 export const initializeReservationData = () => {
-  return Array.from({ length: 10 }, (_, i) => ({
+  return Array.from({ length: 5 }, (_, i) => ({
     id: i + 1,
     reservationId: Date.now() + i,
     fullname: "",

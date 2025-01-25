@@ -1,10 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  Typography,
-  Box,
-  Stack,
-  TextField,
-} from "@mui/material";
+import { Typography, Box, Stack, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -20,7 +15,6 @@ import {
 } from "../redux/actions/entryAction";
 import "dayjs/locale/en-gb";
 import {
-  initializePendingJamaRows,
   paymentColors,
   processEntriesByPaymentMode,
   modeSummaryColumn,
@@ -28,7 +22,6 @@ import {
   processEntries,
   processUpdateEntries,
   currentDateTime,
-  initializeReservationData,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
 import { AccordionSection, EntrySection, PaymentSummary } from "../utils/util";
@@ -45,12 +38,8 @@ const EntryPage = () => {
   const [extraNightData, setExtraNightData] = useState([]);
   const today = dayjs().format("DD-MM-YYYY");
   const [selectedDate, setSelectedDate] = useState(today);
-  const [pendingJamaRows, setPendingJamaRows] = useState(
-    initializePendingJamaRows
-  );
-  const [reservationData, setReservationData] = useState(
-    initializeReservationData
-  );
+  const [pendingJamaRows, setPendingJamaRows] = useState([]);
+  const [reservationData, setReservationData] = useState([]);
 
   useEffect(() => {
     console.log(`Fetching data for selectedDate: ${selectedDate}`);
@@ -239,8 +228,8 @@ const EntryPage = () => {
         setNightData([]);
         setExtraDayData([]);
         setExtraNightData([]);
-        setPendingJamaRows(initializePendingJamaRows);
-        setReservationData(initializeReservationData);
+        setPendingJamaRows([]);
+        setReservationData([]);
       }
     } else {
       setSelectedDate(newDate.format("DD-MM-YYYY"));
@@ -248,8 +237,8 @@ const EntryPage = () => {
       setNightData([]);
       setExtraDayData([]);
       setExtraNightData([]);
-      setPendingJamaRows(initializePendingJamaRows);
-      setReservationData(initializeReservationData);
+      setPendingJamaRows([]);
+      setReservationData([]);
     }
   };
 
@@ -258,9 +247,9 @@ const EntryPage = () => {
     setNightData([]);
     setExtraDayData([]);
     setExtraNightData([]);
-    setPendingJamaRows(initializePendingJamaRows);
+    setPendingJamaRows([]);
     setSelectedDate(today);
-    setReservationData(initializeReservationData);
+    setReservationData([]);
     dispatch(getUnPaidEntries());
     dispatch(getEntriesByDate(today));
   };

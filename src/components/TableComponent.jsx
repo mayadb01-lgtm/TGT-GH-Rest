@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
@@ -19,34 +19,15 @@ import {
 } from "@mui/material";
 import "./TableComponent.css";
 
-const TableComponent = ({
-  period,
-  rowsLength,
-  roomCosts,
-  onSubmit,
-  selectedDate,
-}) => {
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
+const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
   const { entries } = useSelector((state) => state.entry);
 
   const [rows, setRows] = useState(
     initializeRows(period, rowsLength, roomCosts)
   );
-  const handleRowEdit = (updatedRow) => {
-    setRows((prevRows) =>
-      prevRows.map((row) =>
-        row.id === updatedRow.id
-          ? {
-              ...row,
-              ...updatedRow,
-            }
-          : row
-      )
-    );
-  };
 
   useEffect(() => {
-    if (selectedDate && entries.length > 0) {
+    if (entries.length > 0) {
       // Reset rows to initial state before updating
       let initialRows = initializeRows(period, rowsLength, roomCosts);
 
@@ -97,38 +78,45 @@ const TableComponent = ({
     } else {
       setRows(initializeRows(period, rowsLength, roomCosts));
     }
-  }, [
-    entries,
-    selectedDate,
-    period,
-    rowsLength,
-    roomCosts,
-    isAdminAuthenticated,
-  ]);
+  }, [entries]);
 
-  const totalsRow = {
-    id: `${period}-totals`,
-    roomNo: "Totals",
-    cost: "",
-    rate: rows?.reduce(
-      (sum, row) => sum + (isNaN(row.rate) ? 0 : Number(row.rate)),
-      0
-    ),
-    noOfPeople: rows?.reduce(
-      (sum, row) => sum + (isNaN(row.noOfPeople) ? 0 : Number(row.noOfPeople)),
-      0
-    ),
-    type: "",
-    modeOfPayment: "",
-    fullname: "",
-    mobileNumber: "",
-    checkInTime: "",
-    checkOutTime: "",
-  };
+  const totalsRow = useMemo(() => {
+    return {
+      id: `${period}-totals`,
+      roomNo: "Totals",
+      cost: "",
+      rate: rows.reduce(
+        (sum, row) => sum + (isNaN(row.rate) ? 0 : Number(row.rate)),
+        0
+      ),
+      noOfPeople: rows.reduce(
+        (sum, row) =>
+          sum + (isNaN(row.noOfPeople) ? 0 : Number(row.noOfPeople)),
+        0
+      ),
+      type: "",
+      modeOfPayment: "",
+      fullname: "",
+      mobileNumber: "",
+      checkInTime: "",
+      checkOutTime: "",
+    };
+  }, [rows, period]);
 
   useEffect(() => {
     onSubmit(rows);
-  }, [onSubmit, rows, selectedDate]);
+  }, [onSubmit, rows]);
+
+  const handleRowEdit = useCallback(
+    (updatedRow) => {
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === updatedRow.id ? { ...row, ...updatedRow } : row
+        )
+      );
+    },
+    [setRows]
+  );
 
   const tableComponentColumns = [
     "Room",

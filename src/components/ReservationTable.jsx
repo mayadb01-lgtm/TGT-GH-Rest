@@ -18,41 +18,32 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DeleteOutline } from "@mui/icons-material";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { initializeReservationData } from "../utils/utils";
 dayjs.locale("en-gb");
 
 const ReservationTable = ({ reservationData, setReservationData }) => {
   const { entries } = useSelector((state) => state.entry);
 
   useEffect(() => {
-    if (entries.length > 0) {
-      const filteredEntries = entries.filter(
-        (entry) => entry?.period && entry.period === "reservation"
-      );
-      if (filteredEntries.length > 0) {
-        setReservationData((prevRows) => {
-          return prevRows.map((row) => {
-            const entry = filteredEntries.find((entry) => entry.id === row.id);
-            if (entry) {
-              return {
-                ...row,
-                reservationId: entry.reservationId,
-                fullname: entry.fullname,
-                mobileNumber: entry.mobileNumber,
-                noOfPeople: entry.noOfPeople,
-                checkInDateTime: entry.checkInDateTime,
-                checkOutDateTime: entry.checkOutDateTime,
-                rate: entry.rate,
-                advancePayment: entry.advancePayment,
-                advancePaymentDate: entry.advancePaymentDate,
-                modeOfPayment: entry.modeOfPayment,
-              };
-            }
-            return row;
-          });
-        });
-      }
+    if (!entries || entries.length === 0) {
+      setReservationData(initializeReservationData());
+      return;
     }
-  }, [entries, setReservationData]);
+
+    const initialRows = initializeReservationData();
+    const filteredResEntries = entries.filter(
+      (entry) => entry?.period === "reservation"
+    );
+
+    const updatedRows = initialRows.map((row) => {
+      const matchedEntry = filteredResEntries.find(
+        (entry) => entry.id == row.id
+      );
+      return matchedEntry ? { ...row, ...matchedEntry } : row;
+    });
+
+    setReservationData(updatedRows);
+  }, [entries]);
 
   const handleRowEdit = (updatedRow) => {
     setReservationData((prevRows) =>

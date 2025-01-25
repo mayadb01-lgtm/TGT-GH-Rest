@@ -61,7 +61,6 @@ export const EntryAccordion = ({
       </AccordionSummary>
       <AccordionDetails style={{ margin: 0, padding: 0 }}>
         <TableComponent
-          selectedDate={selectedDate}
           period={period}
           title={`${title} Table`}
           rowsLength={11}
