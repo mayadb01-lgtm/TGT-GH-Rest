@@ -11,6 +11,11 @@ const SummaryTable = ({
   pendingJamaCard,
   pendingJamaPPS,
   pendingJamaPPC,
+  reservationCash,
+  reservationCard,
+  reservationPPS,
+  reservationPPC,
+  reservationUnPaid,
   columns,
   color,
 }) => {
@@ -23,6 +28,11 @@ const SummaryTable = ({
     ...(pendingJamaCard || []),
     ...(pendingJamaPPS || []),
     ...(pendingJamaPPC || []),
+    ...(reservationCash || []),
+    ...(reservationCard || []),
+    ...(reservationPPS || []),
+    ...(reservationPPC || []),
+    ...(reservationUnPaid || []),
   ].filter((row) => row.rate !== 0);
 
   if (finalRows.length > 0) {

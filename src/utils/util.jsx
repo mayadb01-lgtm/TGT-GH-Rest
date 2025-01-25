@@ -27,6 +27,11 @@ export const SummaryGrid = ({ entries, columns, colors }) => (
             pendingJamaCard={entry.pendingJamaCard}
             pendingJamaPPS={entry.pendingJamaPPS}
             pendingJamaPPC={entry.pendingJamaPPC}
+            reservationCash={entry.reservationCash}
+            reservationCard={entry.reservationCard}
+            reservationPPS={entry.reservationPPS}
+            reservationPPC={entry.reservationPPC}
+            reservationUnPaid={entry.reservationUnPaid}
             columns={columns}
             color={colors[entry.colorKey]}
           />
