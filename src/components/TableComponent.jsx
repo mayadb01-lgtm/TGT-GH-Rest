@@ -22,9 +22,7 @@ import "./TableComponent.css";
 const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
   const { entries } = useSelector((state) => state.entry);
 
-  const [rows, setRows] = useState(
-    initializeRows(period, rowsLength, roomCosts)
-  );
+  const [rows, setRows] = useState([]);
 
   useEffect(() => {
     if (entries.length > 0) {
@@ -104,7 +102,9 @@ const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
   }, [rows, period]);
 
   useEffect(() => {
-    onSubmit(rows);
+    if (onSubmit) {
+      onSubmit(rows);
+    }
   }, [onSubmit, rows]);
 
   const handleRowEdit = useCallback(

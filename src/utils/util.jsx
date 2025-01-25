@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -18,12 +19,10 @@ import dayjs from "dayjs";
 import { roomCosts } from "./utils";
 import TableComponent from "../components/TableComponent";
 import SummaryTable from "../components/SummaryTable";
-import { useState } from "react";
 
 export const EntryAccordion = ({
   title,
   period,
-  selectedDate,
   roomCosts,
   onSubmit,
   bgColor,
@@ -100,13 +99,7 @@ export const DatePickerComponent = ({
   </LocalizationProvider>
 );
 
-export const EntrySection = ({
-  selectedDate,
-  setDayData,
-  setNightData,
-  setExtraDayData,
-  setExtraNightData,
-}) => (
+export const EntrySection = ({ setDayData, setNightData }) => (
   <>
     {[
       {
@@ -123,6 +116,23 @@ export const EntrySection = ({
         bgColor: "#89D5C9",
         panel: "panel2",
       },
+    ].map(({ title, period, onSubmit, bgColor, panel }) => (
+      <EntryAccordion
+        key={title}
+        title={title}
+        period={period}
+        roomCosts={roomCosts}
+        onSubmit={onSubmit}
+        bgColor={bgColor}
+        panel={panel}
+      />
+    ))}
+  </>
+);
+
+export const ExtraEntrySection = ({ setExtraDayData, setExtraNightData }) => (
+  <>
+    {[
       {
         title: "Extra Day Entries",
         period: "extraDay",
@@ -142,7 +152,6 @@ export const EntrySection = ({
         key={title}
         title={title}
         period={period}
-        selectedDate={selectedDate}
         roomCosts={roomCosts}
         onSubmit={onSubmit}
         bgColor={bgColor}

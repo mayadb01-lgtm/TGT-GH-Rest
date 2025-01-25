@@ -1,5 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import { Typography, Box, Stack, TextField } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Stack,
+  TextField,
+  Switch,
+  FormControlLabel,
+  FormGroup,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -24,7 +32,12 @@ import {
   currentDateTime,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
-import { AccordionSection, EntrySection, PaymentSummary } from "../utils/util";
+import {
+  AccordionSection,
+  EntrySection,
+  ExtraEntrySection,
+  PaymentSummary,
+} from "../utils/util";
 import PendingJamaGrid from "../components/PendingJamaGrid";
 import ReservationTable from "../components/ReservationTable";
 dayjs.locale("en-gb");
@@ -40,6 +53,7 @@ const EntryPage = () => {
   const [selectedDate, setSelectedDate] = useState(today);
   const [pendingJamaRows, setPendingJamaRows] = useState([]);
   const [reservationData, setReservationData] = useState([]);
+  const [extraToggle, setExtraToggle] = useState(false);
 
   useEffect(() => {
     console.log(`Fetching data for selectedDate: ${selectedDate}`);
@@ -552,12 +566,30 @@ const EntryPage = () => {
           </Grid>
           <Box>
             <EntrySection
-              selectedDate={selectedDate}
-              setDayData={setDayData}
-              setNightData={setNightData}
               setExtraDayData={setExtraDayData}
               setExtraNightData={setExtraNightData}
             />
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={extraToggle}
+                    onChange={
+                      extraToggle
+                        ? () => setExtraToggle(false)
+                        : () => setExtraToggle(true)
+                    }
+                  />
+                }
+                label="Show Extra Entry"
+              />
+            </FormGroup>
+            {extraToggle && (
+              <ExtraEntrySection
+                setExtraDayData={setExtraDayData}
+                setExtraNightData={setExtraNightData}
+              />
+            )}
             <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
               <PendingJamaTable
                 pendingJamaRows={pendingJamaRows}
