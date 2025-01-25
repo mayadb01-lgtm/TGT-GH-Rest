@@ -221,7 +221,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.unpaid.night) +
         calculateTotal(processedEntries.unpaid.extraDay) +
         calculateTotal(processedEntries.unpaid.extraNight) +
-        calculateTotal(processedEntries.unpaid.pendingJamaUnPaid),
+        calculateTotal(processedEntries.unpaid.reservationUnPaid),
     },
     { id: "Total", totals: 0 },
   ];
@@ -332,6 +332,8 @@ const EntryPage = () => {
           ...row,
           period: row.period,
           date: selectedDate,
+          createDate: selectedDate,
+          roomNo: 0,
         }));
       }
 
