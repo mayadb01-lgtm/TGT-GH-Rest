@@ -16,9 +16,44 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DeleteOutline } from "@mui/icons-material";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
 dayjs.locale("en-gb");
 
 const ReservationTable = ({ reservationData, setReservationData }) => {
+  const { entries } = useSelector((state) => state.entry);
+
+  useEffect(() => {
+    if (entries.length > 0) {
+      const filteredEntries = entries.filter(
+        (entry) => entry?.period && entry.period === "reservation"
+      );
+      if (filteredEntries.length > 0) {
+        setReservationData((prevRows) => {
+          return prevRows.map((row) => {
+            const entry = filteredEntries.find((entry) => entry.id === row.id);
+            if (entry) {
+              return {
+                ...row,
+                reservationId: entry.reservationId,
+                fullname: entry.fullname,
+                mobileNumber: entry.mobileNumber,
+                noOfPeople: entry.noOfPeople,
+                checkInDateTime: entry.checkInDateTime,
+                checkOutDateTime: entry.checkOutDateTime,
+                rate: entry.rate,
+                advancePayment: entry.advancePayment,
+                advancePaymentDate: entry.advancePaymentDate,
+                modeOfPayment: entry.modeOfPayment,
+              };
+            }
+            return row;
+          });
+        });
+      }
+    }
+  }, [entries, setReservationData]);
+
   const handleRowEdit = (updatedRow) => {
     setReservationData((prevRows) =>
       prevRows.map((row) => (row.id === updatedRow.id ? updatedRow : row))
