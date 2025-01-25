@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import {
   Typography,
   Box,
@@ -31,16 +31,17 @@ import {
   processEntries,
   processUpdateEntries,
   currentDateTime,
+  roomCosts,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
-import ModernLoader, {
-  AccordionSection,
-  EntrySection,
-  ExtraEntrySection,
-  PaymentSummary,
-} from "../utils/util";
-import PendingJamaGrid from "../components/PendingJamaGrid";
-import ReservationTable from "../components/ReservationTable";
+import ModernLoader, { AccordionSection, PaymentSummary } from "../utils/util";
+const PendingJamaGrid = React.lazy(
+  () => import("../components/PendingJamaGrid")
+);
+const ReservationTable = React.lazy(
+  () => import("../components/ReservationTable")
+);
+const EntryAccordion = React.lazy(() => import("../components/EntryAccordion"));
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
@@ -578,51 +579,75 @@ const EntryPage = () => {
             </Box>
           </Grid>
           <Box>
-            <EntrySection
-              setExtraDayData={setExtraDayData}
-              setExtraNightData={setExtraNightData}
-            />
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={extraToggle}
-                    onChange={
-                      extraToggle
-                        ? () => setExtraToggle(false)
-                        : () => setExtraToggle(true)
-                    }
+            <Suspense fallback={<div>Loading...</div>}>
+              <EntryAccordion
+                title="Day Entries"
+                period="Day"
+                roomCosts={roomCosts}
+                onSubmit={setDayData}
+                bgColor="#FAC172"
+              />
+              <EntryAccordion
+                title="Night Entries"
+                period="Night"
+                roomCosts={roomCosts}
+                onSubmit={setNightData}
+                bgColor="#89D5C9"
+              />
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={extraToggle}
+                      onChange={
+                        extraToggle
+                          ? () => setExtraToggle(false)
+                          : () => setExtraToggle(true)
+                      }
+                    />
+                  }
+                  label="Show Extra Entry"
+                />
+              </FormGroup>
+              {extraToggle && (
+                <>
+                  <EntryAccordion
+                    title="Extra Day Entries"
+                    period="extraDay"
+                    roomCosts={roomCosts}
+                    onSubmit={setExtraDayData}
+                    bgColor="#FAC172"
                   />
-                }
-                label="Show Extra Entry"
-              />
-            </FormGroup>
-            {extraToggle && (
-              <ExtraEntrySection
-                setExtraDayData={setExtraDayData}
-                setExtraNightData={setExtraNightData}
-              />
-            )}
-            <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
-              <PendingJamaTable
-                pendingJamaRows={pendingJamaRows}
-                setPendingJamaRows={setPendingJamaRows}
-              />
-            </AccordionSection>
+                  <EntryAccordion
+                    title="Extra Night Entries"
+                    period="extraNight"
+                    roomCosts={roomCosts}
+                    onSubmit={setExtraNightData}
+                    bgColor="#89D5C9"
+                  />
+                </>
+              )}
+              <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
+                <PendingJamaTable
+                  pendingJamaRows={pendingJamaRows}
+                  setPendingJamaRows={setPendingJamaRows}
+                />
+              </AccordionSection>
 
-            <AccordionSection
-              bgColor="#d2d2d2"
-              title="View UnPaid Entries Till Date"
-            >
-              <PendingJamaGrid />
-            </AccordionSection>
-            {/* Reservations   */}
-            <AccordionSection bgColor="#d2d2d2" title="Reservations Entry">
-              <ReservationTable
-                reservationData={reservationData}
-                setReservationData={setReservationData}
-              />
-            </AccordionSection>
+              <AccordionSection
+                bgColor="#d2d2d2"
+                title="View UnPaid Entries Till Date"
+              >
+                <PendingJamaGrid />
+              </AccordionSection>
+              {/* Reservations   */}
+              <AccordionSection bgColor="#d2d2d2" title="Reservations Entry">
+                <ReservationTable
+                  reservationData={reservationData}
+                  setReservationData={setReservationData}
+                />
+              </AccordionSection>
+            </Suspense>
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}

@@ -25,7 +25,10 @@ const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    if (entries.length > 0) {
+    if (entries && entries.length === 0) {
+      setRows(initializeRows(period, rowsLength, roomCosts));
+    }
+    if (entries && entries.length > 0) {
       // Reset rows to initial state before updating
       let initialRows = initializeRows(period, rowsLength, roomCosts);
 
@@ -73,8 +76,6 @@ const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
       }
 
       setRows(updatedRows);
-    } else {
-      setRows(initializeRows(period, rowsLength, roomCosts));
     }
   }, [entries]);
 
