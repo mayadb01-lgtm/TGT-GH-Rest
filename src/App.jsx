@@ -6,9 +6,7 @@ import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import Store from "./redux/store.js";
 import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
-import { useSelector } from "react-redux";
 import { loadAdmin } from "./redux/actions/adminAction.js";
-import ModernLoader from "./utils/util.jsx";
 import "./App.css";
 
 const EntryPage = lazy(() => import("./pages/EntryPage"));
@@ -30,11 +28,6 @@ const RestEntryPage = lazy(
 );
 
 const App = () => {
-  const { loading: userLoading } = useSelector((state) => state.user);
-  const { loading: adminLoading } = useSelector((state) => state.admin);
-  const { loading: entryLoading } = useSelector((state) => state.entry);
-  const { loading: restEntryLoading } = useSelector((state) => state.restEntry);
-
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadAdmin());
@@ -42,12 +35,6 @@ const App = () => {
 
   return (
     <Router>
-      <ModernLoader
-        userLoading={userLoading}
-        adminLoading={adminLoading}
-        entryLoading={entryLoading}
-        restEntryLoading={restEntryLoading}
-      />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route

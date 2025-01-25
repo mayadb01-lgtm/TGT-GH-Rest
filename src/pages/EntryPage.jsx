@@ -7,6 +7,7 @@ import {
   Switch,
   FormControlLabel,
   FormGroup,
+  Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -32,7 +33,7 @@ import {
   currentDateTime,
 } from "../utils/utils";
 import PendingJamaTable from "../components/PendingJamaTable";
-import {
+import ModernLoader, {
   AccordionSection,
   EntrySection,
   ExtraEntrySection,
@@ -43,7 +44,15 @@ import ReservationTable from "../components/ReservationTable";
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
+  const { isAdminAuthenticated, loading: adminLoading } = useSelector(
+    (state) => state.admin
+  );
+  const { isAuthenticated, loading: userLoading } = useSelector(
+    (state) => state.user
+  );
+  const { entries, loading: entryLoading } = useSelector(
+    (state) => state.entry
+  );
   const dispatch = useDispatch();
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
@@ -501,6 +510,10 @@ const EntryPage = () => {
     }
   };
 
+  if (adminLoading || userLoading || entryLoading) {
+    return <ModernLoader adminLoading userLoading entryLoading />;
+  }
+
   return (
     <>
       <Grid
@@ -613,16 +626,62 @@ const EntryPage = () => {
           </Box>
         </Grid>
         {/* Right Side: Filters Table */}
-        <PaymentSummary
-          processedEntries={processedEntries}
-          columns={modeSummaryColumn}
-          paymentColors={paymentColors}
-          modeRows={modeRows}
-          modeColumns={finalModeColumns}
-          handleEntrySubmit={handleEntrySubmit}
-          handleEntryEdit={handleEntryEdit}
-          handleCancelClick={handleCancelClick}
-        />
+        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5, xl: 5 }}>
+          <PaymentSummary
+            processedEntries={processedEntries}
+            columns={modeSummaryColumn}
+            paymentColors={paymentColors}
+            modeRows={modeRows}
+            modeColumns={finalModeColumns}
+            handleEntrySubmit={handleEntrySubmit}
+            handleEntryEdit={handleEntryEdit}
+            handleCancelClick={handleCancelClick}
+          />
+          <Grid item xs={12}>
+            <Box
+              sx={{ px: 2 }}
+              flexDirection="row"
+              display="flex"
+              alignItems="center"
+              gap={2}
+            >
+              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                Submit Entries
+              </Typography>
+              <Stack direction="row" spacing={1}>
+                {(entries?.length > 0 && isAdminAuthenticated) ||
+                (entries?.length > 0 &&
+                  selectedDate == today &&
+                  isAuthenticated) ? (
+                  <Button
+                    onClick={handleEntryEdit}
+                    variant="contained"
+                    color="secondary"
+                    sx={{ px: 3, "&:hover": { backgroundColor: "secondary" } }}
+                  >
+                    Edit
+                  </Button>
+                ) : null}
+                <Button
+                  onClick={handleEntrySubmit}
+                  variant="contained"
+                  color="success"
+                  sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
+                >
+                  Submit
+                </Button>
+                <Button
+                  onClick={handleCancelClick}
+                  variant="contained"
+                  color="error"
+                  sx={{ px: 3, "&:hover": { backgroundColor: "#e57373" } }}
+                >
+                  Cancel
+                </Button>
+              </Stack>
+            </Box>
+          </Grid>
+        </Grid>
       </Grid>
       <Toaster position="top-center" reverseOrder={true} />
     </>

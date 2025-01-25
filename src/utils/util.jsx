@@ -1,10 +1,8 @@
-import { useState } from "react";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
-  Button,
   Stack,
   styled,
   TextField,
@@ -26,14 +24,9 @@ export const EntryAccordion = ({
   roomCosts,
   onSubmit,
   bgColor,
-  panel,
 }) => {
-  const [expanded, setExpanded] = useState(false);
-  const handleChange = (currentPanel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? currentPanel : false);
-  };
   return (
-    <Accordion expanded={expanded === panel} onChange={handleChange(panel)}>
+    <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         style={{
@@ -107,16 +100,14 @@ export const EntrySection = ({ setDayData, setNightData }) => (
         period: "Day",
         onSubmit: setDayData,
         bgColor: "#FAC172",
-        panel: "panel1",
       },
       {
         title: "Night Entries",
         period: "Night",
         onSubmit: setNightData,
         bgColor: "#89D5C9",
-        panel: "panel2",
       },
-    ].map(({ title, period, onSubmit, bgColor, panel }) => (
+    ].map(({ title, period, onSubmit, bgColor }) => (
       <EntryAccordion
         key={title}
         title={title}
@@ -124,7 +115,6 @@ export const EntrySection = ({ setDayData, setNightData }) => (
         roomCosts={roomCosts}
         onSubmit={onSubmit}
         bgColor={bgColor}
-        panel={panel}
       />
     ))}
   </>
@@ -138,16 +128,14 @@ export const ExtraEntrySection = ({ setExtraDayData, setExtraNightData }) => (
         period: "extraDay",
         onSubmit: setExtraDayData,
         bgColor: "#FAC172",
-        panel: "panel3",
       },
       {
         title: "Extra Night Entries",
         period: "extraNight",
         onSubmit: setExtraNightData,
         bgColor: "#89D5C9",
-        panel: "panel4",
       },
-    ].map(({ title, period, onSubmit, bgColor, panel }) => (
+    ].map(({ title, period, onSubmit, bgColor }) => (
       <EntryAccordion
         key={title}
         title={title}
@@ -155,7 +143,6 @@ export const ExtraEntrySection = ({ setExtraDayData, setExtraNightData }) => (
         roomCosts={roomCosts}
         onSubmit={onSubmit}
         bgColor={bgColor}
-        panel={panel}
       />
     ))}
   </>
@@ -192,11 +179,8 @@ export const PaymentSummary = ({
   paymentColors,
   modeRows,
   modeColumns,
-  handleEntryEdit,
-  handleEntrySubmit,
-  handleCancelClick,
 }) => (
-  <Grid size={{ xs: 12, sm: 12, md: 12, lg: 5, xl: 5 }}>
+  <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
     <Grid size={{ xs: 12 }} display="flex">
       <SummaryGrid
         entries={[
@@ -283,46 +267,6 @@ export const PaymentSummary = ({
         colors={paymentColors}
       />
     </Grid>
-
-    <Grid item xs={12}>
-      <Box
-        sx={{ px: 2 }}
-        flexDirection="row"
-        display="flex"
-        alignItems="center"
-        gap={2}
-      >
-        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-          Submit Entries
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          <Button
-            onClick={handleEntryEdit}
-            variant="contained"
-            color="secondary"
-            sx={{ px: 3, "&:hover": { backgroundColor: "secondary" } }}
-          >
-            Edit
-          </Button>
-          <Button
-            onClick={handleEntrySubmit}
-            variant="contained"
-            color="success"
-            sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
-          >
-            Submit
-          </Button>
-          <Button
-            onClick={handleCancelClick}
-            variant="contained"
-            color="error"
-            sx={{ px: 3, "&:hover": { backgroundColor: "#e57373" } }}
-          >
-            Cancel
-          </Button>
-        </Stack>
-      </Box>
-    </Grid>
   </Grid>
 );
 
@@ -405,7 +349,6 @@ const ModernLoader = ({ userLoading, adminLoading, entryLoading }) => {
       </Box>
     );
   }
-  return null;
 };
 
 export default ModernLoader;
