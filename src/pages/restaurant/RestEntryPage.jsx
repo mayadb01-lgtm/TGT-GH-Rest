@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
 import RestUpadTable from "../../components/restaurant/RestUpadTable";
 import RestExpensesTable from "../../components/restaurant/RestExpensesTable";
 import RestPendingTable from "../../components/restaurant/RestPendingTable";
@@ -25,9 +26,9 @@ const RestEntryPage = () => {
   const dispatch = useDispatch();
   const { restEntries } = useSelector((state) => state.restEntry);
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("DD-MM-YYYY")
-  );
+  const today = dayjs().format("DD-MM-YYYY");
+  const [selectedDate, setSelectedDate] = useState(today);
+
   // Upad
   const restUpadInitialData = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
@@ -133,7 +134,9 @@ const RestEntryPage = () => {
   }, [selectedDate, restEntries]);
 
   const handleDateChange = (newDate) => {
-    setSelectedDate(newDate.format("DD-MM-YYYY"));
+    if (newDate) {
+      setSelectedDate(newDate.format("DD-MM-YYYY"));
+    }
   };
 
   const restEntryData = useMemo(() => {
@@ -244,7 +247,7 @@ const RestEntryPage = () => {
     setTotalPP(0);
     setTotalCash(0);
     setGrandTotal(0);
-    dispatch(getRestEntryByDate(dayjs().format("DD-MM-YYYY")));
+    dispatch(getRestEntryByDate(today));
   };
 
   const handleCreateRestEntry = async () => {
@@ -312,7 +315,11 @@ const RestEntryPage = () => {
                 >
                   <DatePicker
                     views={["year", "month", "day"]}
-                    value={dayjs(selectedDate, "DD-MM-YYYY")}
+                    value={
+                      selectedDate
+                        ? dayjs(selectedDate, "DD-MM-YYYY")
+                        : dayjs(today, "DD-MM-YYYY")
+                    }
                     onChange={(newDate) => handleDateChange(newDate)}
                     slots={{
                       textField: (params) => (
