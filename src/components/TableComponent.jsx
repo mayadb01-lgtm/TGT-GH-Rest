@@ -16,6 +16,8 @@ import {
   TextField,
   MenuItem,
   Select,
+  Box,
+  CircularProgress,
 } from "@mui/material";
 import "./TableComponent.css";
 
@@ -145,6 +147,21 @@ const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
       return false;
     }
   };
+
+  if (rows.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}>

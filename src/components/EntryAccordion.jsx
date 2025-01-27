@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  CircularProgress,
   Stack,
   Typography,
 } from "@mui/material";
@@ -38,7 +39,7 @@ const EntryAccordion = ({ title, period, roomCosts, onSubmit, bgColor }) => {
         </Stack>
       </AccordionSummary>
       <AccordionDetails style={{ margin: 0, padding: 0 }}>
-        <Suspense fallback={<div>TableComponent Loading...</div>}>
+        <Suspense fallback={<CircularProgress />}>
           <TableComponent
             period={period}
             title={`${title} Table`}

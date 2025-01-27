@@ -8,6 +8,7 @@ import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
 import { loadAdmin } from "./redux/actions/adminAction.js";
 import "./App.css";
+import ModernLoader from "./utils/util.jsx";
 
 const EntryPage = lazy(() => import("./pages/EntryPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -35,7 +36,7 @@ const App = () => {
 
   return (
     <Router>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<ModernLoader />}>
         <Routes>
           <Route
             path="/"
