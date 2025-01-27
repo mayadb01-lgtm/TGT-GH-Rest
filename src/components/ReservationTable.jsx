@@ -147,7 +147,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                 <TableCell width={"12%"} type="number">
                   <TextField
                     type="number"
-                    value={row.mobileNumber}
+                    value={row.mobileNumber ? row.mobileNumber : ""}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, mobileNumber: value });
@@ -163,7 +163,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                 <TableCell width={"12%"} type="number">
                   <TextField
                     type="number"
-                    value={row.noOfPeople}
+                    value={row.noOfPeople ? row.noOfPeople : ""}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, noOfPeople: value });
@@ -263,7 +263,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                 <TableCell width={"12%"} type="number">
                   <TextField
                     type="number"
-                    value={row.rate}
+                    value={row.rate ? row.rate : ""}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, rate: value });
@@ -279,7 +279,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                 <TableCell width={"12%"} type="number">
                   <TextField
                     type="number"
-                    value={row.advancePayment}
+                    value={row.advancePayment ? row.advancePayment : ""}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleRowEdit({ ...row, advancePayment: value });
@@ -344,14 +344,14 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                       fontSize: "12px",
                     }}
                   >
-                    {["Select", "Cash", "Card", "PPS", "PPC", "UnPaid"].map(
+                    {["Select", "Cash", "Card", "PPS", "PPC"].map(
                       (mode, index) => (
                         <MenuItem
                           key={index}
                           value={mode}
                           sx={{
                             fontSize: "12px",
-                            color: "#fff",
+                            color: "#000",
                             ":hover": {
                               backgroundColor: "#b6b6b6",
                               color: "#000",
@@ -364,11 +364,27 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                     )}
                   </Select>
                 </TableCell>
-                <TableCell width={"5%"}>
+                <TableCell width={"2%"}>
                   <Button
                     onClick={() => {
                       setReservationData((prevRows) =>
-                        prevRows.filter((r) => r.id !== row.id)
+                        prevRows.map((prevRow) =>
+                          prevRow.id === row.id
+                            ? {
+                                ...prevRow,
+                                reservationId: Date.now() + row.id,
+                                fullname: "",
+                                mobileNumber: "",
+                                noOfPeople: "",
+                                checkInDateTime: "",
+                                checkOutDateTime: "",
+                                rate: "",
+                                advancePayment: "",
+                                advancePaymentDate: "",
+                                modeOfPayment: "",
+                              }
+                            : prevRow
+                        )
                       );
                     }}
                     sx={{ fontSize: "12px" }}

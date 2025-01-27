@@ -195,28 +195,26 @@ const GradientSpinner = styled("div")({
 });
 
 const ModernLoader = ({ userLoading, adminLoading, entryLoading }) => {
-  if (userLoading || adminLoading || entryLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          background: "transparent",
-        }}
-      >
-        {userLoading
-          ? "User Loading"
-          : adminLoading
-            ? "Admin Loading"
-            : entryLoading
-              ? "Entry Loading"
-              : "Loading..."}
-        <GradientSpinner />
-      </Box>
-    );
-  }
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        background: "transparent",
+      }}
+    >
+      {userLoading
+        ? "User Loading"
+        : adminLoading
+          ? "Admin Loading"
+          : entryLoading
+            ? "Entry Loading"
+            : "Loading..."}
+      <GradientSpinner />
+    </Box>
+  );
 };
 
 export default ModernLoader;

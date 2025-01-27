@@ -4,9 +4,9 @@ import {
   Box,
   Stack,
   TextField,
-  Switch,
-  FormControlLabel,
-  FormGroup,
+  // Switch,
+  // FormControlLabel,
+  // FormGroup,
   Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -63,7 +63,7 @@ const EntryPage = () => {
   const [selectedDate, setSelectedDate] = useState(today);
   const [pendingJamaRows, setPendingJamaRows] = useState([]);
   const [reservationData, setReservationData] = useState([]);
-  const [extraToggle, setExtraToggle] = useState(false);
+  // const [extraToggle, setExtraToggle] = useState(false);
 
   useEffect(() => {
     console.log(`Fetching data for selectedDate: ${selectedDate}`);
@@ -589,7 +589,7 @@ const EntryPage = () => {
                 onSubmit={setNightData}
                 bgColor="#89D5C9"
               />
-              <FormGroup>
+              {/* <FormGroup>
                 <FormControlLabel
                   control={
                     <Switch
@@ -603,25 +603,25 @@ const EntryPage = () => {
                   }
                   label="Show Extra Entry"
                 />
-              </FormGroup>
-              {extraToggle && (
-                <>
-                  <EntryAccordion
-                    title="Extra Day Entries"
-                    period="extraDay"
-                    roomCosts={roomCosts}
-                    onSubmit={setExtraDayData}
-                    bgColor="#FAC172"
-                  />
-                  <EntryAccordion
-                    title="Extra Night Entries"
-                    period="extraNight"
-                    roomCosts={roomCosts}
-                    onSubmit={setExtraNightData}
-                    bgColor="#89D5C9"
-                  />
-                </>
-              )}
+              </FormGroup> */}
+              {/* {extraToggle && (
+                <> */}
+              <EntryAccordion
+                title="Extra Day Entries"
+                period="extraDay"
+                roomCosts={roomCosts}
+                onSubmit={setExtraDayData}
+                bgColor="#FAC172"
+              />
+              <EntryAccordion
+                title="Extra Night Entries"
+                period="extraNight"
+                roomCosts={roomCosts}
+                onSubmit={setExtraNightData}
+                bgColor="#89D5C9"
+              />
+              {/* </>
+              )} */}
               <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
                 <PendingJamaTable
                   pendingJamaRows={pendingJamaRows}
