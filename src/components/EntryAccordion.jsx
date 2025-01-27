@@ -13,10 +13,7 @@ const TableComponent = React.lazy(() => import("./TableComponent"));
 
 const EntryAccordion = ({ title, period, roomCosts, onSubmit, bgColor }) => {
   return (
-    <Accordion
-      expanded={period === "Day" || period === "Night" ? true : false}
-      style={{ boxShadow: "none" }}
-    >
+    <Accordion style={{ boxShadow: "none" }}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         style={{
