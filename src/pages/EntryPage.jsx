@@ -636,7 +636,7 @@ const EntryPage = () => {
                 <PendingJamaGrid />
               </AccordionSection>
               {/* Reservations   */}
-              <AccordionSection bgColor="#d2d2d2" title="Reservations Entry">
+              <AccordionSection bgColor="#b4d8ff" title="Reservations Entry">
                 <ReservationTable
                   reservationData={reservationData}
                   setReservationData={setReservationData}

@@ -75,7 +75,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                   key={index}
                   sx={{
                     fontWeight: "bold",
-                    backgroundColor: "#eefcc8",
+                    backgroundColor: "#cce5ff",
                     textAlign: "center",
                     border: "1px solid #fff",
                     height: "24px",
