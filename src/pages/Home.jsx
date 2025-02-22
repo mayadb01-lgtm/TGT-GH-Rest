@@ -1,4 +1,4 @@
-import { Stack, Typography, Paper, Avatar } from "@mui/material";
+import { Stack, Typography, Paper } from "@mui/material";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -38,19 +38,13 @@ const Home = () => {
         spacing={2}
         sx={{ textAlign: "center" }}
       >
-        <Avatar
-          sx={{
-            bgcolor: isAdminAuthenticated ? "#ff6a6a" : "#1976d2",
-            width: 56,
-            height: 56,
-          }}
-        >
-          {isAdminAuthenticated ? admin?.name?.charAt(0).toUpperCase() : "A"}
-          {isAuthenticated ? user?.name?.charAt(0).toUpperCase() : "U"}
-        </Avatar>
-        <Typography variant="h5">
-          Welcome, {isAdminAuthenticated ? admin?.name : user?.name}!
-        </Typography>
+        {isAdminAuthenticated || isAuthenticated ? (
+          <Typography variant="h5">
+            Welcome, {isAdminAuthenticated ? admin?.name : user?.name}!
+          </Typography>
+        ) : (
+          <Typography variant="h5">Welcome!</Typography>
+        )}
       </Stack>
       <Typography variant="body1" color="text.secondary">
         Welcome to the TGT Business Management System. Choose a service to

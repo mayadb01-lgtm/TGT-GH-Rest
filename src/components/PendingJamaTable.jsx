@@ -251,6 +251,16 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                         <TextField {...params} size="small" fullWidth />
                       ),
                     }}
+                    sx={{
+                      "& .MuiInputBase-root": {
+                        height: "24px",
+                        fontSize: "12px",
+                        textAlign: "center",
+                      },
+                      "& .MuiSvgIcon-root": {
+                        fontSize: "12px",
+                      },
+                    }}
                   />
                 </LocalizationProvider>
               </TableCell>
