@@ -13,16 +13,16 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { logoutUser } from "../redux/actions/userAction";
 import { logoutAdmin } from "../redux/actions/adminAction";
 import { ThemeSwitcher } from "@toolpad/core";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isAuthenticated } = useSelector((state) => state.user);
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
-  const dispatch = useDispatch();
+  const { isAuthenticated } = useAppSelector((state) => state.user);
+  const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
+  const dispatch = useAppDispatch();
   const location = useLocation();
 
   const handleLogout = () => {

@@ -8,14 +8,14 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { createUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
 
 const SignupPage = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  const { loading, isAuthenticated } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;

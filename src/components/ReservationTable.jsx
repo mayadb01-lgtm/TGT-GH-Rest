@@ -17,12 +17,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DeleteOutline } from "@mui/icons-material";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 import { initializeReservationData } from "../utils/utils";
 dayjs.locale("en-gb");
 
 const ReservationTable = ({ reservationData, setReservationData }) => {
-  const { entries } = useSelector((state) => state.entry);
+  const { entries } = useAppSelector((state) => state.entry);
 
   useEffect(() => {
     if (!entries || entries.length === 0) {

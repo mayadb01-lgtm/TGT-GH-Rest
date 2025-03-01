@@ -12,7 +12,7 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../../redux/hooks";
 import "dayjs/locale/en-gb";
 
 const ExpensesTable = ({
@@ -31,7 +31,7 @@ const ExpensesTable = ({
   grandTotal,
   extraAmount,
 }) => {
-  const { restCategory } = useSelector((state) => state.restCategory);
+  const { restCategory } = useAppSelector((state) => state.restCategory);
   // Column headers
   const columns = useMemo(() => ["ID", "Amount", "Name", "Category"], []);
 

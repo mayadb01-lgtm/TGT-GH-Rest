@@ -8,7 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import toast from "react-hot-toast";
 import { resetAdminPassword } from "../redux/actions/adminAction";
 
@@ -18,8 +18,8 @@ const AdminResetPasswordPage = ({ role }) => {
     password: "",
     referralCode: "",
   });
-  const { loading } = useSelector((state) => state.admin);
-  const dispatch = useDispatch();
+  const { loading } = useAppSelector((state) => state.admin);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {

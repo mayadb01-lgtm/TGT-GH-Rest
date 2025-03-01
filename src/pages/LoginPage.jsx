@@ -8,15 +8,15 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { loginUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
-  const dispatch = useDispatch();
+  const { loading, isAuthenticated } = useAppSelector((state) => state.user);
+  const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const referrer = location.state?.from;

@@ -1,9 +1,9 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 
 const PendingJamaGrid = () => {
-  const { unpaidEntries } = useSelector((state) => state.entry);
+  const { unpaidEntries } = useAppSelector((state) => state.entry);
   const [pendingJamaGridRows, setPendingJamaGridRows] = useState([]);
 
   const setPeriod = {

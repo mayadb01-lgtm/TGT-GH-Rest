@@ -15,7 +15,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import {
   createEntry,
   getEntriesByDate,
@@ -45,16 +45,16 @@ const EntryAccordion = React.lazy(() => import("../components/EntryAccordion"));
 dayjs.locale("en-gb");
 
 const EntryPage = () => {
-  const { isAdminAuthenticated, loading: adminLoading } = useSelector(
+  const { isAdminAuthenticated, loading: adminLoading } = useAppSelector(
     (state) => state.admin
   );
-  const { isAuthenticated, loading: userLoading } = useSelector(
+  const { isAuthenticated, loading: userLoading } = useAppSelector(
     (state) => state.user
   );
-  const { entries, loading: entryLoading } = useSelector(
+  const { entries, loading: entryLoading } = useAppSelector(
     (state) => state.entry
   );
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [dayData, setDayData] = useState([]);
   const [nightData, setNightData] = useState([]);
   const [extraDayData, setExtraDayData] = useState([]);

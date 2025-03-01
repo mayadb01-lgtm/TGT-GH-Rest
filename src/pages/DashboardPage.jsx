@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AppProvider } from "@toolpad/core/AppProvider";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { createTheme } from "@mui/material/styles";
 import {
@@ -54,8 +54,8 @@ const demoTheme = createTheme({
 
 // Dashboard content component
 const DashboardContent = () => {
-  const { loading, entries } = useSelector((state) => state.entry);
-  const dispatch = useDispatch();
+  const { loading, entries } = useAppSelector((state) => state.entry);
+  const dispatch = useAppDispatch();
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
   );
@@ -167,7 +167,7 @@ const LogoutPage = () => <Typography>Logout Page Content</Typography>;
 // Main page component
 const DashboardPage = () => {
   const router = useDemoRouter("/dashboard");
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [currentPage, setCurrentPage] = useState("dashboard");
 
   useEffect(() => {

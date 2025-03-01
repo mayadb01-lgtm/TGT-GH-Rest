@@ -1,10 +1,10 @@
 import { Box, CircularProgress } from "@mui/material";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const { loading, isAuthenticated } = useSelector((state) => state.user);
+  const { loading, isAuthenticated } = useAppSelector((state) => state.user);
 
   const navigate = useNavigate();
   const location = useLocation();

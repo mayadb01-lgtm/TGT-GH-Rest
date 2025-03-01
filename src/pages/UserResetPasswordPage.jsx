@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { resetPassword } from "../redux/actions/userAction";
 
 const ResetPasswordPage = () => {
@@ -19,8 +19,8 @@ const ResetPasswordPage = () => {
     referralCode: "",
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

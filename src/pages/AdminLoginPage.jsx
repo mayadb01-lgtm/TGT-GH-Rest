@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Box, TextField, Button, Typography, Paper } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { loginAdmin } from "../redux/actions/adminAction"; // Action for admin login
 import toast from "react-hot-toast";
 
 const AdminLoginPage = () => {
   const [form, setForm] = useState({ email: "", password: "" });
-  const { loading, isAdminAuthenticated } = useSelector((state) => state.admin);
-  const dispatch = useDispatch();
+  const { loading, isAdminAuthenticated } = useAppSelector(
+    (state) => state.admin
+  );
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const referrer = location.state?.from;

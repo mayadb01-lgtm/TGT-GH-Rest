@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -24,10 +24,10 @@ import {
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
-  const dispatch = useDispatch();
-  const { restEntries } = useSelector((state) => state.restEntry);
-  const { restStaff } = useSelector((state) => state.restStaff);
-  const { isAdminAuthenticated } = useSelector((state) => state.admin);
+  const dispatch = useAppDispatch();
+  const { restEntries } = useAppSelector((state) => state.restEntry);
+  const { restStaff } = useAppSelector((state) => state.restStaff);
+  const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
   const today = dayjs().format("DD-MM-YYYY");
   const [selectedDate, setSelectedDate] = useState(today);
 

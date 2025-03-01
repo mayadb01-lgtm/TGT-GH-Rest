@@ -15,7 +15,7 @@ import {
   Select,
   Button,
 } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 import { DeleteOutline } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import { useEffect, useMemo } from "react";
@@ -24,7 +24,7 @@ import { initializePendingJamaRows, paymentColors } from "../utils/utils";
 dayjs.locale("en-gb");
 
 const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
-  const { entries, unpaidEntries } = useSelector((state) => state.entry);
+  const { entries, unpaidEntries } = useAppSelector((state) => state.entry);
 
   useEffect(() => {
     if (entries && entries.length === 0) {

@@ -1,11 +1,13 @@
 import { Stack, Typography, Paper } from "@mui/material";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  const { isAdminAuthenticated, admin } = useSelector((state) => state.admin);
-  const { isAuthenticated, user } = useSelector((state) => state.user);
+  const { isAdminAuthenticated, admin } = useAppSelector(
+    (state) => state.admin
+  );
+  const { isAuthenticated, user } = useAppSelector((state) => state.user);
 
   const services = [
     {

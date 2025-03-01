@@ -3,7 +3,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { MobileTimePicker } from "@mui/x-date-pickers";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "../redux/hooks";
 import { initializeRows, paymentColors, typeColors } from "../utils/utils";
 import {
   TableContainer,
@@ -22,7 +22,7 @@ import {
 import "./TableComponent.css";
 
 const TableComponent = ({ period, rowsLength, roomCosts, onSubmit }) => {
-  const { entries } = useSelector((state) => state.entry);
+  const { entries } = useAppSelector((state) => state.entry);
 
   const [rows, setRows] = useState([]);
 
