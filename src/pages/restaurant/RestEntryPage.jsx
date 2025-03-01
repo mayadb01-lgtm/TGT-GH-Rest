@@ -137,6 +137,9 @@ const RestEntryPage = () => {
   }, []);
 
   useEffect(() => {
+    if (restEntries && restEntries.length === 0) {
+      resetForm();
+    }
     if (selectedDate && restEntries && restEntries.grandTotal > 0) {
       resetForm();
       setRestUpadData(restEntries.upad);
