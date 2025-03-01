@@ -55,7 +55,6 @@ const RestPendingTable = ({
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" fullWidth />
       )}
-      disableClearable
     />
   );
 

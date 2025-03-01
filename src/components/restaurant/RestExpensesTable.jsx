@@ -12,9 +12,10 @@ import {
   Button,
   Paper,
 } from "@mui/material";
+import { useSelector } from "react-redux";
+import "dayjs/locale/en-gb";
 
 const ExpensesTable = ({
-  fieldOptions,
   restExpensesData,
   setRestExpensesData,
   totalExpenses,
@@ -29,6 +30,7 @@ const ExpensesTable = ({
   grandTotal,
   extraAmount,
 }) => {
+  const { restCategory } = useSelector((state) => state.restCategory);
   // Column headers
   const columns = useMemo(() => ["ID", "Amount", "Name", "Category"], []);
 
@@ -76,33 +78,64 @@ const ExpensesTable = ({
         id: prevData.length + 1,
         _id: "",
         amount: 0,
-        fullname: "",
-        mobileNumber: 0,
-        category: "",
+        expenseName: "",
+        categoryName: "",
       },
     ]);
   }, [setRestExpensesData]);
 
-  // Render autocomplete field
-  const renderAutocomplete = useCallback(
+  // Category Name
+  const renderCategoryAutocomplete = useCallback(
     (options, rowKey, index, currentValue) => (
       <Autocomplete
+        disabled
         options={options}
-        getOptionLabel={(option) => option.fullname || ""}
-        value={options.find((option) => option.fullname === currentValue) || ""}
+        getOptionLabel={(option) => option.categoryName || ""}
+        value={
+          options.find((option) => option.categoryName === currentValue) || ""
+        }
         onChange={(e, value) => {
-          handleUpdateRow(index, rowKey, value?.fullname);
-          handleUpdateRow(
-            index,
-            "mobileNumber",
-            value?.mobileNumber ? value.mobileNumber : 0
-          );
+          handleUpdateRow(index, rowKey, value?.categoryName);
           handleUpdateRow(index, "_id", value ? value._id : "");
         }}
         renderInput={(params) => (
           <TextField {...params} variant="outlined" size="small" />
         )}
-        isOptionEqualToValue={(option, value) => option.title === value?.title}
+      />
+    ),
+    [handleUpdateRow]
+  );
+
+  const flattenedExpenses = restCategory.flatMap((category) =>
+    category.expense.map((exp) => ({
+      _id: exp._id,
+      expenseName: exp.expenseName,
+      categoryName: category.categoryName,
+    }))
+  );
+
+  // Expense Name
+  const renderExpenseAutocomplete = useCallback(
+    (options, rowKey, index, currentValue) => (
+      <Autocomplete
+        options={options}
+        groupBy={(option) => option.categoryName}
+        getOptionLabel={(option) => option.expenseName || ""}
+        value={
+          options.find((option) => option.expenseName === currentValue) || ""
+        }
+        onChange={(_, value) => {
+          handleUpdateRow(index, rowKey, value?.expenseName);
+          handleUpdateRow(index, "_id", value ? value._id : "");
+          handleUpdateRow(
+            index,
+            "categoryName",
+            value ? value.categoryName : ""
+          );
+        }}
+        renderInput={(params) => (
+          <TextField {...params} variant="outlined" size="small" fullWidth />
+        )}
       />
     ),
     [handleUpdateRow]
@@ -137,22 +170,22 @@ const ExpensesTable = ({
                   }
                 />
               </TableCell>
-              <TableCell sx={{ width: "25%" }}>
-                {renderAutocomplete(
-                  fieldOptions,
-                  "fullname",
+              <TableCell sx={{ width: "30%" }}>
+                {renderExpenseAutocomplete(
+                  flattenedExpenses,
+                  "expenseName",
                   index,
-                  row.fullname
+                  row.expenseName
                 )}
               </TableCell>
-              {/* <TableCell sx={{ width: "30%" }}>
-                {renderAutocomplete(
-                  categories,
-                  "category",
+              <TableCell sx={{ width: "25%" }}>
+                {renderCategoryAutocomplete(
+                  restCategory,
+                  "categoryName",
                   index,
-                  row.category
+                  row.categoryName
                 )}
-              </TableCell> */}
+              </TableCell>
             </TableRow>
           ))}
           {/* Calculation Rows */}

@@ -15,6 +15,12 @@ import {
   getRestEntryByDate,
   updateRestEntryByDate,
 } from "../../redux/actions/restEntryAction";
+import { getRestStaff } from "../../redux/actions/restStaffAction";
+import {
+  getRestCategory,
+  getRestCategoryName,
+  getRestExpenseName,
+} from "../../redux/actions/restCategoryAction";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
@@ -61,10 +67,8 @@ const RestEntryPage = () => {
     id: i + 1,
     _id: "",
     amount: 0,
-    fullname: "",
-    mobileNumber: 0,
-    category: 0,
-    createDate: selectedDate,
+    categoryName: "",
+    expenseName: "",
   }));
   const [restExpensesData, setRestExpensesData] = useState(
     restExpensesInitialData
@@ -123,6 +127,13 @@ const RestEntryPage = () => {
       dispatch(getRestEntryByDate(selectedDate));
     }
   }, [dispatch, selectedDate]);
+
+  useEffect(() => {
+    dispatch(getRestStaff());
+    dispatch(getRestCategory());
+    dispatch(getRestCategoryName());
+    dispatch(getRestExpenseName());
+  }, []);
 
   useEffect(() => {
     if (selectedDate && restEntries && restEntries.grandTotal > 0) {
@@ -419,7 +430,6 @@ const RestEntryPage = () => {
                 Expenses
               </Typography>
               <RestExpensesTable
-                fieldOptions={fieldOptions}
                 restExpensesData={restExpensesData}
                 setRestExpensesData={setRestExpensesData}
                 selectedDate={selectedDate}

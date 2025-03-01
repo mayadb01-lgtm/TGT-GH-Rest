@@ -4,6 +4,7 @@ import adminReducer from "./reducers/adminReducer";
 import entryReducer from "./reducers/entryReducer";
 import restEntryReducer from "./reducers/restEntryReducer";
 import restStaffReducer from "./reducers/restStaffReducer";
+import restCategoryReducer from "./reducers/restCategory";
 
 const Store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const Store = configureStore({
     entry: entryReducer,
     restEntry: restEntryReducer,
     restStaff: restStaffReducer,
+    restCategory: restCategoryReducer,
   },
 });
 

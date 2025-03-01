@@ -48,7 +48,6 @@ const EditableRow = ({ row, index, onUpdateRow, fieldOptions }) => {
           renderInput={(params) => (
             <TextField {...params} variant="outlined" size="small" fullWidth />
           )}
-          disableClearable
         />
       </TableCell>
     </TableRow>
