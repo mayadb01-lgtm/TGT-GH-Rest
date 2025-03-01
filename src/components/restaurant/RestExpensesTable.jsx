@@ -16,6 +16,7 @@ import { useSelector } from "react-redux";
 import "dayjs/locale/en-gb";
 
 const ExpensesTable = ({
+  selectedDate,
   restExpensesData,
   setRestExpensesData,
   totalExpenses,
@@ -80,6 +81,7 @@ const ExpensesTable = ({
         amount: 0,
         expenseName: "",
         categoryName: "",
+        createDate: selectedDate,
       },
     ]);
   }, [setRestExpensesData]);

@@ -69,6 +69,7 @@ const RestEntryPage = () => {
     amount: 0,
     categoryName: "",
     expenseName: "",
+    createDate: selectedDate,
   }));
   const [restExpensesData, setRestExpensesData] = useState(
     restExpensesInitialData
@@ -154,17 +155,39 @@ const RestEntryPage = () => {
 
   const handleDateChange = (newDate) => {
     if (newDate) {
-      setSelectedDate(newDate.format("DD-MM-YYYY"));
+      const formattedDate = newDate.format("DD-MM-YYYY");
+      if (formattedDate !== selectedDate) {
+        setSelectedDate(formattedDate);
+      }
     }
   };
 
+  const processRestUpadData = (data) => {
+    return data.filter((row) => {
+      return row.amount > 0 && row.fullname;
+    });
+  };
+  const processRestPendingData = (data) => {
+    return data.filter((row) => {
+      return row.amount > 0 && row.fullname;
+    });
+  };
+  const processRestExpensesData = (data) => {
+    return data.filter((row) => {
+      return row.amount > 0 && row.expenseName;
+    });
+  };
+
   const restEntryData = useMemo(() => {
+    const processedUpadData = processRestUpadData(restUpadData);
+    const processedPendingData = processRestPendingData(restPendingData);
+    const processedExpensesData = processRestExpensesData(restExpensesData);
     return {
       createDate: selectedDate,
       date: selectedDate,
-      upad: JSON.stringify(restUpadData),
-      pending: JSON.stringify(restPendingData),
-      expenses: JSON.stringify(restExpensesData),
+      upad: JSON.stringify(processedUpadData),
+      pending: JSON.stringify(processedPendingData),
+      expenses: JSON.stringify(processedExpensesData),
       extraAmount: extraAmount,
       totalUpad: totalUpad,
       totalPending: totalPending,
@@ -189,71 +212,6 @@ const RestEntryPage = () => {
     grandTotal,
   ]);
 
-  const submitEntryValidation = () => {
-    if (!selectedDate) {
-      toast.error("Please select a date.");
-      return false;
-    }
-
-    if (!restUpadData || restUpadData.length === 0) {
-      toast.error("Upad data is required.");
-      return false;
-    }
-
-    if (!restPendingData || restPendingData.length === 0) {
-      toast.error("Pending data is required.");
-      return false;
-    }
-
-    if (!restExpensesData || restExpensesData.length === 0) {
-      toast.error("Expenses data is required.");
-      return false;
-    }
-
-    if (extraAmount === undefined || extraAmount === null) {
-      toast.error("Extra amount is required.");
-      return false;
-    }
-
-    if (totalUpad === undefined || totalUpad === null) {
-      toast.error("Total Upad is required.");
-      return false;
-    }
-
-    if (totalPending === undefined || totalPending === null) {
-      toast.error("Total Pending is required.");
-      return false;
-    }
-
-    if (totalExpenses === undefined || totalExpenses === null) {
-      toast.error("Total Expenses is required.");
-      return false;
-    }
-
-    if (totalCard === undefined || totalCard === null) {
-      toast.error("Total Card is required.");
-      return false;
-    }
-
-    if (totalPP === undefined || totalPP === null) {
-      toast.error("Total PayPal (PP) is required.");
-      return false;
-    }
-
-    if (totalCash === undefined || totalCash === null) {
-      toast.error("Total Cash is required.");
-      return false;
-    }
-
-    if (grandTotal === undefined || grandTotal === null) {
-      toast.error("Grand Total is required.");
-      return false;
-    }
-
-    // Validation successful
-    return true;
-  };
-
   const resetForm = () => {
     setRestUpadData(restUpadInitialData);
     setRestPendingData(restPendingInitialData);
@@ -266,12 +224,12 @@ const RestEntryPage = () => {
     setTotalPP(0);
     setTotalCash(0);
     setGrandTotal(0);
-    dispatch(getRestEntryByDate(today));
   };
 
   const handleCreateRestEntry = async () => {
-    if (!submitEntryValidation()) {
-      return; // Stop execution if validation fails
+    if (grandTotal === 0) {
+      toast.error("Please enter some data before submitting.");
+      return;
     }
 
     try {
@@ -286,10 +244,10 @@ const RestEntryPage = () => {
   };
 
   const handleEditRestEntry = async () => {
-    if (!submitEntryValidation()) {
-      return; // Stop execution if validation fails
+    if (grandTotal === 0) {
+      toast.error("Please enter some data before submitting.");
+      return;
     }
-
     try {
       dispatch(updateRestEntryByDate(selectedDate, restEntryData));
       resetForm();
@@ -460,22 +418,25 @@ const RestEntryPage = () => {
                 >
                   Reset
                 </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={{ mx: 1, "&:hover": { backgroundColor: "secondary" } }}
-                  onClick={handleEditRestEntry}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  color="success"
-                  sx={{ mx: 1, "&:hover": { backgroundColor: "#81c784" } }}
-                  onClick={handleCreateRestEntry}
-                >
-                  Submit
-                </Button>
+                {restEntries && restEntries.grandTotal > 0 ? (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{ mx: 1, "&:hover": { backgroundColor: "secondary" } }}
+                    onClick={handleEditRestEntry}
+                  >
+                    Edit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mx: 1, "&:hover": { backgroundColor: "#64b5f6" } }}
+                    onClick={handleCreateRestEntry}
+                  >
+                    Submit
+                  </Button>
+                )}
               </Box>
             </Box>
           </Grid>
