@@ -15,23 +15,29 @@ import {
   getRestEntryByDate,
   updateRestEntryByDate,
 } from "../../redux/actions/restEntryAction";
-// import {
-//   categories,
-//   fullNameOptions,
-//   mobileNumberOptions,
-// } from "../../utils/utils";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
   const dispatch = useDispatch();
   const { restEntries } = useSelector((state) => state.restEntry);
+  const { restStaff } = useSelector((state) => state.restStaff);
   const { isAdminAuthenticated } = useSelector((state) => state.admin);
   const today = dayjs().format("DD-MM-YYYY");
   const [selectedDate, setSelectedDate] = useState(today);
 
+  // Create Full Name options
+  const fieldOptions = restStaff
+    ? restStaff?.map((staff) => ({
+        _id: staff._id,
+        fullname: staff.fullname,
+        mobileNumber: staff.mobileNumber,
+      }))
+    : [];
+
   // Upad
   const restUpadInitialData = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
+    _id: "",
     amount: 0,
     fullname: "",
     mobileNumber: 0,
@@ -41,6 +47,7 @@ const RestEntryPage = () => {
   // Pending
   const restPendingInitialData = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
+    _id: "",
     fullname: "",
     mobileNumber: 0,
     amount: 0,
@@ -52,6 +59,7 @@ const RestEntryPage = () => {
   // Expenses
   const restExpensesInitialData = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
+    _id: "",
     amount: 0,
     fullname: "",
     mobileNumber: 0,
@@ -361,6 +369,7 @@ const RestEntryPage = () => {
                 Upaad
               </Typography>
               <RestUpadTable
+                fieldOptions={fieldOptions}
                 restUpadData={restUpadData}
                 setRestUpadData={setRestUpadData}
                 selectedDate={selectedDate}
@@ -385,6 +394,7 @@ const RestEntryPage = () => {
                 Pending
               </Typography>
               <RestPendingTable
+                fieldOptions={fieldOptions}
                 restPendingData={restPendingData}
                 setRestPendingData={setRestPendingData}
                 selectedDate={selectedDate}
@@ -409,6 +419,7 @@ const RestEntryPage = () => {
                 Expenses
               </Typography>
               <RestExpensesTable
+                fieldOptions={fieldOptions}
                 restExpensesData={restExpensesData}
                 setRestExpensesData={setRestExpensesData}
                 selectedDate={selectedDate}

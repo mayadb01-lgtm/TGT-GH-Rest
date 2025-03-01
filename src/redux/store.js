@@ -3,6 +3,7 @@ import userReducer from "./reducers/userReducer";
 import adminReducer from "./reducers/adminReducer";
 import entryReducer from "./reducers/entryReducer";
 import restEntryReducer from "./reducers/restEntryReducer";
+import restStaffReducer from "./reducers/restStaffReducer";
 
 const Store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const Store = configureStore({
     admin: adminReducer,
     entry: entryReducer,
     restEntry: restEntryReducer,
+    restStaff: restStaffReducer,
   },
 });
 

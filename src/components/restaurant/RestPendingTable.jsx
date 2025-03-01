@@ -11,16 +11,20 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { fullNameOptions, mobileNumberOptions } from "../../utils/utils";
 
-const TABLE_COLUMNS = ["ID", "Amount", "Name", "Mobile Number"];
+const TABLE_COLUMNS = ["ID", "Amount", "Name"];
 
-const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
+const RestPendingTable = ({
+  restPendingData,
+  setRestPendingData,
+  fieldOptions,
+}) => {
   const handleAddRow = () => {
     setRestPendingData((prevData) => [
       ...prevData,
       {
         id: prevData.length + 1,
+        _id: "",
         fullname: "",
         mobileNumber: 0,
         amount: 0,
@@ -39,11 +43,15 @@ const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
   const renderAutocompleteCell = (options, row, index, fieldKey) => (
     <Autocomplete
       options={options}
-      getOptionLabel={(option) => option.title || ""}
-      value={options.find((option) => option.title === row[fieldKey]) || null}
-      onChange={(_, value) =>
-        handleUpdateRow(index, fieldKey, value ? value.title : "")
+      getOptionLabel={(option) => option.fullname || ""}
+      value={
+        options.find((option) => option.fullname === row[fieldKey]) || null
       }
+      onChange={(_, value) => {
+        handleUpdateRow(index, fieldKey, value ? value?.fullname : "");
+        handleUpdateRow(index, "mobileNumber", value ? value?.mobileNumber : 0);
+        handleUpdateRow(index, "_id", value?._id ? value._id : "");
+      }}
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" fullWidth />
       )}
@@ -83,34 +91,7 @@ const RestPendingTable = ({ restPendingData, setRestPendingData }) => {
                   />
                 </TableCell>
                 <TableCell sx={{ width: "40%" }}>
-                  {renderAutocompleteCell(
-                    fullNameOptions,
-                    row,
-                    index,
-                    "fullname"
-                  )}
-                </TableCell>
-                <TableCell sx={{ width: "30%" }}>
-                  <Autocomplete
-                    options={mobileNumberOptions}
-                    type="number"
-                    getOptionLabel={(option) => String(option.title) || ""}
-                    value={
-                      mobileNumberOptions.find(
-                        (option) =>
-                          String(option.title) === String(row.mobileNumber)
-                      ) || null
-                    }
-                    onChange={(event, value) =>
-                      handleUpdateRow(index, "mobileNumber", value?.title || "")
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} variant="outlined" size="small" />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      String(option.title) === String(value?.title)
-                    }
-                  />
+                  {renderAutocompleteCell(fieldOptions, row, index, "fullname")}
                 </TableCell>
               </TableRow>
             ))}

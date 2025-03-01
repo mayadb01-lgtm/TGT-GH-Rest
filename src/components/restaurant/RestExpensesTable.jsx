@@ -12,13 +12,9 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import {
-  categories,
-  fullNameOptions,
-  mobileNumberOptions,
-} from "../../utils/utils";
 
 const ExpensesTable = ({
+  fieldOptions,
   restExpensesData,
   setRestExpensesData,
   totalExpenses,
@@ -34,10 +30,7 @@ const ExpensesTable = ({
   extraAmount,
 }) => {
   // Column headers
-  const columns = useMemo(
-    () => ["ID", "Amount", "Name", "Mobile Number", "Category"],
-    []
-  );
+  const columns = useMemo(() => ["ID", "Amount", "Name", "Category"], []);
 
   // Calculation rows
   const calculationRows = useMemo(
@@ -81,6 +74,7 @@ const ExpensesTable = ({
       ...prevData,
       {
         id: prevData.length + 1,
+        _id: "",
         amount: 0,
         fullname: "",
         mobileNumber: 0,
@@ -94,9 +88,17 @@ const ExpensesTable = ({
     (options, rowKey, index, currentValue) => (
       <Autocomplete
         options={options}
-        getOptionLabel={(option) => option.title || ""}
-        value={options.find((option) => option.title === currentValue) || ""}
-        onChange={(e, value) => handleUpdateRow(index, rowKey, value?.title)}
+        getOptionLabel={(option) => option.fullname || ""}
+        value={options.find((option) => option.fullname === currentValue) || ""}
+        onChange={(e, value) => {
+          handleUpdateRow(index, rowKey, value?.fullname);
+          handleUpdateRow(
+            index,
+            "mobileNumber",
+            value?.mobileNumber ? value.mobileNumber : 0
+          );
+          handleUpdateRow(index, "_id", value ? value._id : "");
+        }}
         renderInput={(params) => (
           <TextField {...params} variant="outlined" size="small" />
         )}
@@ -137,42 +139,20 @@ const ExpensesTable = ({
               </TableCell>
               <TableCell sx={{ width: "25%" }}>
                 {renderAutocomplete(
-                  fullNameOptions,
+                  fieldOptions,
                   "fullname",
                   index,
                   row.fullname
                 )}
               </TableCell>
-              <TableCell sx={{ width: "30%" }}>
-                <Autocomplete
-                  options={mobileNumberOptions}
-                  type="number"
-                  getOptionLabel={(option) => String(option.title) || ""}
-                  value={
-                    mobileNumberOptions.find(
-                      (option) =>
-                        String(option.title) === String(row.mobileNumber)
-                    ) || null
-                  }
-                  onChange={(event, value) =>
-                    handleUpdateRow(index, "mobileNumber", value?.title || "")
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} variant="outlined" size="small" />
-                  )}
-                  isOptionEqualToValue={(option, value) =>
-                    String(option.title) === String(value?.title)
-                  }
-                />
-              </TableCell>
-              <TableCell sx={{ width: "30%" }}>
+              {/* <TableCell sx={{ width: "30%" }}>
                 {renderAutocomplete(
                   categories,
                   "category",
                   index,
                   row.category
                 )}
-              </TableCell>
+              </TableCell> */}
             </TableRow>
           ))}
           {/* Calculation Rows */}

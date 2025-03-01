@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import { loadAdmin } from "./redux/actions/adminAction.js";
 import "./App.css";
 import ModernLoader from "./utils/util.jsx";
+import { getRestStaff } from "./redux/actions/restStaffAction";
 
 const EntryPage = lazy(() => import("./pages/EntryPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -32,6 +33,7 @@ const App = () => {
   useLayoutEffect(() => {
     Store.dispatch(loadUser());
     Store.dispatch(loadAdmin());
+    Store.dispatch(getRestStaff());
   }, []);
 
   return (

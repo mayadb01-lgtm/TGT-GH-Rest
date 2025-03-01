@@ -53,42 +53,44 @@ const Home = () => {
 
       {/* Service Cards */}
       {services.map((service, index) => (
-        <Paper
+        <Link
           key={index}
-          elevation={4}
-          sx={{
-            p: 4,
+          to={service.path}
+          style={{
+            textDecoration: "none",
+            color: "inherit",
             width: "90%",
             maxWidth: "600px",
-            borderRadius: 4,
             textAlign: "center",
-            bgcolor: service.bg,
-            transition: "transform 0.3s ease, box-shadow 0.3s ease",
-            "&:hover": {
-              transform: "translateY(-5px)",
-              boxShadow: "0px 10px 30px rgba(0,0,0,0.1)",
-            },
+          }}
+          onClick={() => {
+            toast.promise(new Promise((resolve) => setTimeout(resolve, 500)), {
+              loading: "Redirecting...",
+              success: `Welcome to the ${service.title} page!`,
+              error: `Error accessing the ${service.title} page.`,
+            });
           }}
         >
-          <Link
-            to={service.path}
-            style={{ textDecoration: "none", color: "inherit" }}
-            onClick={() => {
-              toast.promise(
-                new Promise((resolve) => setTimeout(resolve, 500)),
-                {
-                  loading: "Redirecting...",
-                  success: `Welcome to the ${service.title} page!`,
-                  error: `Error accessing the ${service.title} page.`,
-                }
-              );
+          <Paper
+            elevation={4}
+            sx={{
+              p: 4,
+              width: "90%",
+              maxWidth: "600px",
+              borderRadius: 4,
+              bgcolor: service.bg,
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-5px)",
+                boxShadow: "0px 10px 30px rgba(0,0,0,0.1)",
+              },
             }}
           >
             <Typography variant="h4" gutterBottom>
               {service.title}
             </Typography>
-          </Link>
-        </Paper>
+          </Paper>
+        </Link>
       ))}
     </Stack>
   );

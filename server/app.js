@@ -34,11 +34,13 @@ import user from "./controller/user.js";
 import admin from "./controller/admin.js";
 import entry from "./controller/entry.js";
 import restEntry from "./controller/restEntry.js";
+import restStaff from "./controller/restStaff.js";
 
 // Use routes
 app.use("/api/v1/user", user);
 app.use("/api/v1/admin", admin);
 app.use("/api/v1/entry", entry);
 app.use("/api/v1/restEntry", restEntry);
+app.use("/api/v1/restStaff", restStaff);
 
 export default app;

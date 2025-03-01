@@ -11,11 +11,10 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import { fullNameOptions, mobileNumberOptions } from "../../utils/utils";
 
-const tableColumns = ["ID", "Amount", "Name", "Mobile Number"];
+const tableColumns = ["ID", "Amount", "Name"];
 
-const EditableRow = ({ row, index, onUpdateRow }) => {
+const EditableRow = ({ row, index, onUpdateRow, fieldOptions }) => {
   const handleInputChange = (key, value) => {
     onUpdateRow(index, key, value);
   };
@@ -33,53 +32,40 @@ const EditableRow = ({ row, index, onUpdateRow }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "40%" }}>
+      <TableCell sx={{ width: "70%" }}>
         <Autocomplete
-          options={fullNameOptions}
-          getOptionLabel={(option) => option.title}
+          options={fieldOptions}
+          getOptionLabel={(option) => option.fullname || ""}
           value={
-            fullNameOptions.find((option) => option.title === row.fullname) ||
+            fieldOptions.find((option) => option.fullname === row.fullname) ||
             null
           }
-          onChange={(event, value) =>
-            handleInputChange("fullname", value?.title || "")
-          }
+          onChange={(event, value) => {
+            handleInputChange("fullname", value?.fullname || "");
+            handleInputChange("mobileNumber", value?.mobileNumber || "");
+            handleInputChange("_id", value?._id ? value._id : "");
+          }}
           renderInput={(params) => (
             <TextField {...params} variant="outlined" size="small" fullWidth />
           )}
           disableClearable
         />
       </TableCell>
-      <TableCell sx={{ width: "30%" }}>
-        <Autocomplete
-          options={mobileNumberOptions}
-          type="number"
-          getOptionLabel={(option) => String(option.title) || ""}
-          value={
-            mobileNumberOptions.find(
-              (option) => String(option.title) === String(row.mobileNumber)
-            ) || null
-          }
-          onChange={(event, value) =>
-            handleInputChange("mobileNumber", value?.title || "")
-          }
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" size="small" fullWidth />
-          )}
-          isOptionEqualToValue={(option, value) =>
-            String(option.title) === String(value.title)
-          }
-        />
-      </TableCell>
     </TableRow>
   );
 };
 
-const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
+const RestUpadTable = ({ restUpadData, setRestUpadData, fieldOptions }) => {
   const handleAddRow = () => {
     setRestUpadData((prevData) => [
       ...prevData,
-      { id: prevData.length + 1, amount: 0, fullname: "", mobileNumber: 0 },
+      {
+        id: prevData.length + 1,
+        _id: "",
+        amount: 0,
+        fullname: "",
+        mobileNumber: 0,
+      },
     ]);
   };
 
@@ -114,6 +100,7 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, selectedDate }) => {
                 row={row}
                 index={index}
                 onUpdateRow={handleUpdateRow}
+                fieldOptions={fieldOptions}
               />
             ))}
           </TableBody>
