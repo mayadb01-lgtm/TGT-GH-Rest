@@ -15,14 +15,15 @@ export const createRestEntry = (restEntryData) => async (dispatch) => {
       }
     );
     console.log("Rest Entry created successfully", data);
-    dispatch({ type: "CreateRestEntriesSuccess", payload: data.entry });
+    dispatch({ type: "CreateRestEntriesSuccess", payload: data.data });
     toast.success("Rest Entry created successfully");
   } catch (error) {
     dispatch({
       type: "CreateRestEntriesFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error);
   }
 };
 
@@ -38,9 +39,10 @@ export const getRestEntryByDate = (date) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetRestEntriesByDateFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -64,8 +66,9 @@ export const updateRestEntryByDate =
     } catch (error) {
       dispatch({
         type: "UpdateRestEntryFailure",
-        payload: error.response.data.message,
+        payload: error?.response?.data?.message,
       });
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
     }
   };

@@ -20,9 +20,10 @@ export const createAdmin = (adminData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "CreateAdminFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -42,9 +43,10 @@ export const loginAdmin = (adminData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "LoginAdminFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -65,9 +67,10 @@ export const loadAdmin = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "LoadAdminFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -87,9 +90,10 @@ export const logoutAdmin = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "LogoutAdminFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -110,8 +114,9 @@ export const resetAdminPassword = (adminData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "ResetAdminPasswordFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };

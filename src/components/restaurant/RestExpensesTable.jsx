@@ -158,6 +158,13 @@ const ExpensesTable = ({
         </TableHead>
         <TableBody>
           {/* Dynamic Rows */}
+          {restExpensesData.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={5} align="center">
+                No Expense data available
+              </TableCell>
+            </TableRow>
+          )}
           {restExpensesData.map((row, index) => (
             <TableRow key={row.id}>
               <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
@@ -190,6 +197,15 @@ const ExpensesTable = ({
               </TableCell>
             </TableRow>
           ))}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddRow}
+            size="small"
+            sx={{ margin: 2, width: "100%" }}
+          >
+            Add Row
+          </Button>
           {/* Calculation Rows */}
           {calculationRows.map((row, index) => (
             <TableRow key={index}>
@@ -199,7 +215,7 @@ const ExpensesTable = ({
                   variant="outlined"
                   size="small"
                   type="number"
-                  value={row.amount || ""}
+                  value={row.amount || 0}
                   onChange={(e) => {
                     switch (row.label) {
                       case "Total Cash":
@@ -219,16 +235,15 @@ const ExpensesTable = ({
               </TableCell>
             </TableRow>
           ))}
+          {extraAmount < 0 && (
+            <TableRow>
+              <TableCell colSpan={5} align="center" sx={{ color: "red" }}>
+                Extra amount is negative
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAddRow}
-        sx={{ margin: 2 }}
-      >
-        Add Row
-      </Button>
     </TableContainer>
   );
 };

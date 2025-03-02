@@ -36,6 +36,7 @@ const LoginPage = () => {
       setForm({ email: "", password: "" });
     } catch (error) {
       toast.error(error.response.data.message);
+      console.log(error.response.data.message);
     }
   };
 

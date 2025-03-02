@@ -20,9 +20,10 @@ export const createRestStaff = (staffData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "CreateRestStaffFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -38,9 +39,10 @@ export const getRestStaff = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetRestStaffFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -63,9 +65,10 @@ export const updateRestStaff = (id, staffData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "UpdateRestStaffFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -82,8 +85,9 @@ export const removeRestStaff = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "RemoveRestStaffFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };

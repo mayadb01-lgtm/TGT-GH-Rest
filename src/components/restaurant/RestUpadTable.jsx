@@ -108,6 +108,7 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, fieldOptions }) => {
           variant="contained"
           color="primary"
           onClick={handleAddRow}
+          size="small"
           sx={{ m: 2 }}
         >
           Add Row

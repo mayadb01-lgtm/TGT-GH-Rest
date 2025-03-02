@@ -21,11 +21,12 @@ import {
   getRestCategoryName,
   getRestExpenseName,
 } from "../../redux/actions/restCategoryAction";
+import ModernLoader from "../../utils/util";
 dayjs.locale("en-gb");
 
 const RestEntryPage = () => {
   const dispatch = useAppDispatch();
-  const { restEntries } = useAppSelector((state) => state.restEntry);
+  const { loading, restEntries } = useAppSelector((state) => state.restEntry);
   const { restStaff } = useAppSelector((state) => state.restStaff);
   const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
   const today = dayjs().format("DD-MM-YYYY");
@@ -104,24 +105,14 @@ const RestEntryPage = () => {
   }, [restExpensesData]);
 
   useMemo(() => {
-    const total =
-      totalUpad +
-      totalPending +
-      totalExpenses +
-      extraAmount +
-      totalCard +
-      totalPP +
-      totalCash;
+    const total = totalUpad + totalPending + totalExpenses;
     setGrandTotal(total);
-  }, [
-    totalUpad,
-    totalPending,
-    totalExpenses,
-    extraAmount,
-    totalCard,
-    totalPP,
-    totalCash,
-  ]);
+  }, [totalUpad, totalPending, totalExpenses]);
+
+  useMemo(() => {
+    const total = grandTotal - (totalCard + totalPP + totalCash);
+    setExtraAmount(total);
+  }, [grandTotal, totalCard, totalPP, totalCash]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -234,9 +225,9 @@ const RestEntryPage = () => {
       toast.error("Please enter some data before submitting.");
       return;
     }
-
     try {
       dispatch(createRestEntry(restEntryData));
+      setSelectedDate(today);
       resetForm();
     } catch (error) {
       toast.error(
@@ -262,191 +253,198 @@ const RestEntryPage = () => {
     }
   };
 
-  return (
-    <>
-      <Grid
-        container
-        direction="row"
-        display="flex"
-        justifyContent="space-between"
-        alignItems="start"
-        padding={"8px 32px"}
-      >
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4.8, xl: 4.8 }}>
-          {/* Select Date */}
-          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-            <Box style={{ margin: "0", padding: "0" }}>
-              {/* Date Picker */}
-              <Stack
-                direction="row"
-                spacing={1}
-                style={{ margin: "0", padding: "0", alignItems: "center" }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={500}
-                  style={{ margin: "12px" }}
+  if (loading) {
+    return <ModernLoader />;
+  } else {
+    return (
+      <>
+        <Grid
+          container
+          direction="row"
+          display="flex"
+          justifyContent="space-between"
+          alignItems="start"
+          padding={"8px 32px"}
+        >
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4.8, xl: 4.8 }}>
+            {/* Select Date */}
+            <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+              <Box style={{ margin: "0", padding: "0" }}>
+                {/* Date Picker */}
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  style={{ margin: "0", padding: "0", alignItems: "center" }}
                 >
-                  Select Date
-                </Typography>
-                <LocalizationProvider
-                  dateAdapter={AdapterDayjs}
-                  adapterLocale="en-gb"
-                >
-                  <DatePicker
-                    views={["year", "month", "day"]}
-                    value={
-                      selectedDate
-                        ? dayjs(selectedDate, "DD-MM-YYYY")
-                        : dayjs(today, "DD-MM-YYYY")
-                    }
-                    onChange={(newDate) => handleDateChange(newDate)}
-                    slots={{
-                      textField: (params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          size="small"
-                          error={false}
-                          helperText={null}
-                        />
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiInputBase-input": {
-                        padding: 1,
-                      },
-                    }}
-                    disableFuture={isAdminAuthenticated ? false : true}
-                    disablePast={isAdminAuthenticated ? false : true}
-                  />
-                </LocalizationProvider>
-              </Stack>
-            </Box>
-          </Grid>
-          {/* Upad */}
-          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: "18px",
-                  backgroundColor: "#e8e2fd",
-                  padding: "4px 16px",
-                  borderRadius: "4px",
-                  width: "fit-content",
-                }}
-              >
-                Upaad
-              </Typography>
-              <RestUpadTable
-                fieldOptions={fieldOptions}
-                restUpadData={restUpadData}
-                setRestUpadData={setRestUpadData}
-                selectedDate={selectedDate}
-              />
-            </Box>
-          </Grid>
-          {/* Pending */}
-          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: "18px",
-                  backgroundColor: "#e5ffe0",
-                  margin: "16px 0",
-                  padding: "4px 16px",
-                  borderRadius: "4px",
-                  width: "fit-content",
-                }}
-              >
-                Pending
-              </Typography>
-              <RestPendingTable
-                fieldOptions={fieldOptions}
-                restPendingData={restPendingData}
-                setRestPendingData={setRestPendingData}
-                selectedDate={selectedDate}
-              />
-            </Box>
-          </Grid>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
-          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: "18px",
-                  backgroundColor: "#ffe1f2",
-                  padding: "4px 16px",
-                  borderRadius: "4px",
-                  width: "fit-content",
-                }}
-              >
-                Expenses
-              </Typography>
-              <RestExpensesTable
-                restExpensesData={restExpensesData}
-                setRestExpensesData={setRestExpensesData}
-                selectedDate={selectedDate}
-                totalExpenses={totalExpenses}
-                totalUpad={totalUpad}
-                totalPending={totalPending}
-                totalCard={totalCard}
-                setTotalCard={setTotalCard}
-                totalPP={totalPP}
-                setTotalPP={setTotalPP}
-                totalCash={totalCash}
-                setTotalCash={setTotalCash}
-                grandTotal={grandTotal}
-                extraAmount={extraAmount}
-              />
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  marginTop: "16px",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="error"
-                  sx={{ mx: 1, "&:hover": { backgroundColor: "#e57373" } }}
-                  onClick={resetForm}
-                >
-                  Reset
-                </Button>
-                {restEntries && restEntries.grandTotal > 0 ? (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{ mx: 1, "&:hover": { backgroundColor: "secondary" } }}
-                    onClick={handleEditRestEntry}
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={500}
+                    style={{ margin: "12px" }}
                   >
-                    Edit
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ mx: 1, "&:hover": { backgroundColor: "#64b5f6" } }}
-                    onClick={handleCreateRestEntry}
+                    Select Date
+                  </Typography>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    adapterLocale="en-gb"
                   >
-                    Submit
-                  </Button>
-                )}
+                    <DatePicker
+                      views={["year", "month", "day"]}
+                      value={
+                        selectedDate
+                          ? dayjs(selectedDate, "DD-MM-YYYY")
+                          : dayjs(today, "DD-MM-YYYY")
+                      }
+                      onChange={(newDate) => handleDateChange(newDate)}
+                      slots={{
+                        textField: (params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            size="small"
+                            error={false}
+                            helperText={null}
+                          />
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiInputBase-input": {
+                          padding: 1,
+                        },
+                      }}
+                      disableFuture={isAdminAuthenticated ? false : true}
+                      disablePast={isAdminAuthenticated ? false : true}
+                    />
+                  </LocalizationProvider>
+                </Stack>
               </Box>
-            </Box>
+            </Grid>
+            {/* Upad */}
+            <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "18px",
+                    backgroundColor: "#e8e2fd",
+                    padding: "4px 16px",
+                    borderRadius: "4px",
+                    width: "fit-content",
+                  }}
+                >
+                  Upaad
+                </Typography>
+                <RestUpadTable
+                  fieldOptions={fieldOptions}
+                  restUpadData={restUpadData}
+                  setRestUpadData={setRestUpadData}
+                  selectedDate={selectedDate}
+                />
+              </Box>
+            </Grid>
+            {/* Pending */}
+            <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "18px",
+                    backgroundColor: "#e5ffe0",
+                    margin: "16px 0",
+                    padding: "4px 16px",
+                    borderRadius: "4px",
+                    width: "fit-content",
+                  }}
+                >
+                  Pending
+                </Typography>
+                <RestPendingTable
+                  fieldOptions={fieldOptions}
+                  restPendingData={restPendingData}
+                  setRestPendingData={setRestPendingData}
+                  selectedDate={selectedDate}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 12, md: 12, lg: 7, xl: 7 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "18px",
+                    backgroundColor: "#ffe1f2",
+                    padding: "4px 16px",
+                    borderRadius: "4px",
+                    width: "fit-content",
+                  }}
+                >
+                  Expenses
+                </Typography>
+                <RestExpensesTable
+                  restExpensesData={restExpensesData}
+                  setRestExpensesData={setRestExpensesData}
+                  selectedDate={selectedDate}
+                  totalExpenses={totalExpenses}
+                  totalUpad={totalUpad}
+                  totalPending={totalPending}
+                  totalCard={totalCard}
+                  setTotalCard={setTotalCard}
+                  totalPP={totalPP}
+                  setTotalPP={setTotalPP}
+                  totalCash={totalCash}
+                  setTotalCash={setTotalCash}
+                  grandTotal={grandTotal}
+                  extraAmount={extraAmount}
+                />
+                <Box
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    marginTop: "16px",
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="error"
+                    sx={{ mx: 1, "&:hover": { backgroundColor: "#e57373" } }}
+                    onClick={resetForm}
+                  >
+                    Reset
+                  </Button>
+                  {restEntries && restEntries.grandTotal > 0 ? (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      sx={{
+                        mx: 1,
+                        "&:hover": { backgroundColor: "secondary" },
+                      }}
+                      onClick={handleEditRestEntry}
+                    >
+                      Edit
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ mx: 1, "&:hover": { backgroundColor: "#64b5f6" } }}
+                      onClick={handleCreateRestEntry}
+                    >
+                      Submit
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </>
-  );
+      </>
+    );
+  }
 };
 
 export default RestEntryPage;

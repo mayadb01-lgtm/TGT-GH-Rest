@@ -20,9 +20,10 @@ export const createEntry = (entryData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "CreateEntryFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -38,9 +39,10 @@ export const getEntriesByDate = (date) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetEntriesFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -63,9 +65,10 @@ export const updateEntryByDate = (date, entryData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "UpdateEntryFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -81,8 +84,9 @@ export const getUnPaidEntries = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetUnPaidEntriesFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };

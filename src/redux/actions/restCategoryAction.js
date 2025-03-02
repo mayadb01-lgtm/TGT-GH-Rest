@@ -20,9 +20,10 @@ export const createRestCategory = (categoryData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "CreateRestCategoryFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -38,9 +39,10 @@ export const getRestCategory = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetRestCategoryFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -56,9 +58,10 @@ export const getRestCategoryName = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetRestCategoryNameFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -74,9 +77,10 @@ export const getRestExpenseName = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetRestExpenseNameFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -92,8 +96,9 @@ export const getCategoryNameByExpense = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "GetCategoryNameByExpenseFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };

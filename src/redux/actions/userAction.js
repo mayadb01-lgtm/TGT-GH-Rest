@@ -19,9 +19,10 @@ export const createUser = (userData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "RegisterUserFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -45,9 +46,10 @@ export const loginUser = (userData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "LoginUserFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -65,8 +67,12 @@ export const loadUser = () => async (dispatch) => {
     dispatch({ type: "LoadUserSuccess", payload: data.user });
     toast.success("User loaded successfully");
   } catch (error) {
-    dispatch({ type: "LoadUserFailure", payload: error.response.data.message });
-    toast.error(error.response.data.message);
+    dispatch({
+      type: "LoadUserFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -87,9 +93,10 @@ export const logoutUser = () => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "LogoutUserFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };
 
@@ -112,8 +119,9 @@ export const resetPassword = (userData) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: "ResetPasswordFailure",
-      payload: error.response.data.message,
+      payload: error?.response?.data?.message,
     });
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
   }
 };

@@ -75,6 +75,13 @@ const RestPendingTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
+            {restPendingData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  No Pending data available
+                </TableCell>
+              </TableRow>
+            )}
             {restPendingData.map((row, index) => (
               <TableRow key={row.id}>
                 <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
@@ -100,6 +107,7 @@ const RestPendingTable = ({
           variant="contained"
           color="primary"
           onClick={handleAddRow}
+          size="small"
           sx={{ margin: 2 }}
         >
           Add Row

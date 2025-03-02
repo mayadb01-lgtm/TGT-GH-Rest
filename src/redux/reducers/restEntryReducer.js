@@ -13,7 +13,7 @@ const restEntryReducer = createReducer(initialState, (builder) => {
     })
     .addCase("CreateRestEntriesSuccess", (state, action) => {
       state.loading = false;
-      state.entries = [...state.entries, action.payload];
+      state.restEntries = [...state.restEntries, action.payload];
     })
     .addCase("CreateRestEntriesFailure", (state, action) => {
       state.loading = false;
