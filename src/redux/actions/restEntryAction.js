@@ -66,9 +66,11 @@ export const updateRestEntryByDate =
     } catch (error) {
       dispatch({
         type: "UpdateRestEntryFailure",
-        payload: error?.response?.data?.message,
+        payload: error?.response?.data?.message || "An unknown error occurred",
       });
-      toast.error(error?.response?.data?.message);
-      console.log("Error Catch", error?.response?.data?.message);
+
+      toast.error(
+        error?.response?.data?.message || "An unknown error occurred"
+      );
     }
   };

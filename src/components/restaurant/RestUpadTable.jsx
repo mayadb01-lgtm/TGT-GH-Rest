@@ -11,18 +11,28 @@ import {
   Button,
   Paper,
 } from "@mui/material";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
-const tableColumns = ["ID", "Amount", "Name"];
+const tableColumns = ["ID", "Amount", "Name", "Remove"];
 
-const EditableRow = ({ row, index, onUpdateRow, fieldOptions }) => {
+const EditableRow = ({
+  row,
+  index,
+  onUpdateRow,
+  fieldOptions,
+  handleRemoveRow,
+}) => {
   const handleInputChange = (key, value) => {
     onUpdateRow(index, key, value);
   };
 
   return (
-    <TableRow>
-      <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
-      <TableCell sx={{ width: "25%" }}>
+    <TableRow
+      sx={{ bgcolor: row.amount && row.fullname ? "#f5f5f5" : "" }}
+      key={row.id}
+    >
+      <TableCell sx={{ width: "10%" }}>{row.id}</TableCell>
+      <TableCell sx={{ width: "40%" }}>
         <TextField
           variant="outlined"
           type="number"
@@ -32,7 +42,7 @@ const EditableRow = ({ row, index, onUpdateRow, fieldOptions }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "70%" }}>
+      <TableCell sx={{ width: "50%" }}>
         <Autocomplete
           options={fieldOptions}
           getOptionLabel={(option) => option.fullname || ""}
@@ -49,6 +59,11 @@ const EditableRow = ({ row, index, onUpdateRow, fieldOptions }) => {
             <TextField {...params} variant="outlined" size="small" fullWidth />
           )}
         />
+      </TableCell>
+      <TableCell sx={{ width: "5%" }}>
+        <Button size="small" onClick={() => handleRemoveRow(row.id)}>
+          <RemoveCircleOutlineIcon variant="outlined" color="error" />
+        </Button>
       </TableCell>
     </TableRow>
   );
@@ -76,6 +91,14 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, fieldOptions }) => {
 
   const memoizedTableData = useMemo(() => restUpadData, [restUpadData]);
 
+  const handleRemoveRow = (id) => {
+    setRestUpadData((prevData) =>
+      prevData
+        .filter((row) => row.id !== id)
+        .map((row, index) => ({ ...row, id: index + 1 }))
+    );
+  };
+
   return (
     <div>
       <TableContainer
@@ -93,6 +116,13 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, fieldOptions }) => {
             </TableRow>
           </TableHead>
           <TableBody>
+            {memoizedTableData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={tableColumns.length} align="center">
+                  No data found for Upad
+                </TableCell>
+              </TableRow>
+            )}
             {memoizedTableData.map((row, index) => (
               <EditableRow
                 key={row.id}
@@ -100,6 +130,7 @@ const RestUpadTable = ({ restUpadData, setRestUpadData, fieldOptions }) => {
                 index={index}
                 onUpdateRow={handleUpdateRow}
                 fieldOptions={fieldOptions}
+                handleRemoveRow={handleRemoveRow}
               />
             ))}
           </TableBody>

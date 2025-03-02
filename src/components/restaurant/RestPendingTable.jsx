@@ -11,8 +11,9 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import { RemoveCircleOutlineRounded } from "@mui/icons-material";
 
-const TABLE_COLUMNS = ["ID", "Amount", "Name"];
+const TABLE_COLUMNS = ["ID", "Amount", "Name", "Remove"];
 
 const RestPendingTable = ({
   restPendingData,
@@ -37,6 +38,14 @@ const RestPendingTable = ({
       prevData.map((row, i) =>
         i === index ? { ...row, [key]: value || "" } : row
       )
+    );
+  };
+
+  const handleRemoveRow = (id) => {
+    setRestPendingData((prevData) =>
+      prevData
+        .filter((row) => row.id !== id)
+        .map((row, index) => ({ ...row, id: index + 1 }))
     );
   };
 
@@ -83,8 +92,11 @@ const RestPendingTable = ({
               </TableRow>
             )}
             {restPendingData.map((row, index) => (
-              <TableRow key={row.id}>
-                <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
+              <TableRow
+                sx={{ bgcolor: row.amount && row.fullname ? "#f5f5f5" : "" }}
+                key={row.id}
+              >
+                <TableCell sx={{ width: "10%" }}>{row.id}</TableCell>
                 <TableCell sx={{ width: "25%" }}>
                   <TextField
                     variant="outlined"
@@ -98,6 +110,11 @@ const RestPendingTable = ({
                 </TableCell>
                 <TableCell sx={{ width: "40%" }}>
                   {renderAutocompleteCell(fieldOptions, row, index, "fullname")}
+                </TableCell>
+                <TableCell sx={{ width: "5%" }}>
+                  <Button size="small" onClick={() => handleRemoveRow(row.id)}>
+                    <RemoveCircleOutlineRounded color="error" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

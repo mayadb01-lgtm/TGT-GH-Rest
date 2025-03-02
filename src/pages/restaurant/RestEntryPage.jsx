@@ -42,7 +42,7 @@ const RestEntryPage = () => {
     : [];
 
   // Upad
-  const restUpadInitialData = Array.from({ length: 10 }, (_, i) => ({
+  const restUpadInitialData = Array.from({ length: 8 }, (_, i) => ({
     id: i + 1,
     _id: "",
     amount: 0,
@@ -52,7 +52,7 @@ const RestEntryPage = () => {
   }));
   const [restUpadData, setRestUpadData] = useState(restUpadInitialData);
   // Pending
-  const restPendingInitialData = Array.from({ length: 10 }, (_, i) => ({
+  const restPendingInitialData = Array.from({ length: 8 }, (_, i) => ({
     id: i + 1,
     _id: "",
     fullname: "",
@@ -133,6 +133,52 @@ const RestEntryPage = () => {
     }
     if (selectedDate && restEntries && restEntries.grandTotal > 0) {
       resetForm();
+      // setRestUpadData((prev) => {
+      //   return prev.map((row, i) => {
+      //     const upad = restEntries.upad[i];
+      //     return upad
+      //       ? {
+      //           ...row,
+      //           _id: upad._id,
+      //           amount: upad.amount,
+      //           fullname: upad.fullname,
+      //           mobileNumber: upad.mobileNumber,
+      //           createDate: upad.createDate,
+      //         }
+      //       : row;
+      //   });
+      // });
+      // setRestPendingData((prev) => {
+      //   return prev.map((row, i) => {
+      //     const pending = restEntries.pending[i];
+      //     return pending
+      //       ? {
+      //           ...row,
+      //           _id: pending._id,
+      //           amount: pending.amount,
+      //           fullname: pending.fullname,
+      //           mobileNumber: pending.mobileNumber,
+      //           createDate: pending.createDate,
+      //         }
+      //       : row;
+      //   });
+      // });
+      // setRestExpensesData((prev) => {
+      //   return prev.map((row, i) => {
+      //     const expenses = restEntries.expenses[i];
+
+      //     return expenses
+      //       ? {
+      //           ...row,
+      //           _id: expenses._id,
+      //           amount: expenses.amount,
+      //           categoryName: expenses.categoryName,
+      //           expenseName: expenses.expenseName,
+      //           createDate: expenses.createDate,
+      //         }
+      //       : row;
+      //   });
+      // });
       setRestUpadData(restEntries.upad);
       setRestPendingData(restEntries.pending);
       setRestExpensesData(restEntries.expenses);
@@ -221,11 +267,21 @@ const RestEntryPage = () => {
   };
 
   const handleCreateRestEntry = async () => {
-    if (grandTotal === 0) {
-      toast.error("Please enter some data before submitting.");
-      return;
-    }
     try {
+      if (grandTotal === 0) {
+        toast.error("Please enter some data before submitting.");
+        return;
+      }
+      if (extraAmount < 0) {
+        toast.error(
+          "Extra amount cannot be negative, please check the entries."
+        );
+        return;
+      }
+      const confirmSubmit = window.confirm(
+        `Are you sure you want to submit entries for ${selectedDate}?`
+      );
+      if (!confirmSubmit) return;
       dispatch(createRestEntry(restEntryData));
       setSelectedDate(today);
       resetForm();
@@ -238,11 +294,21 @@ const RestEntryPage = () => {
   };
 
   const handleEditRestEntry = async () => {
-    if (grandTotal === 0) {
-      toast.error("Please enter some data before submitting.");
-      return;
-    }
     try {
+      if (grandTotal === 0 && selectedDate === today) {
+        toast.error("Please enter some data before submitting.");
+        return;
+      }
+      if (extraAmount < 0) {
+        toast.error(
+          "Extra amount cannot be negative, please check the entries."
+        );
+        return;
+      }
+      const confirmSubmit = window.confirm(
+        `Are you sure you want to update entries for ${selectedDate}?`
+      );
+      if (!confirmSubmit) return;
       dispatch(updateRestEntryByDate(selectedDate, restEntryData));
       resetForm();
     } catch (error) {

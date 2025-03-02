@@ -38,9 +38,7 @@ const restEntryReducer = createReducer(initialState, (builder) => {
     })
     .addCase("UpdateRestEntrySuccess", (state, action) => {
       state.loading = false;
-      state.restEntries = state.restEntries.map((entry) =>
-        entry._id === action.payload._id ? action.payload : entry
-      );
+      state.restEntries = action.payload;
     })
     .addCase("UpdateRestEntryFailure", (state, action) => {
       state.loading = false;

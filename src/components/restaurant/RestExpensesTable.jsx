@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useAppSelector } from "../../redux/hooks";
 import "dayjs/locale/en-gb";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
 const ExpensesTable = ({
   selectedDate,
@@ -33,7 +34,10 @@ const ExpensesTable = ({
 }) => {
   const { restCategory } = useAppSelector((state) => state.restCategory);
   // Column headers
-  const columns = useMemo(() => ["ID", "Amount", "Name", "Category"], []);
+  const columns = useMemo(
+    () => ["ID", "Amount", "Name", "Category", "Remove"],
+    []
+  );
 
   // Calculation rows
   const calculationRows = useMemo(
@@ -116,6 +120,17 @@ const ExpensesTable = ({
     }))
   );
 
+  const handleRemoveRow = useCallback(
+    (id) => {
+      setRestExpensesData((prevData) =>
+        prevData
+          .filter((row) => row.id !== id)
+          .map((row, index) => ({ ...row, id: index + 1 }))
+      );
+    },
+    [setRestExpensesData]
+  );
+
   // Expense Name
   const renderExpenseAutocomplete = useCallback(
     (options, rowKey, index, currentValue) => (
@@ -166,9 +181,12 @@ const ExpensesTable = ({
             </TableRow>
           )}
           {restExpensesData.map((row, index) => (
-            <TableRow key={row.id}>
+            <TableRow
+              sx={{ bgcolor: row.amount && row.expenseName ? "#f5f5f5" : "" }}
+              key={row.id}
+            >
               <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
-              <TableCell sx={{ width: "15%" }}>
+              <TableCell sx={{ width: "20%" }}>
                 <TextField
                   variant="outlined"
                   size="small"
@@ -187,13 +205,18 @@ const ExpensesTable = ({
                   row.expenseName
                 )}
               </TableCell>
-              <TableCell sx={{ width: "25%" }}>
+              <TableCell sx={{ width: "30%" }}>
                 {renderCategoryAutocomplete(
                   restCategory,
                   "categoryName",
                   index,
                   row.categoryName
                 )}
+              </TableCell>
+              <TableCell sx={{ width: "10%" }}>
+                <Button size="small" onClick={() => handleRemoveRow(row.id)}>
+                  <RemoveCircleOutlineIcon variant="outlined" color="error" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
