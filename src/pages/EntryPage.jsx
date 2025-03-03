@@ -38,9 +38,9 @@ import ModernLoader, { AccordionSection, PaymentSummary } from "../utils/util";
 const PendingJamaGrid = React.lazy(
   () => import("../components/PendingJamaGrid")
 );
-const ReservationTable = React.lazy(
-  () => import("../components/ReservationTable")
-);
+// const ReservationTable = React.lazy(
+//   () => import("../components/ReservationTable")
+// );
 const EntryAccordion = React.lazy(() => import("../components/EntryAccordion"));
 dayjs.locale("en-gb");
 
@@ -66,9 +66,8 @@ const EntryPage = () => {
   const [extraToggle, setExtraToggle] = useState(false);
 
   useEffect(() => {
-    console.log(`Fetching data for selectedDate: ${selectedDate}`);
     const fetchEntries = async () => {
-      await dispatch(getEntriesByDate(selectedDate));
+      dispatch(getEntriesByDate(selectedDate));
     };
     fetchEntries();
   }, [dispatch, selectedDate]);
@@ -647,12 +646,12 @@ const EntryPage = () => {
                 <PendingJamaGrid />
               </AccordionSection>
               {/* Reservations   */}
-              <AccordionSection bgColor="#b4d8ff" title="Reservations Entry">
+              {/* <AccordionSection bgColor="#b4d8ff" title="Reservations Entry">
                 <ReservationTable
                   reservationData={reservationData}
                   setReservationData={setReservationData}
                 />
-              </AccordionSection>
+              </AccordionSection> */}
             </Suspense>
           </Box>
         </Grid>
@@ -692,15 +691,16 @@ const EntryPage = () => {
                   >
                     Edit
                   </Button>
-                ) : null}
-                <Button
-                  onClick={handleEntrySubmit}
-                  variant="contained"
-                  color="success"
-                  sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
-                >
-                  Submit
-                </Button>
+                ) : (
+                  <Button
+                    onClick={handleEntrySubmit}
+                    variant="contained"
+                    color="success"
+                    sx={{ px: 3, "&:hover": { backgroundColor: "#81c784" } }}
+                  >
+                    Submit
+                  </Button>
+                )}
                 <Button
                   onClick={handleCancelClick}
                   variant="contained"
