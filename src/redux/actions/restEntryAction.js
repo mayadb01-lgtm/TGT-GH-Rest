@@ -14,9 +14,9 @@ export const createRestEntry = (restEntryData) => async (dispatch) => {
         },
       }
     );
-    console.log("Rest Entry created successfully", data);
+    console.log("Restaurant Entry created successfully", data);
     dispatch({ type: "CreateRestEntriesSuccess", payload: data.data });
-    toast.success("Rest Entry created successfully");
+    toast.success("Restaurant Entry created successfully");
   } catch (error) {
     dispatch({
       type: "CreateRestEntriesFailure",
@@ -36,6 +36,9 @@ export const getRestEntryByDate = (date) => async (dispatch) => {
     );
     console.log("Rest Entries fetched successfully", data);
     dispatch({ type: "GetRestEntriesByDateSuccess", payload: data.data });
+    if (data.data.grandTotal > 0) {
+      toast.success("Restaurant Entries fetched successfully");
+    }
   } catch (error) {
     dispatch({
       type: "GetRestEntriesByDateFailure",
@@ -60,9 +63,9 @@ export const updateRestEntryByDate =
           },
         }
       );
-      console.log("Rest Entry updated successfully", data);
+      console.log("Restaurant Entry updated successfully", data);
       dispatch({ type: "UpdateRestEntrySuccess", payload: data.data });
-      toast.success("Rest Entry updated successfully");
+      toast.success("Restaurant Entry updated successfully");
     } catch (error) {
       dispatch({
         type: "UpdateRestEntryFailure",

@@ -102,3 +102,49 @@ export const getCategoryNameByExpense = (id) => async (dispatch) => {
     console.log("Error Catch", error?.response?.data?.message);
   }
 };
+
+// Update Category
+export const updateRestCategory = (id, categoryData) => async (dispatch) => {
+  try {
+    dispatch({ type: "UpdateRestCategoryRequest" });
+    const { data } = await axios.put(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restCategory/update-category/${id}`,
+      categoryData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Category updated successfully", data);
+    dispatch({ type: "UpdateRestCategorySuccess", payload: data.data });
+    toast.success("Category updated successfully");
+  } catch (error) {
+    dispatch({
+      type: "UpdateRestCategoryFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};
+
+// Remove Category
+export const removeRestCategory = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: "RemoveRestCategoryRequest" });
+    const { data } = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restCategory/delete-category/${id}`
+    );
+    console.log("Category removed successfully", data);
+    dispatch({ type: "RemoveRestCategorySuccess", payload: data.data });
+    toast.success("Category removed successfully");
+  } catch (error) {
+    dispatch({
+      type: "RemoveRestCategoryFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};

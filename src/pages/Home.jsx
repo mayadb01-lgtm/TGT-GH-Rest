@@ -66,11 +66,18 @@ const Home = () => {
             textAlign: "center",
           }}
           onClick={() => {
-            toast.promise(new Promise((resolve) => setTimeout(resolve, 500)), {
-              loading: "Redirecting...",
-              success: `Welcome to the ${service.title} page!`,
-              error: `Error accessing the ${service.title} page.`,
-            });
+            if (isAdminAuthenticated || isAuthenticated) {
+              toast.promise(
+                new Promise((resolve) => setTimeout(resolve, 500)),
+                {
+                  loading: "Redirecting...",
+                  success: `Welcome to the ${service.title} page!`,
+                  error: `Error accessing the ${service.title} page.`,
+                }
+              );
+            } else {
+              toast.error("Please login to access the services.");
+            }
           }}
         >
           <Paper
