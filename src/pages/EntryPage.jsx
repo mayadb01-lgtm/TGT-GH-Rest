@@ -4,9 +4,9 @@ import {
   Box,
   Stack,
   TextField,
-  // Switch,
-  // FormControlLabel,
-  // FormGroup,
+  Switch,
+  FormControlLabel,
+  FormGroup,
   Button,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -63,16 +63,19 @@ const EntryPage = () => {
   const [selectedDate, setSelectedDate] = useState(today);
   const [pendingJamaRows, setPendingJamaRows] = useState([]);
   const [reservationData, setReservationData] = useState([]);
-  // const [extraToggle, setExtraToggle] = useState(false);
+  const [extraToggle, setExtraToggle] = useState(false);
 
   useEffect(() => {
     console.log(`Fetching data for selectedDate: ${selectedDate}`);
     const fetchEntries = async () => {
       await dispatch(getEntriesByDate(selectedDate));
-      await dispatch(getUnPaidEntries());
     };
     fetchEntries();
   }, [dispatch, selectedDate]);
+
+  useEffect(() => {
+    dispatch(getUnPaidEntries());
+  }, [dispatch]);
 
   let processedEntries = useMemo(() => {
     // Cash
@@ -186,6 +189,14 @@ const EntryPage = () => {
       ? entries.reduce((sum, row) => Number(sum) + Number(row.rate), 0)
       : 0;
 
+  const calculateTotalReservation = (entries) =>
+    entries
+      ? entries.reduce(
+          (sum, row) => Number(sum) + Number(row.advancePayment),
+          0
+        )
+      : 0;
+
   const modeRows = [
     {
       id: "Cash",
@@ -195,7 +206,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.cash.extraDay) +
         calculateTotal(processedEntries.cash.extraNight) +
         calculateTotal(processedEntries.cash.pendingJamaCash) +
-        calculateTotal(processedEntries.cash.reservationCash),
+        calculateTotalReservation(processedEntries.cash.reservation),
     },
     {
       id: "Card",
@@ -205,7 +216,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.card.extraDay) +
         calculateTotal(processedEntries.card.extraNight) +
         calculateTotal(processedEntries.card.pendingJamaCard) +
-        calculateTotal(processedEntries.card.reservationCard),
+        calculateTotalReservation(processedEntries.card.reservation),
     },
     {
       id: "PPS",
@@ -215,7 +226,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.pps.extraDay) +
         calculateTotal(processedEntries.pps.extraNight) +
         calculateTotal(processedEntries.pps.pendingJamaPPS) +
-        calculateTotal(processedEntries.pps.reservationPPS),
+        calculateTotalReservation(processedEntries.pps.reservationPPS),
     },
     {
       id: "PPC",
@@ -225,7 +236,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.ppc.extraDay) +
         calculateTotal(processedEntries.ppc.extraNight) +
         calculateTotal(processedEntries.ppc.pendingJamaPPC) +
-        calculateTotal(processedEntries.ppc.reservationPPC),
+        calculateTotalReservation(processedEntries.ppc.reservationPPC),
     },
     {
       id: "UnPaid",
@@ -234,7 +245,7 @@ const EntryPage = () => {
         calculateTotal(processedEntries.unpaid.night) +
         calculateTotal(processedEntries.unpaid.extraDay) +
         calculateTotal(processedEntries.unpaid.extraNight) +
-        calculateTotal(processedEntries.unpaid.reservationUnPaid),
+        calculateTotalReservation(processedEntries.unpaid.reservationUnPaid),
     },
     { id: "Total", totals: 0 },
   ];
@@ -589,7 +600,7 @@ const EntryPage = () => {
                 onSubmit={setNightData}
                 bgColor="#89D5C9"
               />
-              {/* <FormGroup>
+              <FormGroup>
                 <FormControlLabel
                   control={
                     <Switch
@@ -603,25 +614,25 @@ const EntryPage = () => {
                   }
                   label="Show Extra Entry"
                 />
-              </FormGroup> */}
-              {/* {extraToggle && (
-                <> */}
-              <EntryAccordion
-                title="Extra Day Entries"
-                period="extraDay"
-                roomCosts={roomCosts}
-                onSubmit={setExtraDayData}
-                bgColor="#FAC172"
-              />
-              <EntryAccordion
-                title="Extra Night Entries"
-                period="extraNight"
-                roomCosts={roomCosts}
-                onSubmit={setExtraNightData}
-                bgColor="#89D5C9"
-              />
-              {/* </>
-              )} */}
+              </FormGroup>
+              {extraToggle && (
+                <>
+                  <EntryAccordion
+                    title="Extra Day Entries"
+                    period="extraDay"
+                    roomCosts={roomCosts}
+                    onSubmit={setExtraDayData}
+                    bgColor="#FAC172"
+                  />
+                  <EntryAccordion
+                    title="Extra Night Entries"
+                    period="extraNight"
+                    roomCosts={roomCosts}
+                    onSubmit={setExtraNightData}
+                    bgColor="#89D5C9"
+                  />
+                </>
+              )}
               <AccordionSection bgColor="#ADC865" title="Pending Jama Entries">
                 <PendingJamaTable
                   pendingJamaRows={pendingJamaRows}

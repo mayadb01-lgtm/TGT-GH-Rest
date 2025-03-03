@@ -344,7 +344,7 @@ const ReservationTable = ({ reservationData, setReservationData }) => {
                       fontSize: "12px",
                     }}
                   >
-                    {["Select", "Cash", "Card", "PPS", "PPC"].map(
+                    {["Select", "Cash", "Card", "PPS", "PPC", "UnPaid"].map(
                       (mode, index) => (
                         <MenuItem
                           key={index}
