@@ -93,6 +93,15 @@ const App = () => {
             }
           />
           <Route
+            path="/admin/restaurant/dashboard"
+            element={
+              <ProtectedAdminRoute>
+                <Navbar />
+                <DashboardPage />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
             path="/signup"
             element={
               <>

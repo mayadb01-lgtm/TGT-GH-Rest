@@ -10,8 +10,8 @@ router.post("/create-staff", async (req, res) => {
     const staff = await RestStaff.create({
       fullname: reqBody.fullname,
       mobileNumber: reqBody.mobileNumber,
-      createDate: reqBody.createDate,
-      updatedDateTime: reqBody.updatedDateTime,
+      createDate: new Date().toLocaleDateString(),
+      updatedDateTime: new Date().toString(),
     });
 
     res.status(200).json({
@@ -29,7 +29,10 @@ router.post("/create-staff", async (req, res) => {
 // Get Staff All - ID, fullname, Mobile Number
 router.get("/get-staff-id-name-mobile", async (req, res) => {
   try {
-    const staff = await RestStaff.find({}, { id: 1, fullname: 1, mobileNumber: 1 });
+    const staff = await RestStaff.find(
+      {},
+      { id: 1, fullname: 1, mobileNumber: 1 }
+    );
 
     res.status(200).json({
       success: true,
@@ -43,7 +46,7 @@ router.get("/get-staff-id-name-mobile", async (req, res) => {
   }
 });
 
-// Update Staff
+// Update Staff - id = ObjectId
 router.put("/update-staff/:id", async (req, res) => {
   try {
     const staff = await RestStaff.findByIdAndUpdate(req.params.id, req.body, {

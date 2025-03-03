@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -10,26 +10,50 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { useDemoRouter } from "@toolpad/core/internal";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { getEntriesByDate } from "../redux/actions/entryAction";
 import dayjs from "dayjs";
 import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import RestStaffDashboard from "../components/restaurant/RestStaffDashboard";
+
 dayjs.locale("en-gb");
 
 // Navigation items
 const NAVIGATION = [
-  { kind: "header", title: "Main items" },
+  { kind: "header", title: "Guest House" },
   {
-    kind: "link",
+    segment: "dashboard",
     title: "Dashboard",
     icon: <DashboardIcon />,
-    to: "/dashboard",
   },
-  { kind: "divider" },
-  { kind: "link", title: "Home", to: "/" },
+  {
+    segment: "reports",
+    title: "Reports",
+    icon: <BarChartIcon />,
+    children: [
+      { segment: "sales", title: "Sales" },
+      { segment: "orders", title: "Orders" },
+    ],
+  },
+  { kind: "header", title: "Restaurant" },
+  {
+    segment: "restaurant-reports",
+    title: "Reports",
+    icon: <BarChartIcon />,
+    children: [
+      { segment: "restaurant-sales", title: "Sales" },
+      { segment: "restaurant-orders", title: "Orders" },
+    ],
+  },
+  { segment: "manage-staff", title: "Manage Staff", icon: <DashboardIcon /> },
+  {
+    segment: "categories-expenses",
+    title: "Categories & Expenses",
+    icon: <DashboardIcon />,
+  },
 ];
 
 // Theme setup
@@ -37,34 +61,28 @@ const demoTheme = createTheme({
   cssVariables: {
     colorSchemeSelector: "data-toolpad-color-scheme",
   },
-  colorSchemes: {
-    light: true,
-    // dark: true
-  },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
-    },
-  },
+  colorSchemes: { light: true },
+  breakpoints: { values: { xs: 0, sm: 600, md: 960, lg: 1200, xl: 1536 } },
 });
 
-// Dashboard content component
 const DashboardContent = () => {
-  const { loading, entries } = useAppSelector((state) => state.entry);
   const dispatch = useAppDispatch();
+  const { loading, entries } = useAppSelector((state) => state.entry);
   const [selectedDate, setSelectedDate] = useState(
     dayjs().format("DD-MM-YYYY")
   );
 
-  const handleDateChange = (newDate) => {
-    if (newDate) {
-      setSelectedDate(newDate.format("DD-MM-YYYY"));
-    }
-  };
+  const handleDateChange = useCallback(
+    (newDate) => {
+      if (newDate) {
+        const formattedDate = newDate.format("DD-MM-YYYY");
+        if (formattedDate !== selectedDate) {
+          setSelectedDate(formattedDate);
+        }
+      }
+    },
+    [selectedDate]
+  );
 
   useEffect(() => {
     dispatch(getEntriesByDate(selectedDate));
@@ -73,39 +91,17 @@ const DashboardContent = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     { field: "roomNo", headerName: "Room No", width: 130 },
-    { field: "cost", headerName: "Price", width: 90 },
-    { field: "rate", headerName: "Rate", width: 90 },
-    { field: "noOfPeople", headerName: "People", width: 130 },
-    { field: "type", headerName: "Type", width: 130 },
-    { field: "modeOfPayment", headerName: "Mode of Payment", width: 130 },
-    { field: "checkInTime", headerName: "Check In Time", width: 130 },
-    { field: "checkOutTime", headerName: "Check Out Time", width: 130 },
+    { field: "cost", headerName: "Price", width: 100 },
+    { field: "rate", headerName: "Rate", width: 100 },
+    { field: "noOfPeople", headerName: "People", width: 100 },
+    { field: "type", headerName: "Type", width: 120 },
+    { field: "modeOfPayment", headerName: "Payment Mode", width: 140 },
+    { field: "checkInTime", headerName: "Check In", width: 130 },
+    { field: "checkOutTime", headerName: "Check Out", width: 130 },
     { field: "date", headerName: "Date", width: 130 },
-    { field: "period", headerName: "Period", width: 130 },
-    { field: "createDate", headerName: "Created At", width: 130 },
-    { field: "updateDate", headerName: "Updated At", width: 130 },
+    { field: "period", headerName: "Period", width: 110 },
+    { field: "createDate", headerName: "Created At", width: 140 },
   ];
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          py: 4,
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  const totalsRow = {
-    id: "Total",
-    rate: entries.reduce((acc, curr) => acc + curr.rate, 0),
-    noOfPeople: entries.reduce((acc, curr) => acc + curr.noOfPeople, 0),
-  };
 
   return (
     <Box
@@ -114,102 +110,84 @@ const DashboardContent = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        textAlign: "center",
+        width: "100%",
       }}
     >
-      <Stack direction="row" spacing={1} style={{ alignItems: "center" }}>
+      <Stack direction="row" spacing={1} alignItems="center">
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
           Select Date
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <DatePicker
             value={dayjs(selectedDate, "DD-MM-YYYY")}
-            onChange={(newDate) => handleDateChange(newDate)}
-            slots={{
-              textField: (params) => (
-                <TextField
-                  {...params}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                />
-              ),
-            }}
-            views={["day", "month", "year"]}
+            onChange={handleDateChange}
             format="DD-MM-YYYY"
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                size="small"
+                fullWidth
+              />
+            )}
           />
         </LocalizationProvider>
       </Stack>
-      <DataGrid
-        rows={[...entries, totalsRow].map((entry, index) => ({
-          ...entry,
-        }))}
-        columns={columns}
-        pageSize={5}
-        getRowClassName={(params) =>
-          params.row.id === "Total" ? "total-row" : ""
-        }
-        sx={{
-          "& .total-row": {
-            fontWeight: "bold",
-          },
-        }}
-      />
+      {loading ? (
+        <CircularProgress sx={{ mt: 2 }} />
+      ) : (
+        <DataGrid
+          rows={entries}
+          columns={columns}
+          pageSize={5}
+          sx={{ mt: 2, height: 400 }}
+        />
+      )}
     </Box>
   );
 };
 
-// Placeholder components for other pages
-const ProfilePage = () => <Typography>Profile Page Content</Typography>;
-const HomePage = () => <Typography>Home Page Content</Typography>;
-const LogoutPage = () => <Typography>Logout Page Content</Typography>;
-
-// Main page component
 const DashboardPage = () => {
-  const router = useDemoRouter("/dashboard");
-  const dispatch = useAppDispatch();
+  const [pathname, setPathname] = useState("/dashboard");
   const [currentPage, setCurrentPage] = useState("dashboard");
 
+  const router = useMemo(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => {
+        setPathname(path);
+        setCurrentPage(path.replace("/", "")); // Extract segment from pathname
+      },
+    };
+  }, [pathname]);
+
   useEffect(() => {
-    if (currentPage === "dashboard") {
-      dispatch(getEntriesByDate(dayjs().format("DD-MM-YYYY")));
-    }
-  }, [dispatch, currentPage]);
+    setCurrentPage(pathname.replace("/", "")); // Sync currentPage when pathname changes
+  }, [pathname]);
 
   const renderPageContent = () => {
     switch (currentPage) {
-      case "profile":
-        return <ProfilePage />;
-      case "home":
-        return <HomePage />;
-      case "logout":
-        return <LogoutPage />;
+      case "manage-staff":
+        return <RestStaffDashboard />;
+      case "categories-expenses":
+        return <Typography>Categories Page Content</Typography>;
       default:
         return <DashboardContent />;
     }
   };
 
-  const CustomAppTitle = () => (
-    <Typography variant="h6" color="textPrimary">
-      TGT Admin Dashboard
-    </Typography>
-  );
-
   return (
-    <AppProvider
-      navigation={NAVIGATION.map((item) => ({
-        ...item,
-        onClick: item.to
-          ? () => setCurrentPage(item.to.replace("/", ""))
-          : undefined,
-      }))}
-      router={router}
-      theme={demoTheme}
-    >
+    <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
       <DashboardLayout
+        defaultSidebarCollapsed
         slots={{
-          appTitle: CustomAppTitle,
+          appTitle: () => (
+            <Typography variant="h6">TGT Admin Dashboard</Typography>
+          ),
         }}
+        sidebarExpandedWidth={260}
+        navigation={NAVIGATION}
       >
         {renderPageContent()}
       </DashboardLayout>
