@@ -138,6 +138,32 @@ router.get("/get-entry/:date", async (req, res) => {
   }
 });
 
+// Get Entries by Date Range
+router.get("/get-entries/:startDate/:endDate", async (req, res) => {
+  try {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+
+    const entries = await Entry.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+      // user: req.user._id, // Find the Entry by date and authenticated user's ID
+    });
+
+    res.status(200).json({
+      success: true,
+      data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // Update Entry by Date
 router.put("/update-entry/:date", async (req, res) => {
   try {

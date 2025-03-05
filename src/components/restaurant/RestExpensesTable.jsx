@@ -29,6 +29,8 @@ const ExpensesTable = ({
   setTotalPP,
   totalCash,
   setTotalCash,
+  computerAmount,
+  setComputerAmount,
   grandTotal,
   extraAmount,
 }) => {
@@ -49,6 +51,7 @@ const ExpensesTable = ({
       { label: "Total PP", amount: totalPP },
       { label: "Total Cash", amount: totalCash },
       { label: "Grand Total", amount: grandTotal },
+      { label: "Computer Amount", amount: computerAmount },
       { label: "Extra Amount", amount: extraAmount },
     ],
     [
@@ -59,6 +62,7 @@ const ExpensesTable = ({
       totalPP,
       totalCash,
       grandTotal,
+      computerAmount,
       extraAmount,
     ]
   );
@@ -250,6 +254,9 @@ const ExpensesTable = ({
                       case "Total PP":
                         setTotalPP(Number(e.target.value));
                         break;
+                      case "Computer Amount":
+                        setComputerAmount(Number(e.target.value));
+                        break;
                       default:
                         break;
                     }
@@ -284,6 +291,8 @@ ExpensesTable.propTypes = {
   totalCash: PropTypes.number.isRequired,
   setTotalCash: PropTypes.func.isRequired,
   grandTotal: PropTypes.number.isRequired,
+  computerAmount: PropTypes.number.isRequired,
+  setComputerAmount: PropTypes.func.isRequired,
   extraAmount: PropTypes.number.isRequired,
 };
 

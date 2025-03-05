@@ -13,6 +13,9 @@ import CategoryIcon from "@mui/icons-material/Category";
 import BadgeIcon from "@mui/icons-material/Badge";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HotelIcon from "@mui/icons-material/Hotel";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
+import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -22,6 +25,18 @@ const NAVIGATION = [
     icon: <DashboardIcon />,
   },
   { kind: "header", title: "Guest House" },
+  {
+    segment: "reports",
+    title: "Reports",
+    icon: <BarChartIcon />,
+    children: [
+      {
+        segment: "sales-report",
+        title: "Sales Report",
+        icon: <MonetizationOnOutlinedIcon />,
+      },
+    ],
+  },
   {
     segment: "gh-dashboard",
     title: "GH-Dashboard",
@@ -52,7 +67,7 @@ const demoTheme = createTheme({
 
 const DashboardPage = () => {
   const [pathname, setPathname] = useState("/dashboard");
-  const [currentPage, setCurrentPage] = useState("");
+  const [segments, setSegments] = useState([]);
 
   const router = useMemo(() => {
     return {
@@ -60,21 +75,26 @@ const DashboardPage = () => {
       searchParams: new URLSearchParams(),
       navigate: (path) => {
         setPathname(path);
-        setCurrentPage(path.replace("/", "")); // Extract segment from pathname
+        setSegments(path.replace("/dashboard", "").split("/").filter(Boolean));
       },
     };
   }, [pathname]);
 
   useEffect(() => {
-    setCurrentPage(pathname.replace("/", ""));
+    setSegments(pathname.replace("/dashboard", "").split("/").filter(Boolean));
   }, [pathname]);
 
   const renderPageContent = () => {
-    switch (currentPage) {
-      // Guest house
+    if (segments.length === 0) return <HomeDashboard />;
+
+    switch (segments[0]) {
       case "gh-dashboard":
         return <GHDashboard />;
-      // Restaurant
+      case "reports":
+        if (segments[1] === "sales-report") {
+          return <GHSalesDashboard />;
+        }
+        return <Typography>Reports Overview</Typography>;
       case "res-dashboard":
         return <Typography>Restaurant Dashboard</Typography>;
       case "manage-staff":

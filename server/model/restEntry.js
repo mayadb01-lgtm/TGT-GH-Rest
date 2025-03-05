@@ -53,6 +53,7 @@ const restEntrySchema = new Schema(
     totalPP: { type: Number, default: 0 },
     totalCash: { type: Number, default: 0 },
     grandTotal: { type: Number, default: 0 },
+    computerAmount: { type: Number, default: 0 },
     date: { type: String, required: true },
     createDate: { type: String, required: true },
     updatedDate: { type: String, default: "" },

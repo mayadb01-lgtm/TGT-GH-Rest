@@ -82,6 +82,7 @@ const RestEntryPage = () => {
   const [totalPP, setTotalPP] = useState(0);
   const [totalCash, setTotalCash] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
+  const [computerAmount, setComputerAmount] = useState(0);
   const [extraAmount, setExtraAmount] = useState(0);
   useMemo(() => {
     const total = restUpadData.reduce((acc, row) => {
@@ -105,14 +106,20 @@ const RestEntryPage = () => {
   }, [restExpensesData]);
 
   useMemo(() => {
-    const total = totalUpad + totalPending + totalExpenses;
+    const total =
+      totalUpad +
+      totalPending +
+      totalExpenses +
+      totalCard +
+      totalPP +
+      totalCash;
     setGrandTotal(total);
-  }, [totalUpad, totalPending, totalExpenses]);
+  }, [totalUpad, totalPending, totalExpenses, totalCard, totalPP, totalCash]);
 
   useMemo(() => {
-    const total = grandTotal - (totalCard + totalPP + totalCash);
+    const total = grandTotal - computerAmount;
     setExtraAmount(total);
-  }, [grandTotal, totalCard, totalPP, totalCash]);
+  }, [grandTotal, computerAmount]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -190,6 +197,7 @@ const RestEntryPage = () => {
       setTotalPP(restEntries.totalPP);
       setTotalCash(restEntries.totalCash);
       setGrandTotal(restEntries.grandTotal);
+      setComputerAmount(restEntries.computerAmount);
     }
   }, [selectedDate, restEntries]);
 
@@ -264,6 +272,7 @@ const RestEntryPage = () => {
     setTotalPP(0);
     setTotalCash(0);
     setGrandTotal(0);
+    setComputerAmount(0);
   };
 
   const handleCreateRestEntry = async () => {
@@ -295,7 +304,11 @@ const RestEntryPage = () => {
 
   const handleEditRestEntry = async () => {
     try {
-      if (grandTotal === 0 && selectedDate === today) {
+      if (
+        restEntries.grandTotal === 0 &&
+        grandTotal === 0 &&
+        selectedDate === today
+      ) {
         toast.error("Please enter some data before submitting.");
         return;
       }
@@ -464,6 +477,8 @@ const RestEntryPage = () => {
                   totalCash={totalCash}
                   setTotalCash={setTotalCash}
                   grandTotal={grandTotal}
+                  computerAmount={computerAmount}
+                  setComputerAmount={setComputerAmount}
                   extraAmount={extraAmount}
                 />
                 <Box

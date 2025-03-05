@@ -46,6 +46,26 @@ export const getEntriesByDate = (date) => async (dispatch) => {
   }
 };
 
+// Get Entries by Date Range
+export const getEntriesByDateRange =
+  (startDate, endDate) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetEntriesRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/entry/get-entries/${startDate}/${endDate}`
+      );
+      console.log("Entries fetched successfully", data);
+      dispatch({ type: "GetEntriesSuccess", payload: data.data });
+    } catch (error) {
+      dispatch({
+        type: "GetEntriesFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
+
 // Update Entry by Date
 export const updateEntryByDate = (date, entryData) => async (dispatch) => {
   try {

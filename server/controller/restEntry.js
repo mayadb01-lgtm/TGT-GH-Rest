@@ -23,6 +23,7 @@ router.post("/create-entry", async (req, res) => {
       totalPP: reqBody.totalPP,
       totalCash: reqBody.totalCash,
       grandTotal: reqBody.grandTotal,
+      computerAmount: reqBody.computerAmount,
       date: reqBody.date,
       createDate: reqBody.createDate,
       updatedDateTime: reqBody.updatedDateTime,
