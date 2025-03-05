@@ -14,10 +14,10 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HotelIcon from "@mui/icons-material/Hotel";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
-import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
 import RestSalesDashboard from "../components/restaurant/RestSalesDashboard";
 import RestUpaadEntriesDashboard from "../components/restaurant/RestUpaadEntriesDashboard";
+import PaymentsIcon from "@mui/icons-material/Payments";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -35,7 +35,7 @@ const NAVIGATION = [
       {
         segment: "sales-report",
         title: "Sales Report",
-        icon: <MonetizationOnOutlinedIcon />,
+        icon: <CurrencyRupeeIcon />,
       },
     ],
   },
@@ -53,12 +53,12 @@ const NAVIGATION = [
       {
         segment: "sales-report",
         title: "Sales Report",
-        icon: <MonetizationOnOutlinedIcon />,
+        icon: <CurrencyRupeeIcon />,
       },
       {
         segment: "upaad-report",
         title: "Upaad Report",
-        icon: <MonetizationOnOutlinedIcon />,
+        icon: <PaymentsIcon />,
       },
     ],
   },

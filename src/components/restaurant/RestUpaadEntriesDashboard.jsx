@@ -42,19 +42,10 @@ const RestUpaadEntriesDashboard = () => {
 
   const columns = [
     { field: "id", headerName: "Index", width: 150 },
+    { field: "createDate", headerName: "Date", width: 150 },
     { field: "fullname", headerName: "Staff Name", width: 150 },
     { field: "amount", headerName: "Amount", width: 150 },
   ];
-
-  // const preparedEntries = restEntries
-  //   .map((entry, index) => ({
-  //     id: index + 1,
-  //     fullname: entry.fullname,
-  //     amount: entry.amount,
-  //   }))
-  //   .concat(totalRow);
-
-  // From selectedStaff, filter out the entries
 
   const selectedStaffEntries = restEntries.filter(
     (entry) => entry.fullname === selectedStaff?.fullname
@@ -63,6 +54,7 @@ const RestUpaadEntriesDashboard = () => {
   const preparedEntries = useMemo(() => {
     const totalRow = {
       id: "Total",
+      createDate: "",
       fullname: "Total",
       amount: selectedStaffEntries
         .map((entry) => entry.amount)
@@ -72,6 +64,7 @@ const RestUpaadEntriesDashboard = () => {
       return selectedStaffEntries
         .map((entry, index) => ({
           id: index + 1,
+          createDate: entry.createDate,
           fullname: entry.fullname,
           amount: entry.amount,
         }))
@@ -80,6 +73,7 @@ const RestUpaadEntriesDashboard = () => {
     return restEntries
       .map((entry, index) => ({
         id: index + 1,
+        createDate: entry.createDate,
         fullname: entry.fullname,
         amount: entry.amount,
       }))
