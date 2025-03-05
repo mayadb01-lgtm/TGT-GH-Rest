@@ -111,4 +111,25 @@ router.put("/update-entry/:date", async (req, res) => {
   }
 });
 
+// Get Entries by Date Range
+router.get("/get-entries/:startDate/:endDate", async (req, res) => {
+  try {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const entries = await RestEntry.find({
+      createDate: { $gte: startDate, $lte: endDate },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export default router;

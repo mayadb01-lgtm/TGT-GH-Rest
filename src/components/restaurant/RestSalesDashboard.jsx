@@ -10,14 +10,14 @@ import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { getEntriesByDateRange } from "../../redux/actions/entryAction";
 import dayjs from "dayjs";
+import { getRestEntriesByDateRange } from "../../redux/actions/restEntryAction";
 
 dayjs.locale("en-gb");
 
-const GHSalesDashboard = () => {
+const RestSalesDashboard = () => {
   const dispatch = useAppDispatch();
-  const { loading, entries } = useAppSelector((state) => state.entry);
+  const { loading, restEntries } = useAppSelector((state) => state.restEntry);
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
   const [endDate, setEndDate] = useState(dayjs());
 
@@ -31,7 +31,7 @@ const GHSalesDashboard = () => {
 
   useEffect(() => {
     dispatch(
-      getEntriesByDateRange(
+      getRestEntriesByDateRange(
         startDate.format("DD-MM-YYYY"),
         endDate.format("DD-MM-YYYY")
       )
@@ -47,20 +47,21 @@ const GHSalesDashboard = () => {
   const totalRow = {
     id: "Total",
     date: "Total",
-    total: entries
-      .map((entry) =>
-        entry?.entry.map((item) => item.cost).reduce((a, b) => a + b, 0)
-      )
-      .reduce((a, b) => a + b, 0),
+    total: restEntries.reduce((total, entry) => total + entry.grandTotal, 0),
   };
 
-  const preparedEntries = entries
+  const preparedEntries = restEntries
     .map((entry, index) => ({
       id: index + 1,
-      date: entry.date,
-      total: entry?.entry.map((item) => item.cost).reduce((a, b) => a + b, 0),
+      date: entry.createDate,
+      total: entry.grandTotal,
     }))
     .concat(totalRow);
+
+  //   const setQuickDateRange = (days) => {
+  //     setStartDate(dayjs().subtract(days, "days"));
+  //     setEndDate(dayjs());
+  //   };
 
   return (
     <Box
@@ -79,10 +80,11 @@ const GHSalesDashboard = () => {
         }}
       >
         <Typography variant="h5" fontWeight={600} color="text.primary">
-          Guest House Sales Dashboard
+          Restaurant Sales Dashboard
         </Typography>
       </Box>
       <Stack direction="row" spacing={2} alignItems="center">
+        {/* Header */}
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
           Select Date Range
         </Typography>
@@ -103,6 +105,37 @@ const GHSalesDashboard = () => {
             views={["year", "month", "day"]}
           />
         </LocalizationProvider>
+        {/* Quick Date Range Selection */}
+        {/* <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setQuickDateRange(7)}
+          >
+            Last 7 Days
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setQuickDateRange(30)}
+          >
+            Last 30 Days
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setQuickDateRange(90)}
+          >
+            Last 90 Days
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setQuickDateRange(365)}
+          >
+            Last 12 Months
+          </Button>
+        </Stack> */}
       </Stack>
       {loading ? (
         <CircularProgress sx={{ mt: 2 }} />
@@ -118,4 +151,4 @@ const GHSalesDashboard = () => {
   );
 };
 
-export default GHSalesDashboard;
+export default RestSalesDashboard;

@@ -16,6 +16,7 @@ import HotelIcon from "@mui/icons-material/Hotel";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
+import RestSalesDashboard from "../components/restaurant/RestSalesDashboard";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -26,7 +27,7 @@ const NAVIGATION = [
   },
   { kind: "header", title: "Guest House" },
   {
-    segment: "reports",
+    segment: "gh-reports",
     title: "Reports",
     icon: <BarChartIcon />,
     children: [
@@ -43,6 +44,18 @@ const NAVIGATION = [
     icon: <HotelIcon />,
   },
   { kind: "header", title: "Restaurant" },
+  {
+    segment: "res-reports",
+    title: "Reports",
+    icon: <BarChartIcon />,
+    children: [
+      {
+        segment: "sales-report",
+        title: "Sales Report",
+        icon: <MonetizationOnOutlinedIcon />,
+      },
+    ],
+  },
   {
     segment: "res-dashboard",
     title: "Res-Dashboard",
@@ -90,9 +103,14 @@ const DashboardPage = () => {
     switch (segments[0]) {
       case "gh-dashboard":
         return <GHDashboard />;
-      case "reports":
+      case "gh-reports":
         if (segments[1] === "sales-report") {
           return <GHSalesDashboard />;
+        }
+        return <Typography>Reports Overview</Typography>;
+      case "res-reports":
+        if (segments[1] === "sales-report") {
+          return <RestSalesDashboard />;
         }
         return <Typography>Reports Overview</Typography>;
       case "res-dashboard":
@@ -109,7 +127,7 @@ const DashboardPage = () => {
   return (
     <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
       <DashboardLayout
-        defaultSidebarCollapsed
+        // defaultSidebarCollapsed
         slots={{
           appTitle: () => (
             <Typography variant="h6">TGT Admin Dashboard</Typography>

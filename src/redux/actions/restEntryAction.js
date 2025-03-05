@@ -49,6 +49,29 @@ export const getRestEntryByDate = (date) => async (dispatch) => {
   }
 };
 
+// Get Restaurant Entry by Date Range
+export const getRestEntriesByDateRange =
+  (startDate, endDate) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetRestEntriesByDateRangeRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entries/${startDate}/${endDate}`
+      );
+      console.log("Rest Entries fetched successfully", data);
+      dispatch({
+        type: "GetRestEntriesByDateRangeSuccess",
+        payload: data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "GetRestEntriesByDateRangeFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
+
 // Update Restaurant Entry by Date
 export const updateRestEntryByDate =
   (date, restEntryData) => async (dispatch) => {

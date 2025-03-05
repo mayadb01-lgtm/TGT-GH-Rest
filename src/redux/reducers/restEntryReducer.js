@@ -32,6 +32,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.error = action.payload;
       state.restEntries = [];
     })
+    // Get Entries By Date Range
+    .addCase("GetRestEntriesByDateRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetRestEntriesByDateRangeSuccess", (state, action) => {
+      state.loading = false;
+      state.restEntries = action.payload;
+    })
+    .addCase("GetRestEntriesByDateRangeFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.restEntries = [];
+    })
     // Update Entry
     .addCase("UpdateRestEntryRequest", (state) => {
       state.loading = true;
