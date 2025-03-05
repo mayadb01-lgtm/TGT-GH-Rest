@@ -100,3 +100,22 @@ export const updateRestEntryByDate =
       );
     }
   };
+
+// Get Upad by Date Range
+export const getUpadByDateRange = (startDate, endDate) => async (dispatch) => {
+  try {
+    dispatch({ type: "GetUpadByDateRangeRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-upad-entries/${startDate}/${endDate}`
+    );
+    console.log("Upad fetched successfully", data);
+    dispatch({ type: "GetUpadByDateRangeSuccess", payload: data.data });
+  } catch (error) {
+    dispatch({
+      type: "GetUpadByDateRangeFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};

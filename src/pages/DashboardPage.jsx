@@ -17,6 +17,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
 import RestSalesDashboard from "../components/restaurant/RestSalesDashboard";
+import RestUpaadEntriesDashboard from "../components/restaurant/RestUpaadEntriesDashboard";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -52,6 +53,11 @@ const NAVIGATION = [
       {
         segment: "sales-report",
         title: "Sales Report",
+        icon: <MonetizationOnOutlinedIcon />,
+      },
+      {
+        segment: "upaad-report",
+        title: "Upaad Report",
         icon: <MonetizationOnOutlinedIcon />,
       },
     ],
@@ -111,6 +117,9 @@ const DashboardPage = () => {
       case "res-reports":
         if (segments[1] === "sales-report") {
           return <RestSalesDashboard />;
+        }
+        if (segments[1] === "upaad-report") {
+          return <RestUpaadEntriesDashboard />;
         }
         return <Typography>Reports Overview</Typography>;
       case "res-dashboard":

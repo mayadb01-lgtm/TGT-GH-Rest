@@ -56,6 +56,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
     .addCase("UpdateRestEntryFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    })
+    // Get Upaad Entry By Date Range
+    .addCase("GetUpadByDateRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetUpadByDateRangeSuccess", (state, action) => {
+      state.loading = false;
+      state.restEntries = action.payload;
+    })
+    .addCase("GetUpadByDateRangeFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.restEntries = [];
     });
 });
 
