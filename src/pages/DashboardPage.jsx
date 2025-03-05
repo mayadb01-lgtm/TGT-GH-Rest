@@ -14,10 +14,13 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HotelIcon from "@mui/icons-material/Hotel";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import GHSalesDashboard from "../components/guest-house/GHSalesDashboard";
 import RestSalesDashboard from "../components/restaurant/RestSalesDashboard";
 import RestUpaadEntriesDashboard from "../components/restaurant/RestUpaadEntriesDashboard";
 import PaymentsIcon from "@mui/icons-material/Payments";
+import CreditScoreIcon from "@mui/icons-material/CreditScore";
+import RestExpensesDashboard from "../components/restaurant/RestExpensesDashboard";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -59,6 +62,11 @@ const NAVIGATION = [
         segment: "upaad-report",
         title: "Upaad Report",
         icon: <PaymentsIcon />,
+      },
+      {
+        segment: "expenses-report",
+        title: "Expenses Report",
+        icon: <CreditScoreIcon />,
       },
     ],
   },
@@ -120,6 +128,9 @@ const DashboardPage = () => {
         }
         if (segments[1] === "upaad-report") {
           return <RestUpaadEntriesDashboard />;
+        }
+        if (segments[1] === "expenses-report") {
+          return <RestExpensesDashboard />;
         }
         return <Typography>Reports Overview</Typography>;
       case "res-dashboard":

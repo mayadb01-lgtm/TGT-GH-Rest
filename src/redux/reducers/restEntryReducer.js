@@ -69,6 +69,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.restEntries = [];
+    })
+    // Get Expense Entry By Date
+    .addCase("GetExpensesByDateRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetExpensesByDateRangeSuccess", (state, action) => {
+      state.loading = false;
+      state.restEntries = action.payload;
+    })
+    .addCase("GetExpensesByDateRangeFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.restEntries = [];
     });
 });
 

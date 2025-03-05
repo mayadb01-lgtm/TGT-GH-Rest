@@ -155,4 +155,27 @@ router.get("/get-upad-entries/:startDate/:endDate", async (req, res) => {
   }
 });
 
+// Get Expenses Entries by Date Range
+router.get("/get-expenses-entries/:startDate/:endDate", async (req, res) => {
+  try {
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    const entries = await RestEntry.find({
+      createDate: { $gte: startDate, $lte: endDate },
+    });
+
+    const expensesEntries = entries.flatMap((entry) => entry.expenses);
+
+    res.status(200).json({
+      success: true,
+      data: expensesEntries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export default router;

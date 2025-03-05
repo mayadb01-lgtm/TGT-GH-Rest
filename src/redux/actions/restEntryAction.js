@@ -119,3 +119,23 @@ export const getUpadByDateRange = (startDate, endDate) => async (dispatch) => {
     console.log("Error Catch", error?.response?.data?.message);
   }
 };
+
+// Get Expenses by Date Range
+export const getExpensesByDateRange =
+  (startDate, endDate) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetExpensesByDateRangeRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-expenses-entries/${startDate}/${endDate}`
+      );
+      console.log("Expenses fetched successfully", data);
+      dispatch({ type: "GetExpensesByDateRangeSuccess", payload: data.data });
+    } catch (error) {
+      dispatch({
+        type: "GetExpensesByDateRangeFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
