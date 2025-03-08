@@ -2,6 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   restEntries: [],
+  restPendingNameOptions: [],
   loading: false,
   error: null,
 };
@@ -82,6 +83,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.restEntries = [];
+    })
+    // Pending Entries - Name Options - Get Last 7 Days GH Entries - Users
+    .addCase("GetPendingEntriesLastSevenDaysRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetPendingEntriesLastSevenDaysSuccess", (state, action) => {
+      state.loading = false;
+      state.restPendingNameOptions = action.payload;
+    })
+    .addCase("GetPendingEntriesLastSevenDaysFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.restPendingNameOptions = [];
     });
 });
 

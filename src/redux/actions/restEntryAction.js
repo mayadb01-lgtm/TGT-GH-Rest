@@ -139,3 +139,25 @@ export const getExpensesByDateRange =
       console.log("Error Catch", error?.response?.data?.message);
     }
   };
+
+// Get Name options from GH - Last 7 Days
+export const getRestStaffGHLastSevenDays = () => async (dispatch) => {
+  try {
+    dispatch({ type: "GetPendingEntriesLastSevenDaysRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/aggregation/get-pending-rest`
+    );
+    console.log("GH Name with Staff Options fetched successfully", data);
+    dispatch({
+      type: "GetPendingEntriesLastSevenDaysSuccess",
+      payload: data.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: "GetPendingEntriesLastSevenDaysFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};

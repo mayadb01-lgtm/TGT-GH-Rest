@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import {
   createRestEntry,
   getRestEntryByDate,
+  getRestStaffGHLastSevenDays,
   updateRestEntryByDate,
 } from "../../redux/actions/restEntryAction";
 import { getRestStaff } from "../../redux/actions/restStaffAction";
@@ -132,6 +133,7 @@ const RestEntryPage = () => {
     dispatch(getRestCategory());
     dispatch(getRestCategoryName());
     dispatch(getRestExpenseName());
+    dispatch(getRestStaffGHLastSevenDays());
   }, []);
 
   useEffect(() => {
@@ -439,7 +441,6 @@ const RestEntryPage = () => {
                   Pending
                 </Typography>
                 <RestPendingTable
-                  fieldOptions={fieldOptions}
                   restPendingData={restPendingData}
                   setRestPendingData={setRestPendingData}
                   selectedDate={selectedDate}
