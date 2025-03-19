@@ -41,58 +41,70 @@ const PendingJamaGrid = () => {
     modeOfPayment: "",
   };
 
-  return (
-    <div>
-      <DataGrid
-        rows={[...pendingJamaGridRows, totalRow]}
-        columns={[
-          { field: "id", headerName: "Index", width: 80 },
-          { field: "createDate", headerName: "Created Date", width: 100 },
-          { field: "roomNo", headerName: "Room No", width: 80 },
-          { field: "fullname", headerName: "Full Name", width: 180 },
-          { field: "mobileNumber", headerName: "Mobile No", width: 150 },
-          { field: "rate", headerName: "Rate", width: 80 },
-          { field: "modeOfPayment", headerName: "Mode of Payment", width: 100 },
-          { field: "period", headerName: "Period", width: 100 },
-        ]}
-        rowHeight={35}
-        sx={{
-          fontSize: "12px",
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-columnHeaderTitleContainer": {
-            display: "flex",
-            justifyContent: "center",
-          },
-          "& .MuiDataGrid-columnHeader": {
-            maxHeight: "35px",
-            fontWeight: "bold",
-            border: "0.5px solid #f0f0f0",
-            backgroundColor: "#f1f1f1",
-          },
-          "& .MuiDataGrid-row": {
-            maxHeight: "35px",
-          },
-          "& .MuiDataGrid-cell": {
-            maxHeight: "35px",
-            textAlign: "center",
-            border: "0.5px solid #f0f0f0",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            display: "none",
-          },
-          "& .total-row": {
-            fontWeight: "bold",
-          },
-        }}
-        getRowClassName={(params) =>
-          params.row.id === "Total" ? "total-row" : ""
-        }
-        disableColumnSorting
-      />
-    </div>
-  );
+  if (pendingJamaGridRows.length === 0) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <p>No Pending Jama Entries</p>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <DataGrid
+          rows={[...pendingJamaGridRows, totalRow]}
+          columns={[
+            { field: "id", headerName: "Index", width: 80 },
+            { field: "createDate", headerName: "Created Date", width: 100 },
+            { field: "roomNo", headerName: "Room No", width: 80 },
+            { field: "fullname", headerName: "Full Name", width: 180 },
+            { field: "mobileNumber", headerName: "Mobile No", width: 150 },
+            { field: "rate", headerName: "Rate", width: 80 },
+            {
+              field: "modeOfPayment",
+              headerName: "Mode of Payment",
+              width: 100,
+            },
+            { field: "period", headerName: "Period", width: 100 },
+          ]}
+          rowHeight={35}
+          sx={{
+            fontSize: "12px",
+            "& .MuiDataGrid-root": {
+              border: "none",
+            },
+            "& .MuiDataGrid-columnHeaderTitleContainer": {
+              display: "flex",
+              justifyContent: "center",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              maxHeight: "35px",
+              fontWeight: "bold",
+              border: "0.5px solid #f0f0f0",
+              backgroundColor: "#f1f1f1",
+            },
+            "& .MuiDataGrid-row": {
+              maxHeight: "35px",
+            },
+            "& .MuiDataGrid-cell": {
+              maxHeight: "35px",
+              textAlign: "center",
+              border: "0.5px solid #f0f0f0",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              display: "none",
+            },
+            "& .total-row": {
+              fontWeight: "bold",
+            },
+          }}
+          getRowClassName={(params) =>
+            params.row.id === "Total" ? "total-row" : ""
+          }
+          disableColumnSorting
+        />
+      </div>
+    );
+  }
 };
 
 export default PendingJamaGrid;

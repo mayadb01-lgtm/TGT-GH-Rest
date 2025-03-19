@@ -178,4 +178,68 @@ router.get("/get-expenses-entries/:startDate/:endDate", async (req, res) => {
   }
 });
 
+router.get(
+  "/get-entries-by-payment-method/:startDate/:endDate",
+  async (req, res) => {
+    try {
+      const startDate = req.params.startDate;
+      const endDate = req.params.endDate;
+      const entries = await RestEntry.find(
+        {
+          createDate: { $gte: startDate, $lte: endDate },
+        },
+        {
+          _id: 1,
+          totalCard: 1,
+          totalPP: 1,
+          totalCash: 1,
+          grandTotal: 1,
+          computerAmount: 1,
+          createDate: 1,
+        }
+      );
+
+      // const entriesByPaymentMethod = entries.map((entry) => {
+      //   return {
+      //     Card: entry.totalCard,
+      //     PP: entry.totalPP,
+      //     Cash: entry.totalCash,
+      //     grandTotal: entry.grandTotal,
+      //     computerAmount: entry.computerAmount,
+      //     createDate: entry.createDate,
+      //   };
+      // });
+
+      // const entriesByPaymentMethod = {
+      //   Card: entries.map((entry) => entry.totalCard),
+      //   PP: entries.map((entry) => entry.totalPP),
+      //   Cash: entries.map((entry) => entry.totalCash),
+      //   grandTotal: entries.map((entry) => entry.grandTotal),
+      //   computerAmount: entries.map((entry) => entry.computerAmount),
+      //   createDate: entries.map((entry) => entry.createDate),
+      // };
+
+      const entriesByPaymentMethod = entries.map((entry) => ({
+        Card: entry.totalCard,
+        PP: entry.totalPP,
+        Cash: entry.totalCash,
+        grandTotal: entry.grandTotal,
+        computerAmount: entry.computerAmount,
+        createDate: entry.createDate,
+        _id: entry._id,
+      }));
+
+      res.status(200).json({
+        success: true,
+        data: entriesByPaymentMethod,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+);
+
 export default router;

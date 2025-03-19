@@ -51,8 +51,8 @@ export const initializePendingJamaRows = () => {
     period: "UnPaid",
     createDate: "",
     cost: 0,
-    checkInTime: "",
-    checkOutTime: "",
+    checkInTime: "10:00 AM",
+    checkOutTime: "10:00 AM",
     noOfPeople: 0,
   }));
 };
@@ -120,8 +120,8 @@ export const initializeRows = (period, rowsLength, roomCosts) => {
     modeOfPayment: "",
     fullname: "",
     mobileNumber: 0,
-    checkInTime: "",
-    checkOutTime: "",
+    checkInTime: "10:00 AM",
+    checkOutTime: "10:00 AM",
     period: period,
     createDate: "",
   }));

@@ -96,6 +96,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.restPendingNameOptions = [];
+    })
+    // Get Entries by Payment Method - Date Range
+    .addCase("GetRestEntryByPaymentMethodRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetRestEntryByPaymentMethodSuccess", (state, action) => {
+      state.loading = false;
+      state.restEntries = action.payload;
+    })
+    .addCase("GetRestEntryByPaymentMethodFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.restEntries = [];
     });
 });
 

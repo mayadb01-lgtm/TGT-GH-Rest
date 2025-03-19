@@ -21,6 +21,8 @@ import RestUpaadEntriesDashboard from "../components/restaurant/RestUpaadEntries
 import PaymentsIcon from "@mui/icons-material/Payments";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import RestExpensesDashboard from "../components/restaurant/RestExpensesDashboard";
+import { BookOutlined } from "@mui/icons-material";
+import BankBooksDashboard from "../components/restaurant/RestBankBookEntry";
 dayjs.locale("en-gb");
 
 const NAVIGATION = [
@@ -67,6 +69,11 @@ const NAVIGATION = [
         segment: "expenses-report",
         title: "Expenses Report",
         icon: <CreditScoreIcon />,
+      },
+      {
+        segment: "bank-books",
+        title: "Bank Books",
+        icon: <BookOutlined />,
       },
     ],
   },
@@ -131,6 +138,9 @@ const DashboardPage = () => {
         }
         if (segments[1] === "expenses-report") {
           return <RestExpensesDashboard />;
+        }
+        if (segments[1] === "bank-books") {
+          return <BankBooksDashboard />;
         }
         return <Typography>Reports Overview</Typography>;
       case "res-dashboard":
