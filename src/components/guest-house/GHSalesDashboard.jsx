@@ -47,20 +47,28 @@ const GHSalesDashboard = () => {
   const totalRow = {
     id: "Total",
     date: "Total",
-    total: entries
-      .map((entry) =>
-        entry?.entry.map((item) => item.cost).reduce((a, b) => a + b, 0)
-      )
-      .reduce((a, b) => a + b, 0),
+    total:
+      entries &&
+      entries.length > 0 &&
+      entries
+        ?.map((entry) =>
+          entry?.entry?.map((item) => item.rate).reduce((a, b) => a + b, 0)
+        )
+        .reduce((a, b) => a + b, 0),
   };
 
-  const preparedEntries = entries
-    .map((entry, index) => ({
-      id: index + 1,
-      date: entry.date,
-      total: entry?.entry.map((item) => item.cost).reduce((a, b) => a + b, 0),
-    }))
-    .concat(totalRow);
+  const preparedEntries =
+    entries &&
+    entries.length > 0 &&
+    entries
+      ?.map((entry, index) => ({
+        id: index + 1,
+        date: entry.date,
+        total: entry?.entry
+          ?.map((item) => item.rate)
+          .reduce((a, b) => a + b, 0),
+      }))
+      .concat(totalRow);
 
   return (
     <Box
