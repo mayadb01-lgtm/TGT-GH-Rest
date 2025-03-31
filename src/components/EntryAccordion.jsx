@@ -18,9 +18,10 @@ const EntryAccordion = ({
   roomType,
   onSubmit,
   bgColor,
+  tableData,
 }) => {
   return (
-    <Accordion style={{ boxShadow: "none" }}>
+    <Accordion style={{ boxShadow: "none" }} expanded={true}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         style={{
@@ -54,6 +55,7 @@ const EntryAccordion = ({
             roomCosts={roomCosts}
             roomType={roomType}
             onSubmit={onSubmit}
+            tableData={tableData}
           />
         </Suspense>
       </AccordionDetails>
