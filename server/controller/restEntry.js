@@ -10,11 +10,13 @@ router.post("/create-entry", async (req, res) => {
     const upad = JSON.parse(reqBody.upad);
     const pending = JSON.parse(reqBody.pending);
     const expenses = JSON.parse(reqBody.expenses);
+    const pendingUsers = JSON.parse(reqBody.pendingUsers);
 
     const entry = await RestEntry.create({
       upad,
       pending,
       expenses,
+      pendingUsers,
       extraAmount: reqBody.extraAmount,
       totalUpad: reqBody.totalUpad,
       totalPending: reqBody.totalPending,

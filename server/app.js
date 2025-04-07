@@ -37,6 +37,7 @@ import restEntry from "./controller/restEntry.js";
 import restStaff from "./controller/restStaff.js";
 import restCategory from "./controller/restCategory.js";
 import pendingRestAggregation from "./controller/pendingRestAggregation.js";
+import restPending from "./controller/restPending.js";
 
 // Use routes
 app.use("/api/v1/user", user);
@@ -46,5 +47,6 @@ app.use("/api/v1/restEntry", restEntry);
 app.use("/api/v1/restStaff", restStaff);
 app.use("/api/v1/restCategory", restCategory);
 app.use("/api/v1/aggregation", pendingRestAggregation);
+app.use("/api/v1/restPending", restPending);
 
 export default app;
