@@ -3,12 +3,12 @@ import { Suspense, lazy, useLayoutEffect } from "react";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
-import Store from "./redux/store.js";
 import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
 import { loadAdmin } from "./redux/actions/adminAction.js";
 import "./App.css";
 import ModernLoader from "./utils/util.jsx";
+import { useAppDispatch, useAppSelector } from "./redux/hooks/index.js";
 
 const EntryPage = lazy(() => import("./pages/EntryPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -29,10 +29,13 @@ const RestEntryPage = lazy(
 );
 
 const App = () => {
+  const dispatch = useAppDispatch();
+  const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
+  const { isAuthenticated } = useAppSelector((state) => state.user);
   useLayoutEffect(() => {
-    Store.dispatch(loadUser());
-    Store.dispatch(loadAdmin());
-  }, []);
+    if (isAuthenticated && !isAdminAuthenticated) dispatch(loadUser());
+    if (isAdminAuthenticated && !isAuthenticated) dispatch(loadAdmin());
+  }, [dispatch, isAdminAuthenticated, isAuthenticated]);
 
   return (
     <Router>
