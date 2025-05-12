@@ -52,8 +52,6 @@ const EntryAccordion = ({
             period={period}
             title={`${title} Table`}
             rowsLength={11}
-            roomCosts={roomCosts}
-            roomType={roomType}
             onSubmit={onSubmit}
             tableData={tableData}
           />
