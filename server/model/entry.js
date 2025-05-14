@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { Schema, model } from "mongoose";
 
 const entrySchemaObj = new Schema(
@@ -56,7 +57,13 @@ const entrySchema = new Schema({
   entry: [entrySchemaObj],
   date: { type: String, required: true },
   createdAt: { type: Date, default: Date.now() },
+  entryCreateDate: { type: Date },
   // user: { type: Schema.Types.ObjectId, ref: "User" },
+});
+
+entrySchema.pre("save", function (next) {
+  this.entryCreateDate = dayjs().startOf("day").toDate(); // Sets time to 00:00:00
+  next();
 });
 
 export default model("Entry", entrySchema);
