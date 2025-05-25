@@ -7,6 +7,7 @@ const officeBookSchema = new Schema(
   {
     id: { type: String, required: true },
     amount: { type: Number, required: true },
+    modeOfPayment: { type: String, required: true },
     fullname: { type: String, required: true },
     category: { type: String, required: true },
     remark: { type: String, required: true },

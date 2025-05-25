@@ -8,11 +8,22 @@ import {
   TableBody,
   TextField,
   Button,
+  Autocomplete,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useMemo } from "react";
+import { MODE_OF_PAYMENT_OPTIONS } from "../../utils/utils";
+import dayjs from "dayjs";
 
-const tableColumns = ["ID", "Amount", "Name", "Category", "Remark", "Remove"];
+const tableColumns = [
+  "ID",
+  "Amount",
+  "Mode",
+  "Name",
+  "Category",
+  "Remark",
+  "Remove",
+];
 
 const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
   const handleInputChange = (key, value) => {
@@ -22,11 +33,15 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
   return (
     <TableRow
       sx={{
-        bgcolor: row.amount && row.fullname && row.category ? "#f5f5f5" : "",
+        bgcolor:
+          row.amount && row.fullname && row.category && row.modeOfPayment
+            ? "#f5f5f5"
+            : "",
+        width: "100%",
       }}
       key={row.id}
     >
-      <TableCell sx={{ width: "5%" }}>{row.id}</TableCell>
+      <TableCell>{row.id}</TableCell>
       <TableCell sx={{ width: "15%" }}>
         <TextField
           variant="outlined"
@@ -37,7 +52,18 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "30%" }}>
+      <TableCell sx={{ width: "20%" }}>
+        <Autocomplete
+          options={MODE_OF_PAYMENT_OPTIONS}
+          getOptionLabel={(option) => option || ""}
+          value={row.modeOfPayment || ""}
+          onChange={(_, value) => handleInputChange("modeOfPayment", value)}
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" size="small" fullWidth />
+          )}
+        />
+      </TableCell>
+      <TableCell sx={{ width: "25%" }}>
         <TextField
           variant="outlined"
           size="small"
@@ -46,7 +72,7 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "20%" }}>
+      <TableCell sx={{ width: "15%" }}>
         <TextField
           variant="outlined"
           size="small"
@@ -55,7 +81,7 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "30%" }}>
+      <TableCell sx={{ width: "25%" }}>
         <TextField
           variant="outlined"
           size="small"
@@ -80,9 +106,11 @@ const OfficeBookTable = ({ officeData, setOfficeData }) => {
       {
         id: prevData.length + 1,
         amount: 0,
+        modeOfPayment: "",
         fullname: "",
         remark: "",
         category: "",
+        createDate: dayjs().format("DD-MM-YYYY"),
       },
     ]);
   };
@@ -102,6 +130,7 @@ const OfficeBookTable = ({ officeData, setOfficeData }) => {
         .map((row, index) => ({ ...row, id: index + 1 }))
     );
   };
+
   return (
     <div>
       <TableContainer

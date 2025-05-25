@@ -27,10 +27,12 @@ const OfficeEntryPage = () => {
     Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       amount: 0,
+      modeOfPayment: "",
       fullname: "",
       category: "",
       remark: "",
       createDate: date,
+      entryCreateDate: dayjs(date).startOf("day").toDate(),
     }));
   const [officeInData, setOfficeInData] = useState(() =>
     makeInitialRows(today)
@@ -76,23 +78,45 @@ const OfficeEntryPage = () => {
     setOfficeOutData(rows);
   };
 
-  const processOfficeData = (data) => {
-    return data.filter((row) => row.amount > 0 && row.fullname && row.category);
-  };
+  const isRowValid = (row) =>
+    row.amount > 0 &&
+    row.fullname?.trim() &&
+    row.category?.trim() &&
+    row.modeOfPayment?.trim();
+
+  const isFormValid = useMemo(() => {
+    const inValid = officeInData.filter(
+      (row) => row.amount > 0 && !isRowValid(row)
+    );
+    const outValid = officeOutData.filter(
+      (row) => row.amount > 0 && !isRowValid(row)
+    );
+    return inValid.length === 0 && outValid.length === 0;
+  }, [officeInData, officeOutData]);
+
+  const processOfficeData = (data) => data.filter((row) => isRowValid(row));
 
   const officeBookData = useMemo(() => {
     const processedOfficeIn = processOfficeData(officeInData);
     const processedOfficeOut = processOfficeData(officeOutData);
+    const isEmpty =
+      processedOfficeIn.length === 0 && processedOfficeOut.length === 0;
+    if (isEmpty) return null;
     return {
       officeIn: JSON.stringify(processedOfficeIn),
       officeOut: JSON.stringify(processedOfficeOut),
       createDate: selectedDate,
+      entryCreateDate: dayjs(selectedDate).startOf("day").toDate(),
     };
   }, [officeInData, officeOutData, selectedDate]);
 
   // Submit Entry
   const handleOfficeSubmit = async () => {
     try {
+      if (!isFormValid) {
+        toast.error("Please fill in all the required fields.");
+        return;
+      }
       const confirmSubmit = window.confirm(
         `Are you sure you want to submit office book for ${selectedDate}?`
       );
@@ -102,8 +126,9 @@ const OfficeEntryPage = () => {
       resetForm();
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "An error occurred while creating the entry."
+        error?.response?.data?.message ??
+          error?.message ??
+          "An unknown error occurred."
       );
     }
   };
@@ -111,6 +136,10 @@ const OfficeEntryPage = () => {
   // Update Entry
   const handleUpdateOfficeSubmit = async () => {
     try {
+      if (!isFormValid) {
+        toast.error("Please fill in all the required fields.");
+        return;
+      }
       const confirmSubmit = window.confirm(
         `Are you sure you want to update office book for ${selectedDate}?`
       );
@@ -120,8 +149,9 @@ const OfficeEntryPage = () => {
       resetForm();
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "An error occurred while updating the entry."
+        error?.response?.data?.message ??
+          error?.message ??
+          "An unknown error occurred."
       );
     }
   };
@@ -138,8 +168,9 @@ const OfficeEntryPage = () => {
       resetForm();
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "An error occurred while deleting the entry."
+        error?.response?.data?.message ??
+          error?.message ??
+          "An unknown error occurred."
       );
     }
   };
@@ -147,7 +178,6 @@ const OfficeEntryPage = () => {
   if (loading) {
     return <ModernLoader />;
   } else {
-    console.log("Office Book", officeBook);
     return (
       <>
         <Grid
@@ -210,8 +240,8 @@ const OfficeEntryPage = () => {
                         padding: 1,
                       },
                     }}
-                    disableFuture={isAdminAuthenticated ? false : true}
-                    disablePast={isAdminAuthenticated ? false : true}
+                    disableFuture={!isAdminAuthenticated}
+                    disablePast={!isAdminAuthenticated}
                   />
                 </LocalizationProvider>
               </Stack>

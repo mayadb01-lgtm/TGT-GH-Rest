@@ -12,7 +12,10 @@ router.post("/create-entry", async (req, res) => {
     const officeOut = JSON.parse(reqBody.officeOut);
 
     const validateEntries = (entries) =>
-      entries.every((item) => item.amount && item.fullname && item.category);
+      entries.every(
+        (item) =>
+          item.amount && item.fullname && item.category && item.modeOfPayment
+      );
 
     if (officeIn && !validateEntries(officeIn)) {
       return res.status(400).json({
@@ -32,6 +35,7 @@ router.post("/create-entry", async (req, res) => {
       officeIn,
       officeOut,
       createDate: reqBody.createDate,
+      modeOfPayment: reqBody.modeOfPayment,
     });
 
     res.status(200).json({
@@ -83,7 +87,7 @@ router.put("/update-entry/:date", async (req, res) => {
     const officeOut = JSON.parse(reqBody.officeOut);
 
     const validateEntries = (entries) =>
-      entries.every((item) => item.amount && item.fullname && item.category);
+      entries.every((item) => item.amount && item.fullname && item.category && item.modeOfPayment);
 
     if (officeIn && !validateEntries(officeIn)) {
       return res.status(400).json({
@@ -104,6 +108,7 @@ router.put("/update-entry/:date", async (req, res) => {
       {
         officeIn,
         officeOut,
+        modeOfPayment: reqBody.modeOfPayment,
       },
       { new: true }
     );
