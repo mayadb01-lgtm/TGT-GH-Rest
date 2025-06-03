@@ -103,8 +103,8 @@ export const processEntries = (data, period, selectedDate, currentDateTime) => {
     .filter(
       (row) =>
         row.rate !== 0 &&
-        // row.noOfPeople !== 0 &&
-        // row.type !== "" &&
+        row.noOfPeople !== 0 &&
+        row.type !== "" &&
         row.modeOfPayment !== ""
     )
     .map((row) => ({
@@ -122,8 +122,8 @@ export const processUpdateEntries = (data, period, selectedDate) => {
     .filter(
       (row) =>
         row.rate !== 0 &&
-        // row.noOfPeople !== 0 &&
-        // row.type !== "" &&
+        row.noOfPeople !== 0 &&
+        row.type !== "" &&
         row.modeOfPayment !== ""
     )
     .map((row) => ({
@@ -131,13 +131,14 @@ export const processUpdateEntries = (data, period, selectedDate) => {
       period,
       date: selectedDate,
       updatedDateTime: currentDateTime,
+      createDate: row.createDate,
     }))
     .sort((a, b) => a.roomNo - b.roomNo);
 };
 
 // Table Component
 
-export const initializeRows = (period, rowsLength) => {
+export const initializeRows = (period, rowsLength, selectedDate) => {
   return Array.from({ length: rowsLength }, (_, i) => ({
     id: `${period} - ${i + 1}`,
     roomNo: roomNumber[i + 1] || 0,
@@ -152,7 +153,7 @@ export const initializeRows = (period, rowsLength) => {
     checkInTime: "10:00 AM",
     checkOutTime: "10:00 AM",
     period: period,
-    createDate: "",
+    createDate: selectedDate || "",
   }));
 };
 

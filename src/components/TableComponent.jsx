@@ -21,22 +21,18 @@ import {
 } from "@mui/material";
 import "./TableComponent.css";
 
-const TableComponent = ({
-  period,
-  rowsLength,
-  onSubmit,
-}) => {
+const TableComponent = ({ period, rowsLength, onSubmit, selectedDate }) => {
   const { entries } = useAppSelector((state) => state.entry);
 
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     if (entries && entries.length === 0) {
-      setRows(initializeRows(period, rowsLength));
+      setRows(initializeRows(period, rowsLength, selectedDate));
     }
     if (entries && entries.length > 0) {
       // Reset rows to initial state before updating
-      let initialRows = initializeRows(period, rowsLength);
+      let initialRows = initializeRows(period, rowsLength, selectedDate);
 
       const dayEntries = entries.filter((entry) => entry?.period === "day");
       const nightEntries = entries.filter((entry) => entry?.period === "night");

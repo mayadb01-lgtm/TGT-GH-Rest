@@ -612,6 +612,7 @@ const EntryPage = () => {
                 roomType={roomType}
                 onSubmit={setDayData}
                 bgColor="#FAC172"
+                selectedDate={selectedDate}
               />
               <EntryAccordion
                 title="Night Entries"
@@ -620,6 +621,7 @@ const EntryPage = () => {
                 roomType={roomType}
                 onSubmit={setNightData}
                 bgColor="#89D5C9"
+                selectedDate={selectedDate}
               />
               <FormGroup>
                 <FormControlLabel
@@ -645,6 +647,7 @@ const EntryPage = () => {
                     roomType={roomType}
                     onSubmit={setExtraDayData}
                     bgColor="#FAC172"
+                    selectedDate={selectedDate}
                   />
                   <EntryAccordion
                     title="Extra Night Entries"
@@ -653,6 +656,7 @@ const EntryPage = () => {
                     roomType={roomType}
                     onSubmit={setExtraNightData}
                     bgColor="#89D5C9"
+                    selectedDate={selectedDate}
                   />
                 </>
               )}
