@@ -112,3 +112,98 @@ export const getOfficeBookByDateRange =
       console.log("Error Catch", error?.response?.data?.message);
     }
   };
+
+// OfficeCategory Action
+
+// Create Office Category
+export const createOfficeCategory =
+  (officeCategoryData) => async (dispatch) => {
+    try {
+      dispatch({ type: "CreateOfficeCategoryRequest" });
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/create-category`,
+        officeCategoryData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Office Category created successfully", data);
+      dispatch({ type: "CreateOfficeCategorySuccess", payload: data.data });
+      toast.success("Office Category created successfully");
+    } catch (error) {
+      dispatch({
+        type: "CreateOfficeCategoryFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
+
+// Get Office All Categories
+export const getOfficeAllCategories = () => async (dispatch) => {
+  try {
+    dispatch({ type: "GetOfficeAllCategoriesRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-categories`
+    );
+    console.log("Office All Categories fetched successfully", data);
+    dispatch({ type: "GetOfficeAllCategoriesSuccess", payload: data.data });
+  } catch (error) {
+    dispatch({
+      type: "GetOfficeAllCategoriesFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};
+
+// Update Office Category
+export const updateOfficeCategory =
+  (id, officeCategoryData) => async (dispatch) => {
+    try {
+      dispatch({ type: "UpdateOfficeCategoryRequest" });
+      const { data } = await axios.put(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/update-category/${id}`,
+        officeCategoryData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Office Category updated successfully", data);
+      dispatch({ type: "UpdateOfficeCategorySuccess", payload: data.data });
+      toast.success("Office Category updated successfully");
+    } catch (error) {
+      dispatch({
+        type: "UpdateOfficeCategoryFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
+
+// Delete Office Category
+export const deleteOfficeCategory = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: "DeleteOfficeCategoryRequest" });
+    const { data } = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/delete-category/${id}`
+    );
+    console.log("Office Category deleted successfully", data);
+    dispatch({ type: "DeleteOfficeCategorySuccess", payload: data.data });
+    toast.success("Office Category deleted successfully");
+  } catch (error) {
+    dispatch({
+      type: "DeleteOfficeCategoryFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};

@@ -29,6 +29,7 @@ import RestStaffDashboard from "../components/restaurant/RestStaffDashboard";
 import RestCategoryExpensesDashboard from "../components/restaurant/RestCategoryExpensesDashboard";
 import RestPendingUsersDashboard from "../components/restaurant/RestPendingUsersDashboard";
 import OfficeBookDashboard from "../components/office/OfficeBookDashboard";
+import OfficeCategoryDashboard from "../components/office/OfficeCategoryDashboard";
 
 const DashboardHeader = ({ onNavigate }) => {
   const navigate = useNavigate();
@@ -131,6 +132,11 @@ const NAVIGATION = [
   { segment: "pending-users", title: "Pending Users", icon: <BadgeIcon /> },
   { kind: "header", title: "Office Book" },
   { segment: "office-book", title: "Office Book", icon: <BadgeIcon /> },
+  {
+    segment: "office-category",
+    title: "Office Category",
+    icon: <CategoryIcon />,
+  },
 ];
 
 // Theme setup
@@ -185,6 +191,7 @@ const DashboardPage = () => {
     { path: "categories-expenses", element: <RestCategoryExpensesDashboard /> },
     { path: "pending-users", element: <RestPendingUsersDashboard /> },
     { path: "office-book", element: <OfficeBookDashboard /> },
+    { path: "office-category", element: <OfficeCategoryDashboard /> },
     { path: "*", element: <Typography>404: Page Not Found</Typography> },
   ]);
 

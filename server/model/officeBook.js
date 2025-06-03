@@ -55,4 +55,17 @@ officeBookSchema.pre("save", function (next) {
   next();
 });
 
+// Office Category Schema
+const officeCategorySchema = new Schema(
+  {
+    categoryName: { type: String, required: true },
+    categoryDescription: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now() },
+    updatedAt: { type: Date, default: Date.now() },
+  },
+  { timestamps: true }
+);
+
+export const OfficeCategory = model("OfficeCategory", officeCategorySchema);
+
 export default model("OfficeBook", officeEntrySchema);

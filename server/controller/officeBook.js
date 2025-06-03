@@ -1,6 +1,6 @@
 import { Router } from "express";
 import dayjs from "dayjs";
-import OfficeBook from "../model/officeBook.js";
+import OfficeBook, { OfficeCategory } from "../model/officeBook.js";
 const router = Router();
 
 // Create a new Entry
@@ -87,7 +87,10 @@ router.put("/update-entry/:date", async (req, res) => {
     const officeOut = JSON.parse(reqBody.officeOut);
 
     const validateEntries = (entries) =>
-      entries.every((item) => item.amount && item.fullname && item.category && item.modeOfPayment);
+      entries.every(
+        (item) =>
+          item.amount && item.fullname && item.category && item.modeOfPayment
+      );
 
     if (officeIn && !validateEntries(officeIn)) {
       return res.status(400).json({
@@ -159,6 +162,103 @@ router.get("/get-entries/:startDate/:endDate", async (req, res) => {
     res.status(200).json({
       success: true,
       data: entries,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// OfficeCategory Controller
+
+// Create a new Category
+router.post("/create-category", async (req, res) => {
+  try {
+    const reqBody = req.body;
+
+    // Check if category name already exists
+    const existingCategory = await OfficeCategory.findOne({
+      categoryName: reqBody.categoryName,
+    });
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "Category name already exists",
+      });
+    }
+
+    const category = await OfficeCategory.create({
+      categoryName: reqBody.categoryName,
+      categoryDescription: reqBody.categoryDescription,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Get All Categories
+router.get("/get-categories", async (req, res) => {
+  try {
+    const categories = await OfficeCategory.find();
+
+    res.status(200).json({
+      success: true,
+      data: categories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Update Category
+router.put("/update-category/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const reqBody = req.body;
+
+    const category = await OfficeCategory.findByIdAndUpdate(
+      categoryId,
+      {
+        categoryName: reqBody.categoryName,
+        categoryDescription: reqBody.categoryDescription,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// Delete a Category
+router.delete("/delete-category/:id", async (req, res) => {
+  try {
+    const categoryId = req.params.id;
+    const category = await OfficeCategory.findByIdAndDelete(categoryId);
+
+    res.status(200).json({
+      success: true,
+      data: category,
     });
   } catch (error) {
     res.status(500).json({

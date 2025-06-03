@@ -10,6 +10,7 @@ import OfficeBookTable from "../../components/office/OfficeBookTable";
 import {
   createOfficeBook,
   deleteOfficeBookByDate,
+  getOfficeAllCategories,
   getOfficeBookByDate,
   updateOfficeBookByDate,
 } from "../../redux/actions/officeBookAction";
@@ -19,7 +20,9 @@ dayjs.locale("en-gb");
 
 const OfficeEntryPage = () => {
   const dispatch = useAppDispatch();
-  const { loading, officeBook } = useAppSelector((state) => state.officeBook);
+  const { loading, officeBook, officeCategory } = useAppSelector(
+    (state) => state.officeBook
+  );
   const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
   const today = dayjs().format("DD-MM-YYYY");
 
@@ -42,25 +45,48 @@ const OfficeEntryPage = () => {
   );
   const [selectedDate, setSelectedDate] = useState(today);
 
+  // Fetch office bookings by date
   useEffect(() => {
     if (selectedDate) {
       dispatch(getOfficeBookByDate(selectedDate));
     }
   }, [dispatch, selectedDate]);
 
+  // Fetch all office categories on mount
+  useEffect(() => {
+    dispatch(getOfficeAllCategories());
+  }, [dispatch]);
+
+  // Memoized category options
+  const categoryOptions = useMemo(() => {
+    return officeCategory?.map(({ categoryName }) => ({ categoryName })) || [];
+  }, [officeCategory]);
+
+  // Disable Edit when In and Out - Amount Total is 0
+  const isEditDisabled = useMemo(() => {
+    const totalIn = officeInData.reduce((total, row) => total + row.amount, 0);
+    const totalOut = officeOutData.reduce(
+      (total, row) => total + row.amount,
+      0
+    );
+    return totalIn === 0 && totalOut === 0;
+  }, [officeInData, officeOutData]);
+
+  // Handle office booking data
   useEffect(() => {
     if (!officeBook) return;
 
-    if (
-      (!officeBook.officeIn || officeBook.officeIn.length === 0) &&
-      (!officeBook.officeOut || officeBook.officeOut.length === 0)
-    ) {
+    const isEmptyIn = !officeBook.officeIn?.length;
+    const isEmptyOut = !officeBook.officeOut?.length;
+
+    if (isEmptyIn && isEmptyOut) {
       resetForm();
       return;
     }
+
     resetForm();
-    if (officeBook.officeIn) setOfficeInData(officeBook.officeIn);
-    if (officeBook.officeOut) setOfficeOutData(officeBook.officeOut);
+    if (!isEmptyIn) setOfficeInData(officeBook.officeIn);
+    if (!isEmptyOut) setOfficeOutData(officeBook.officeOut);
   }, [officeBook, selectedDate]);
 
   const handleDateChange = (newDate) => {
@@ -73,16 +99,18 @@ const OfficeEntryPage = () => {
   };
 
   const resetForm = () => {
-    const rows = makeInitialRows(selectedDate); // Use current selected date
+    const rows = makeInitialRows(selectedDate);
     setOfficeInData(rows);
     setOfficeOutData(rows);
   };
-
-  const isRowValid = (row) =>
-    row.amount > 0 &&
-    row.fullname?.trim() &&
-    row.category?.trim() &&
-    row.modeOfPayment?.trim();
+  const isRowValid = (row) => {
+    return (
+      row.amount > 0 &&
+      row.fullname?.trim() &&
+      row.category?.trim() &&
+      row.modeOfPayment?.trim()
+    );
+  };
 
   const isFormValid = useMemo(() => {
     const inValid = officeInData.filter(
@@ -144,7 +172,9 @@ const OfficeEntryPage = () => {
         `Are you sure you want to update office book for ${selectedDate}?`
       );
       if (!confirmSubmit) return;
-      dispatch(updateOfficeBookByDate(selectedDate, officeBookData));
+
+      await dispatch(updateOfficeBookByDate(selectedDate, officeBookData));
+      await dispatch(getOfficeBookByDate(today));
       setSelectedDate(today);
       resetForm();
     } catch (error) {
@@ -163,7 +193,8 @@ const OfficeEntryPage = () => {
         `Are you sure you want to delete office book for ${selectedDate}?`
       );
       if (!confirmSubmit) return;
-      dispatch(deleteOfficeBookByDate(selectedDate));
+      await dispatch(deleteOfficeBookByDate(selectedDate));
+      await dispatch(getOfficeBookByDate(today));
       setSelectedDate(today);
       resetForm();
     } catch (error) {
@@ -203,13 +234,6 @@ const OfficeEntryPage = () => {
                   style={{ margin: 0 }}
                 >
                   Office Book Entry
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={500}
-                  style={{ margin: "12px" }}
-                >
-                  Select Date
                 </Typography>
                 <LocalizationProvider
                   dateAdapter={AdapterDayjs}
@@ -265,6 +289,7 @@ const OfficeEntryPage = () => {
                   Office In
                 </Typography>
                 <OfficeBookTable
+                  categoryOptions={categoryOptions}
                   officeData={officeInData}
                   setOfficeData={setOfficeInData}
                 />
@@ -289,6 +314,7 @@ const OfficeEntryPage = () => {
                   Office Out
                 </Typography>
                 <OfficeBookTable
+                  categoryOptions={categoryOptions}
                   officeData={officeOutData}
                   setOfficeData={setOfficeOutData}
                 />
@@ -319,8 +345,10 @@ const OfficeEntryPage = () => {
                     sx={{
                       mx: 1,
                       "&:hover": { backgroundColor: "secondary" },
+                      "&:disabled": { backgroundColor: "secondary" },
                     }}
                     onClick={handleUpdateOfficeSubmit}
+                    disabled={isEditDisabled ? true : false}
                   >
                     Edit
                   </Button>

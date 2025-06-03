@@ -25,7 +25,13 @@ const tableColumns = [
   "Remove",
 ];
 
-const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
+const EditableRow = ({
+  row,
+  index,
+  onUpdateRow,
+  handleRemoveRow,
+  categoryOptions,
+}) => {
   const handleInputChange = (key, value) => {
     onUpdateRow(index, key, value);
   };
@@ -52,7 +58,7 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "20%" }}>
+      <TableCell sx={{ width: "15%" }}>
         <Autocomplete
           options={MODE_OF_PAYMENT_OPTIONS}
           getOptionLabel={(option) => option || ""}
@@ -73,12 +79,20 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
         />
       </TableCell>
       <TableCell sx={{ width: "15%" }}>
-        <TextField
-          variant="outlined"
-          size="small"
-          value={row.category || ""}
-          onChange={(e) => handleInputChange("category", e.target.value)}
-          fullWidth
+        <Autocomplete
+          options={categoryOptions}
+          getOptionLabel={(option) => option.categoryName || ""}
+          value={
+            categoryOptions.find(
+              (option) => option.categoryName === row.category
+            ) || null
+          }
+          onChange={(_, value) =>
+            handleInputChange("category", value?.categoryName || "")
+          }
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" size="small" fullWidth />
+          )}
         />
       </TableCell>
       <TableCell sx={{ width: "25%" }}>
@@ -99,7 +113,7 @@ const EditableRow = ({ row, index, onUpdateRow, handleRemoveRow }) => {
   );
 };
 
-const OfficeBookTable = ({ officeData, setOfficeData }) => {
+const OfficeBookTable = ({ officeData, setOfficeData, categoryOptions }) => {
   const handleAddRow = () => {
     setOfficeData((prevData) => [
       ...prevData,
@@ -162,6 +176,7 @@ const OfficeBookTable = ({ officeData, setOfficeData }) => {
                 index={index}
                 onUpdateRow={handleUpdateRow}
                 handleRemoveRow={handleRemoveRow}
+                categoryOptions={categoryOptions}
               />
             ))}
           </TableBody>
