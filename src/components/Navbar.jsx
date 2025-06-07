@@ -20,8 +20,11 @@ import { ThemeSwitcher } from "@toolpad/core";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isAuthenticated } = useAppSelector((state) => state.user);
-  const { isAdminAuthenticated } = useAppSelector((state) => state.admin);
+  const { isAdminAuthenticated, admin } = useAppSelector(
+    (state) => state.admin
+  );
+  const { isAuthenticated, user } = useAppSelector((state) => state.user);
+  const isSuperUserOrAdmin = admin?.isSuperAdmin || user?.isSuperUser || false;
   const dispatch = useAppDispatch();
   const location = useLocation();
 
@@ -37,7 +40,7 @@ const Navbar = () => {
   const navLinks =
     isAuthenticated || isAdminAuthenticated ? (
       <>
-        {isAdminAuthenticated && (
+        {isAdminAuthenticated && isSuperUserOrAdmin && (
           <Button color="inherit" component={Link} to="/dashboard">
             Dashboard
           </Button>

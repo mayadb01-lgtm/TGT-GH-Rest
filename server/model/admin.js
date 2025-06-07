@@ -86,6 +86,10 @@ const adminSchema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  isSuperAdmin: {
+    type: Boolean,
+    default: false,
+  },
   resetPasswordToken: String,
   resetPasswordTime: Date,
 });
