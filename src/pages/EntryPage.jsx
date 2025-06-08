@@ -573,6 +573,7 @@ const EntryPage = () => {
                   adapterLocale="en-gb"
                 >
                   <DatePicker
+                    disabled={!isAdminAuthenticated}
                     views={["year", "month", "day"]}
                     value={
                       selectedDate
