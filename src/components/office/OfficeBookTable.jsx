@@ -20,7 +20,7 @@ const tableColumns = [
   "ID",
   "Amount",
   "Mode",
-  "Expense",
+  "Sub Category",
   "Category",
   "Name",
   "Remark",
@@ -62,6 +62,7 @@ const EditableRow = ({
     <Autocomplete
       options={options}
       getOptionLabel={(option) => option.expenseName || ""}
+      groupBy={(option) => option.categoryName || ""}
       value={options.find((opt) => opt.expenseName === currentValue) || null}
       onChange={(_, value) => {
         handleInputChange(rowKey, value?.expenseName);
