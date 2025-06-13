@@ -350,6 +350,7 @@ const OfficeEntryPage = () => {
                   <OfficeBookTable
                     officeData={officeInData}
                     setOfficeData={setOfficeInData}
+                    isOfficeIn
                   />
                 </Box>
               </Grid>
@@ -373,6 +374,7 @@ const OfficeEntryPage = () => {
                   <OfficeBookTable
                     officeData={officeOutData}
                     setOfficeData={setOfficeOutData}
+                    isOfficeOut
                   />
                 </Box>
               </Grid>

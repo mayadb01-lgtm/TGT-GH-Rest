@@ -20,9 +20,9 @@ const tableColumns = [
   "ID",
   "Amount",
   "Mode",
-  "Name",
   "Expense",
   "Category",
+  "Name",
   "Remark",
   "Remove",
 ];
@@ -33,12 +33,23 @@ const EditableRow = ({
   onUpdateRow,
   handleRemoveRow,
   categoryOptions,
+  officeCategoryOptions,
+  isOfficeIn,
+  isOfficeOut,
 }) => {
   const handleInputChange = (key, value) => {
     onUpdateRow(index, key, value);
   };
 
-  const flattenedExpenses = categoryOptions.flatMap((category) =>
+  if ((isOfficeIn && isOfficeOut) || (!isOfficeIn && !isOfficeOut)) {
+    return null;
+  }
+
+  // Select correct data source
+  const sourceOptions = isOfficeIn ? officeCategoryOptions : categoryOptions;
+
+  // Flattened expenses for autocomplete
+  const flattenedExpenses = sourceOptions.flatMap((category) =>
     category.expense.map((exp) => ({
       _id: exp._id,
       expenseName: exp.expenseName,
@@ -46,15 +57,30 @@ const EditableRow = ({
     }))
   );
 
-  // Category Name
-  const renderCategoryAutocomplete = (options, rowKey, index, currentValue) => (
+  // Render Expense Autocomplete
+  const renderExpenseAutocomplete = (options, rowKey, currentValue) => (
+    <Autocomplete
+      options={options}
+      getOptionLabel={(option) => option.expenseName || ""}
+      value={options.find((opt) => opt.expenseName === currentValue) || null}
+      onChange={(_, value) => {
+        handleInputChange(rowKey, value?.expenseName);
+        handleInputChange("_id", value ? value._id : "");
+        handleInputChange("categoryName", value ? value.categoryName : "");
+      }}
+      renderInput={(params) => (
+        <TextField {...params} variant="outlined" size="small" />
+      )}
+    />
+  );
+
+  // Render Category Autocomplete (disabled)
+  const renderCategoryAutocomplete = (options, rowKey, currentValue) => (
     <Autocomplete
       disabled
       options={options}
       getOptionLabel={(option) => option.categoryName || ""}
-      value={
-        options.find((option) => option.categoryName === currentValue) || ""
-      }
+      value={options.find((opt) => opt.categoryName === currentValue) || null}
       onChange={(e, value) => {
         handleInputChange(rowKey, value?.categoryName);
         handleInputChange("_id", value ? value._id : "");
@@ -65,28 +91,9 @@ const EditableRow = ({
     />
   );
 
-  // Expense Name
-  const renderExpenseAutocomplete = (options, rowKey, index, currentValue) => (
-    <Autocomplete
-      options={options}
-      groupBy={(option) => option.categoryName}
-      getOptionLabel={(option) => option.expenseName || ""}
-      value={
-        options.find((option) => option.expenseName === currentValue) || ""
-      }
-      onChange={(_, value) => {
-        handleInputChange(rowKey, value?.expenseName);
-        handleInputChange("_id", value ? value._id : "");
-        handleInputChange("categoryName", value ? value.categoryName : "");
-      }}
-      renderInput={(params) => (
-        <TextField {...params} variant="outlined" size="small" fullWidth />
-      )}
-    />
-  );
-
   return (
     <TableRow
+      key={row.id}
       sx={{
         bgcolor:
           row.amount && row.fullname && row.category && row.modeOfPayment
@@ -94,9 +101,9 @@ const EditableRow = ({
             : "",
         width: "100%",
       }}
-      key={row.id}
     >
       <TableCell>{row.id}</TableCell>
+
       <TableCell sx={{ width: "15%" }}>
         <TextField
           variant="outlined"
@@ -107,6 +114,7 @@ const EditableRow = ({
           fullWidth
         />
       </TableCell>
+
       <TableCell sx={{ width: "15%" }}>
         <Autocomplete
           options={MODE_OF_PAYMENT_OPTIONS}
@@ -118,6 +126,23 @@ const EditableRow = ({
           )}
         />
       </TableCell>
+
+      <TableCell sx={{ width: "15%" }}>
+        {renderExpenseAutocomplete(
+          flattenedExpenses,
+          "expenseName",
+          row.expenseName
+        )}
+      </TableCell>
+
+      <TableCell sx={{ width: "15%" }}>
+        {renderCategoryAutocomplete(
+          sourceOptions.map((cat) => ({ categoryName: cat.categoryName })),
+          "categoryName",
+          row.categoryName
+        )}
+      </TableCell>
+
       <TableCell sx={{ width: "25%" }}>
         <TextField
           variant="outlined"
@@ -127,22 +152,7 @@ const EditableRow = ({
           fullWidth
         />
       </TableCell>
-      <TableCell sx={{ width: "15%" }}>
-        {renderExpenseAutocomplete(
-          flattenedExpenses,
-          "expenseName",
-          index,
-          row.expenseName
-        )}
-      </TableCell>
-      <TableCell sx={{ width: "15%" }}>
-        {renderCategoryAutocomplete(
-          categoryOptions,
-          "categoryName",
-          index,
-          row.categoryName
-        )}
-      </TableCell>
+
       <TableCell sx={{ width: "25%" }}>
         <TextField
           variant="outlined"
@@ -152,17 +162,24 @@ const EditableRow = ({
           fullWidth
         />
       </TableCell>
+
       <TableCell>
         <Button size="small" onClick={() => handleRemoveRow(row.id)}>
-          <RemoveCircleOutlineIcon variant="outlined" color="error" />
+          <RemoveCircleOutlineIcon color="error" />
         </Button>
       </TableCell>
     </TableRow>
   );
 };
 
-const OfficeBookTable = ({ officeData, setOfficeData }) => {
+const OfficeBookTable = ({
+  officeData,
+  setOfficeData,
+  isOfficeIn,
+  isOfficeOut,
+}) => {
   const { restCategory } = useAppSelector((state) => state.restCategory);
+  const { officeCategory } = useAppSelector((state) => state.officeBook);
 
   const handleAddRow = () => {
     setOfficeData((prevData) => [
@@ -227,6 +244,9 @@ const OfficeBookTable = ({ officeData, setOfficeData }) => {
                 onUpdateRow={handleUpdateRow}
                 handleRemoveRow={handleRemoveRow}
                 categoryOptions={restCategory}
+                officeCategoryOptions={officeCategory}
+                isOfficeIn={isOfficeIn}
+                isOfficeOut={isOfficeOut}
               />
             ))}
           </TableBody>

@@ -172,13 +172,11 @@ router.get("/get-entries/:startDate/:endDate", async (req, res) => {
 });
 
 // OfficeCategory Controller
-
 // Create a new Category
 router.post("/create-category", async (req, res) => {
   try {
     const reqBody = req.body;
 
-    // Check if category name already exists
     const existingCategory = await OfficeCategory.findOne({
       categoryName: reqBody.categoryName,
     });
@@ -192,6 +190,7 @@ router.post("/create-category", async (req, res) => {
     const category = await OfficeCategory.create({
       categoryName: reqBody.categoryName,
       categoryDescription: reqBody.categoryDescription,
+      expense: reqBody.expense,
     });
 
     res.status(200).json({
@@ -206,34 +205,80 @@ router.post("/create-category", async (req, res) => {
   }
 });
 
-// Get All Categories
+// Get all Categories
 router.get("/get-categories", async (req, res) => {
   try {
     const categories = await OfficeCategory.find();
-
     res.status(200).json({
       success: true,
       data: categories,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get category names only
+router.get("/get-category-name", async (req, res) => {
+  try {
+    const categories = await OfficeCategory.find({}, { categoryName: 1 });
+    res.status(200).json({
+      success: true,
+      data: categories,
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get All Expenses - Flattened
+router.get("/get-expenses", async (req, res) => {
+  try {
+    const categories = await OfficeCategory.find({}, { expense: 1 });
+
+    const allExpenses = categories.flatMap((category) =>
+      category.expense.map((exp) => ({
+        _id: exp._id,
+        expenseName: exp.expenseName,
+      }))
+    );
+
+    res.status(200).json({
+      success: true,
+      data: allExpenses,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get a category name by expense ID
+router.get("/get-category-name/:id", async (req, res) => {
+  try {
+    const category = await OfficeCategory.findOne({
+      "expense._id": req.params.id,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: category?.categoryName || "",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 // Update Category
 router.put("/update-category/:id", async (req, res) => {
   try {
-    const categoryId = req.params.id;
     const reqBody = req.body;
 
     const category = await OfficeCategory.findByIdAndUpdate(
-      categoryId,
+      req.params.id,
       {
         categoryName: reqBody.categoryName,
         categoryDescription: reqBody.categoryDescription,
+        expense: reqBody.expense,
       },
       { new: true }
     );
@@ -243,28 +288,20 @@ router.put("/update-category/:id", async (req, res) => {
       data: category,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// Delete a Category
+// Delete Category
 router.delete("/delete-category/:id", async (req, res) => {
   try {
-    const categoryId = req.params.id;
-    const category = await OfficeCategory.findByIdAndDelete(categoryId);
-
+    const category = await OfficeCategory.findByIdAndDelete(req.params.id);
     res.status(200).json({
       success: true,
       data: category,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
