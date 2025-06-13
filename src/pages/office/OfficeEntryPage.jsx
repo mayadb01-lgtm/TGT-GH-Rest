@@ -10,6 +10,7 @@ import OfficeBookTable from "../../components/office/OfficeBookTable";
 import {
   createOfficeBook,
   deleteOfficeBookByDate,
+  getOfficeAllCategories,
   getOfficeBookByDate,
   updateOfficeBookByDate,
 } from "../../redux/actions/officeBookAction";
@@ -52,6 +53,7 @@ const OfficeEntryPage = () => {
   // Fetch all office categories on mount
   useEffect(() => {
     dispatch(getRestCategory());
+    dispatch(getOfficeAllCategories());
   }, [dispatch]);
 
   // Disable Edit when In and Out - Amount Total is 0
