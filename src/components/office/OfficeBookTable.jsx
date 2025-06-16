@@ -16,17 +16,6 @@ import { MODE_OF_PAYMENT_OPTIONS } from "../../utils/utils";
 import dayjs from "dayjs";
 import { useAppSelector } from "../../redux/hooks";
 
-const tableColumns = [
-  "ID",
-  "Amount",
-  "Mode",
-  "Sub Category",
-  "Category",
-  "Name",
-  "Remark",
-  "Remove",
-];
-
 const EditableRow = ({
   row,
   index,
@@ -181,6 +170,19 @@ const OfficeBookTable = ({
 }) => {
   const { restCategory } = useAppSelector((state) => state.restCategory);
   const { officeCategory } = useAppSelector((state) => state.officeBook);
+
+  const tableColumns = isOfficeIn
+    ? ["ID", "Amount", "Mode", "Income", "Category", "Name", "Remark", "Remove"]
+    : [
+        "ID",
+        "Amount",
+        "Mode",
+        "Expense",
+        "Category",
+        "Name",
+        "Remark",
+        "Remove",
+      ];
 
   const handleAddRow = () => {
     setOfficeData((prevData) => [
