@@ -31,7 +31,7 @@ const CategoryAccordion = ({ key, category, onEdit, onDelete }) => (
       boxShadow: 2,
       overflow: "hidden",
       backgroundColor: "#f9f9f9",
-      margin: "10px",
+      margin: "2px",
       "&:before": { display: "none" },
     }}
   >
@@ -45,7 +45,7 @@ const CategoryAccordion = ({ key, category, onEdit, onDelete }) => (
         "&:hover": { backgroundColor: "#f0f0f0" },
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: "bold", flexGrow: 1 }}>
+      <Typography sx={{ fontWeight: "bold", flexGrow: 1 }}>
         {category.categoryName}
       </Typography>
       <Box>

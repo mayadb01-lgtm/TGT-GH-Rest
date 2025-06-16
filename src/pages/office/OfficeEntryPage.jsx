@@ -29,11 +29,11 @@ const OfficeEntryPage = () => {
       id: i + 1,
       amount: 0,
       modeOfPayment: "",
+      categoryName: "",
+      expenseName: "",
       fullname: "",
-      category: "",
       remark: "",
       createDate: date,
-      entryCreateDate: dayjs(date).startOf("day").toDate(),
     }));
   const [officeInData, setOfficeInData] = useState(() =>
     makeInitialRows(today)
@@ -97,11 +97,12 @@ const OfficeEntryPage = () => {
     setOfficeInData(rows);
     setOfficeOutData(rows);
   };
+
   const isRowValid = (row) => {
     return (
       row.amount > 0 &&
-      row.fullname?.trim() &&
-      row.category?.trim() &&
+      row.categoryName?.trim() &&
+      row.expenseName?.trim() &&
       row.modeOfPayment?.trim()
     );
   };
@@ -128,7 +129,6 @@ const OfficeEntryPage = () => {
       officeIn: JSON.stringify(processedOfficeIn),
       officeOut: JSON.stringify(processedOfficeOut),
       createDate: selectedDate,
-      entryCreateDate: dayjs(selectedDate).startOf("day").toDate(),
     };
   }, [officeInData, officeOutData, selectedDate]);
 

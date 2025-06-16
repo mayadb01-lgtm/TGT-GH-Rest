@@ -14,7 +14,11 @@ router.post("/create-entry", async (req, res) => {
     const validateEntries = (entries) =>
       entries.every(
         (item) =>
-          item.amount && item.fullname && item.category && item.modeOfPayment
+          item.amount &&
+          item.fullname &&
+          item.categoryName &&
+          item.expenseName &&
+          item.modeOfPayment
       );
 
     if (officeIn && !validateEntries(officeIn)) {
@@ -89,7 +93,11 @@ router.put("/update-entry/:date", async (req, res) => {
     const validateEntries = (entries) =>
       entries.every(
         (item) =>
-          item.amount && item.fullname && item.category && item.modeOfPayment
+          item.amount &&
+          item.fullname &&
+          item.categoryName &&
+          item.expenseName &&
+          item.modeOfPayment
       );
 
     if (officeIn && !validateEntries(officeIn)) {

@@ -191,7 +191,8 @@ const OfficeBookTable = ({
         modeOfPayment: "",
         fullname: "",
         remark: "",
-        category: "",
+        categoryName: "",
+        expenseName: "",
         createDate: dayjs().format("DD-MM-YYYY"),
       },
     ]);
