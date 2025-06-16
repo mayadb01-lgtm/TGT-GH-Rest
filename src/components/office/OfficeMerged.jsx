@@ -4,11 +4,9 @@ import {
   Typography,
   CircularProgress,
   Stack,
-  TextField,
   FormControlLabel,
   Switch,
   Button,
-  Checkbox,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -357,6 +355,43 @@ const OfficeMerged = () => {
     showPPSDetails,
   ]);
 
+  const switchConfigs = [
+    {
+      label: "Detailed Cash Info",
+      checked: showCashDetails,
+      onChange: () => setShowCashDetails((prev) => !prev),
+    },
+    {
+      label: "Detailed Card Info",
+      checked: showCardDetails,
+      onChange: () => setShowCardDetails((prev) => !prev),
+    },
+    {
+      label: "Detailed PP Info",
+      checked: showPPDetails,
+      onChange: () => setShowPPDetails((prev) => !prev),
+    },
+    {
+      label: "Detailed PPC Info",
+      checked: showPPCDetails,
+      onChange: () => setShowPPCDetails((prev) => !prev),
+    },
+    {
+      label: "Detailed PPS Info",
+      checked: showPPSDetails,
+      onChange: () => setShowPPSDetails((prev) => !prev),
+    },
+  ];
+
+  const totalsConfig = [
+    { label: "Cash", key: "cash", color: "#2196f3" },
+    { label: "Card", key: "card", color: "#4caf50" },
+    { label: "PP", key: "pp", color: "#ff9800" },
+    { label: "PPC", key: "ppc", color: "#9c27b0" },
+    { label: "PPS", key: "pps", color: "#f44336" },
+    { label: "Total", key: "total", color: "#999999" },
+  ];
+
   // Get all unique dates from all sources
   const uniqueDates = useMemo(() => {
     const ghDates = entries?.map((entry) => formatDate(entry.date)) || [];
@@ -370,9 +405,6 @@ const OfficeMerged = () => {
         dayjs(a, "DD-MM-YYYY").isAfter(dayjs(b, "DD-MM-YYYY")) ? 1 : -1
     );
   }, [entries, restEntries, officeBook]);
-
-  console.log("uniqueDates", uniqueDates);
-
   const preparedRows = useMemo(() => {
     return uniqueDates.map((dateStr, idx) => {
       // TODO:CASH
@@ -415,7 +447,7 @@ const OfficeMerged = () => {
       const officeCashOut =
         officeBook
           ?.filter((entry) => formatDate(entry.createDate) === dateStr)
-          ?.flatMap((entry) => entry.officeOut || [])
+          ?.flatMap((entry) => entry?.officeOut ?? [])
           ?.reduce(
             (sum, item) =>
               sum + (item.modeOfPayment === "Cash" ? item.amount : 0),
@@ -454,7 +486,7 @@ const OfficeMerged = () => {
       const OfficeCardOut =
         officeBook
           ?.filter((entry) => formatDate(entry.createDate) === dateStr)
-          ?.flatMap((entry) => entry.officeOut || [])
+          ?.flatMap((entry) => entry?.officeOut ?? [])
           ?.reduce(
             (sum, item) =>
               sum + (item.modeOfPayment === "Card" ? item.amount : 0),
@@ -482,7 +514,7 @@ const OfficeMerged = () => {
       const OfficePPOut =
         officeBook
           ?.filter((entry) => formatDate(entry.createDate) === dateStr)
-          ?.flatMap((entry) => entry.officeOut || [])
+          ?.flatMap((entry) => entry?.officeOut ?? [])
           ?.reduce(
             (sum, item) =>
               sum + (item.modeOfPayment === "PP" ? item.amount : 0),
@@ -515,7 +547,7 @@ const OfficeMerged = () => {
       const officePPCOut =
         officeBook
           ?.filter((entry) => formatDate(entry.createDate) === dateStr)
-          ?.flatMap((entry) => entry.officeOut || [])
+          ?.flatMap((entry) => entry?.officeOut ?? [])
           ?.reduce(
             (sum, item) =>
               sum + (item.modeOfPayment === "PPC" ? item.amount : 0),
@@ -548,7 +580,7 @@ const OfficeMerged = () => {
       const officePPSOut =
         officeBook
           ?.filter((entry) => formatDate(entry.createDate) === dateStr)
-          ?.flatMap((entry) => entry.officeOut || [])
+          ?.flatMap((entry) => entry?.officeOut ?? [])
           ?.reduce(
             (sum, item) =>
               sum + (item.modeOfPayment === "PPS" ? item.amount : 0),
@@ -590,88 +622,39 @@ const OfficeMerged = () => {
     });
   }, [uniqueDates, entries, restEntries, officeBook]);
 
+  const keys = [
+    "ghCashIn",
+    "restCashIn",
+    "restCashOut",
+    "officeCashIn",
+    "officeCashOut",
+    "cash",
+    "ghCardIn",
+    "restCardIn",
+    "OfficeCardIn",
+    "OfficeCardOut",
+    "card",
+    "restPPIn",
+    "OfficePPIn",
+    "OfficePPOut",
+    "pp",
+    "ghPPCIn",
+    "officePPCIn",
+    "officePPCOut",
+    "ppc",
+    "ghPPSIn",
+    "officePPSIn",
+    "officePPSOut",
+    "pps",
+    "total",
+  ];
+
   const totalsRow = useMemo(() => {
-    const totalGHInCash =
-      preparedRows?.reduce((sum, item) => sum + item.ghCashIn, 0) || 0;
-    const totalRestInCash =
-      preparedRows?.reduce((sum, item) => sum + item.restCashIn, 0) || 0;
-    const totalRestOutCash =
-      preparedRows?.reduce((sum, item) => sum + item.restCashOut, 0) || 0;
-    const totalOfficeInCash =
-      preparedRows?.reduce((sum, item) => sum + item.officeCashIn, 0) || 0;
-    const totalOfficeOutCash =
-      preparedRows?.reduce((sum, item) => sum + item.officeCashOut, 0) || 0;
-    const totalCash =
-      preparedRows?.reduce((sum, item) => sum + item.cash, 0) || 0;
-
-    const totalGHInCard =
-      preparedRows?.reduce((sum, item) => sum + item.ghCardIn, 0) || 0;
-    const totalRestInCard =
-      preparedRows?.reduce((sum, item) => sum + item.restCardIn, 0) || 0;
-    const totalOfficeInCard =
-      preparedRows?.reduce((sum, item) => sum + item.OfficeCardIn, 0) || 0;
-    const totalOfficeOutCard =
-      preparedRows?.reduce((sum, item) => sum + item.OfficeCardOut, 0) || 0;
-    const totalCard =
-      preparedRows?.reduce((sum, item) => sum + item.card, 0) || 0;
-
-    const totalRestInPP =
-      preparedRows?.reduce((sum, item) => sum + item.restPPIn, 0) || 0;
-    const totalOfficeInPP =
-      preparedRows?.reduce((sum, item) => sum + item.OfficePPIn, 0) || 0;
-    const totalOfficeOutPP =
-      preparedRows?.reduce((sum, item) => sum + item.OfficePPOut, 0) || 0;
-    const totalPP = preparedRows?.reduce((sum, item) => sum + item.pp, 0) || 0;
-
-    const totalGHInPPC =
-      preparedRows?.reduce((sum, item) => sum + item.ghPPCIn, 0) || 0;
-    const totalOfficeInPPC =
-      preparedRows?.reduce((sum, item) => sum + item.officePPCIn, 0) || 0;
-    const totalOfficeOutPPC =
-      preparedRows?.reduce((sum, item) => sum + item.officePPCOut, 0) || 0;
-    const totalPPC =
-      preparedRows?.reduce((sum, item) => sum + item.ppc, 0) || 0;
-
-    const totalGHInPPS =
-      preparedRows?.reduce((sum, item) => sum + item.ghPPSIn, 0) || 0;
-    const totalOfficeInPPS =
-      preparedRows?.reduce((sum, item) => sum + item.officePPSIn, 0) || 0;
-    const totalOfficeOutPPS =
-      preparedRows?.reduce((sum, item) => sum + item.officePPSOut, 0) || 0;
-    const totalPPS =
-      preparedRows?.reduce((sum, item) => sum + item.pps, 0) || 0;
-
-    const totalAll =
-      preparedRows?.reduce((sum, item) => sum + item.total, 0) || 0;
-
-    return {
-      id: "Total",
-      date: "Total",
-      ghCashIn: totalGHInCash,
-      restCashIn: totalRestInCash,
-      restCashOut: totalRestOutCash,
-      officeCashIn: totalOfficeInCash,
-      officeCashOut: totalOfficeOutCash,
-      cash: totalCash,
-      ghCardIn: totalGHInCard,
-      restCardIn: totalRestInCard,
-      OfficeCardIn: totalOfficeInCard,
-      OfficeCardOut: totalOfficeOutCard,
-      card: totalCard,
-      restPPIn: totalRestInPP,
-      OfficePPIn: totalOfficeInPP,
-      OfficePPOut: totalOfficeOutPP,
-      pp: totalPP,
-      ghPPCIn: totalGHInPPC,
-      officePPCIn: totalOfficeInPPC,
-      officePPCOut: totalOfficeOutPPC,
-      ppc: totalPPC,
-      ghPPSIn: totalGHInPPS,
-      officePPSIn: totalOfficeInPPS,
-      officePPSOut: totalOfficeOutPPS,
-      pps: totalPPS,
-      total: totalAll,
-    };
+    const totals = keys.reduce((acc, key) => {
+      acc[key] = preparedRows?.reduce((sum, row) => sum + (row[key] || 0), 0);
+      return acc;
+    }, {});
+    return { id: "Total", date: "Total", ...totals };
   }, [preparedRows]);
 
   // Pie Chart Data
@@ -758,7 +741,11 @@ const OfficeMerged = () => {
             value={startDate}
             onChange={handleStartDateChange}
             format="DD-MM-YYYY"
-            renderInput={(params) => <TextField {...params} size="small" />}
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
             views={["year", "month", "day"]}
           />
           <Typography>-</Typography>
@@ -766,19 +753,14 @@ const OfficeMerged = () => {
             value={endDate}
             onChange={handleEndDateChange}
             format="DD-MM-YYYY"
-            renderInput={(params) => <TextField {...params} size="small" />}
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
             views={["year", "month", "day"]}
           />
         </LocalizationProvider>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={isFullScreen}
-              onChange={() => setIsFullScreen((prev) => !prev)}
-            />
-          }
-          label="Full Screen Graph"
-        />
         <Button
           variant="outlined"
           color="primary"
@@ -789,79 +771,23 @@ const OfficeMerged = () => {
         </Button>
       </Stack>
       <Stack direction="row" spacing={1} mt={1}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showCashDetails}
-              onChange={() => setShowCashDetails((prev) => !prev)}
-            />
-          }
-          label="Detailed Cash Info"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            paddingInlineEnd: "8px",
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showCardDetails}
-              onChange={() => setShowCardDetails((prev) => !prev)}
-            />
-          }
-          label="Detailed Card Info"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            paddingInlineEnd: "8px",
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showPPDetails}
-              onChange={() => setShowPPDetails((prev) => !prev)}
-            />
-          }
-          label="Detailed PP Info"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            paddingInlineEnd: "8px",
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showPPCDetails}
-              onChange={() => setShowPPCDetails((prev) => !prev)}
-            />
-          }
-          label="Detailed PPC Info"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            paddingInlineEnd: "8px",
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={showPPSDetails}
-              onChange={() => setShowPPSDetails((prev) => !prev)}
-            />
-          }
-          label="Detailed PPS Info"
-          sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            paddingInlineEnd: "8px",
-          }}
-        />
+        {switchConfigs.map((config, idx) => (
+          <FormControlLabel
+            key={idx}
+            control={
+              <Switch checked={config.checked} onChange={config.onChange} />
+            }
+            label={config.label}
+            sx={{
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
+              paddingInlineEnd: "8px",
+            }}
+          />
+        ))}
       </Stack>
 
-      {ghLoading && restLoading && officeLoading ? (
+      {ghLoading || restLoading || officeLoading ? (
         <CircularProgress sx={{ mt: 2 }} />
       ) : (
         <Box sx={{ width: "100%", height: "100%" }}>
@@ -869,9 +795,6 @@ const OfficeMerged = () => {
             <DataGrid
               rows={[...preparedRows, totalsRow]}
               columns={visibleColumns}
-              initialState={{
-                pinnedColumns: { left: ["id", "date"] },
-              }}
               pageSize={5}
               showCellVerticalBorder
               showColumnVerticalBorder
@@ -903,55 +826,92 @@ const OfficeMerged = () => {
             />
           </Box>
 
-          <Box width="50%">
+          <Box width={{ xs: "100%", md: "50%", marginInline: "auto" }}>
             {pieChartData.length === 0 ? (
               <Typography variant="h5" fontWeight={600} color="text.primary">
                 No Data Available
               </Typography>
             ) : (
-              <Stack direction="row" spacing={2} alignItems="center" mt={2}>
-                <PieChartComponent
-                  data={pieChartData}
-                  isFullScreen={isFullScreen}
-                />
-                <Stack direction="column" spacing={1}>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    color="text.primary"
+              <Box width="100%" mt={2}>
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  spacing={4}
+                  alignItems="flex-start"
+                  justifyContent="center"
+                  flexWrap="nowrap"
+                >
+                  <PieChartComponent
+                    data={pieChartData}
+                    isFullScreen={isFullScreen}
+                  />
+                  <Stack
+                    direction="column"
+                    spacing={2}
+                    sx={{
+                      backgroundColor: "#fafafa",
+                      borderRadius: 3,
+                      px: 2,
+                      py: 2,
+                      boxShadow: 2,
+                      minWidth: isFullScreen ? "400px" : "300px",
+                    }}
                   >
-                    Cash - {totalsRow.cash}
-                  </Typography>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    color="text.primary"
-                  >
-                    Card - {totalsRow.card}
-                  </Typography>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    color="text.primary"
-                  >
-                    PPS - {totalsRow.pps}
-                  </Typography>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    color="text.primary"
-                  >
-                    PPC - {totalsRow.ppc}
-                  </Typography>
-                  <Typography
-                    variant="h5"
-                    fontWeight={600}
-                    color="text.primary"
-                  >
-                    PPSD - {totalsRow.ppsd}
-                  </Typography>
+                    <Typography
+                      variant="h6"
+                      fontWeight={700}
+                      color="text.primary"
+                    >
+                      Payment Breakdown
+                    </Typography>
+                    {totalsConfig.map(({ label, key, color }) => (
+                      <Box
+                        key={key}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{
+                          borderLeft: `6px solid ${color || "#ccc"}`,
+                          pl: 2,
+                          pr: 1,
+                          py: 1,
+                          backgroundColor: "#fff",
+                          borderRadius: 2,
+                          transition: "all 0.2s ease-in-out",
+                          "&:hover": {
+                            backgroundColor: "#f1f1f1",
+                          },
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              backgroundColor: color || "#999",
+                              boxShadow: "0 0 2px rgba(0,0,0,0.2)",
+                            }}
+                          />
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={500}
+                            color="text.secondary"
+                          >
+                            {label}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight={600}
+                          color="text.primary"
+                        >
+                          ₹{totalsRow[key]?.toLocaleString("en-IN") || 0}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
                 </Stack>
-              </Stack>
+              </Box>
             )}
           </Box>
         </Box>
