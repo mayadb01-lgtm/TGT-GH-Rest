@@ -17,6 +17,7 @@ import {
 import ModernLoader from "../../utils/util";
 import toast from "react-hot-toast";
 import { getRestCategory } from "../../redux/actions/restCategoryAction";
+import { getRestStaff } from "../../redux/actions/restStaffAction";
 dayjs.locale("en-gb");
 const OfficeEntryPage = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const OfficeEntryPage = () => {
       fullname: "",
       remark: "",
       createDate: date,
+      fullname_id: "",
     }));
   const [officeInData, setOfficeInData] = useState(() =>
     makeInitialRows(today)
@@ -54,6 +56,7 @@ const OfficeEntryPage = () => {
   useEffect(() => {
     dispatch(getRestCategory());
     dispatch(getOfficeAllCategories());
+    dispatch(getRestStaff());
   }, [dispatch]);
 
   // Disable Edit when In and Out - Amount Total is 0

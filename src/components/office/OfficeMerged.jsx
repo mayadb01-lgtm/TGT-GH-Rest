@@ -49,6 +49,35 @@ const OfficeMerged = () => {
   const [showPPCDetails, setShowPPCDetails] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await dispatch(
+          getOfficeBookByDateRange(
+            startDate.format("DD-MM-YYYY"),
+            endDate.format("DD-MM-YYYY")
+          )
+        );
+        await dispatch(
+          getEntriesByDateRange(
+            startDate.format("DD-MM-YYYY"),
+            endDate.format("DD-MM-YYYY")
+          )
+        );
+        await dispatch(
+          getRestEntriesByDateRange(
+            startDate.format("DD-MM-YYYY"),
+            endDate.format("DD-MM-YYYY")
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch, startDate, endDate]);
+
   const handleStartDateChange = useCallback((newDate) => {
     if (newDate) setStartDate(newDate);
   }, []);
@@ -56,27 +85,6 @@ const OfficeMerged = () => {
   const handleEndDateChange = useCallback((newDate) => {
     if (newDate) setEndDate(newDate);
   }, []);
-
-  useEffect(() => {
-    dispatch(
-      getEntriesByDateRange(
-        startDate.format("DD-MM-YYYY"),
-        endDate.format("DD-MM-YYYY")
-      )
-    );
-    dispatch(
-      getRestEntriesByDateRange(
-        startDate.format("DD-MM-YYYY"),
-        endDate.format("DD-MM-YYYY")
-      )
-    );
-    dispatch(
-      getOfficeBookByDateRange(
-        startDate.format("DD-MM-YYYY"),
-        endDate.format("DD-MM-YYYY")
-      )
-    );
-  }, [dispatch, startDate, endDate]);
 
   const visibleColumns = useMemo(() => {
     const idDate = [
@@ -397,8 +405,11 @@ const OfficeMerged = () => {
     const ghDates = entries?.map((entry) => formatDate(entry.date)) || [];
     const restDates =
       restEntries?.map((entry) => formatDate(entry.createDate)) || [];
+
     const officeDates =
-      officeBook?.map((entry) => formatDate(entry.createDate)) || [];
+      officeBook && Array.isArray(officeBook)
+        ? officeBook.map((entry) => formatDate(entry.createDate))
+        : [];
 
     return [...new Set([...ghDates, ...restDates, ...officeDates])].sort(
       (a, b) =>
@@ -801,6 +812,8 @@ const OfficeMerged = () => {
               sx={{
                 mt: 2,
                 flexGrow: 1,
+                height: "100%",
+                width: "100%",
                 alignItems:
                   showCardDetails ||
                   showCashDetails ||

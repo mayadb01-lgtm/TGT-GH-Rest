@@ -14,6 +14,7 @@ const officeBookSchema = new Schema(
     remark: { type: String },
     createDate: { type: String, required: true },
     entryCreateDate: { type: Date },
+    fullname_id: { type: String },
     updatedDate: { type: String, default: "" },
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },

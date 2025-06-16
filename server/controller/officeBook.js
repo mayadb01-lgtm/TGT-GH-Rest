@@ -40,6 +40,7 @@ router.post("/create-entry", async (req, res) => {
       officeOut,
       createDate: reqBody.createDate,
       modeOfPayment: reqBody.modeOfPayment,
+      fullname_id: reqBody?.fullname_id || "",
     });
 
     res.status(200).json({
@@ -120,6 +121,7 @@ router.put("/update-entry/:date", async (req, res) => {
         officeIn,
         officeOut,
         modeOfPayment: reqBody.modeOfPayment,
+        fullname_id: reqBody?.fullname_id || "",
       },
       { new: true }
     );

@@ -26,6 +26,8 @@ const EditableRow = ({
   isOfficeIn,
   isOfficeOut,
 }) => {
+  const { loading, restStaff } = useAppSelector((state) => state.restStaff);
+
   const handleInputChange = (key, value) => {
     onUpdateRow(index, key, value);
   };
@@ -64,16 +66,44 @@ const EditableRow = ({
     />
   );
 
+  const flattenedCategory = sourceOptions.flatMap((category) => ({
+    _id: category._id,
+    categoryName: category.categoryName,
+  }));
+
   // Render Category Autocomplete (disabled)
-  const renderCategoryAutocomplete = (options, rowKey, currentValue) => (
+  const renderCategoryAutocomplete = (options, rowKey, currentValue) =>
+    loading ? (
+      <TextField variant="outlined" size="small" disabled />
+    ) : (
+      <Autocomplete
+        disabled
+        options={options}
+        getOptionLabel={(option) => option.categoryName || ""}
+        value={options.find((opt) => opt.categoryName === currentValue) || null}
+        onChange={(e, value) => {
+          handleInputChange(rowKey, value?.categoryName);
+          handleInputChange("_id", value ? value._id : "");
+        }}
+        renderInput={(params) => (
+          <TextField {...params} variant="outlined" size="small" />
+        )}
+      />
+    );
+
+  const flattenedUpadName = restStaff.flatMap((staff) => ({
+    _id: staff._id,
+    fullname: staff.fullname,
+  }));
+
+  const renderUpadNameAutocomplete = (options, rowKey, currentValue) => (
     <Autocomplete
-      disabled
       options={options}
-      getOptionLabel={(option) => option.categoryName || ""}
-      value={options.find((opt) => opt.categoryName === currentValue) || null}
-      onChange={(e, value) => {
-        handleInputChange(rowKey, value?.categoryName);
-        handleInputChange("_id", value ? value._id : "");
+      getOptionLabel={(option) => option.fullname || ""}
+      value={options.find((opt) => opt.fullname === currentValue) || null}
+      onChange={(_, value) => {
+        handleInputChange(rowKey, value?.fullname);
+        handleInputChange("fullname_id", value ? value._id : "");
       }}
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" />
@@ -127,20 +157,28 @@ const EditableRow = ({
 
       <TableCell sx={{ width: "15%" }}>
         {renderCategoryAutocomplete(
-          sourceOptions.map((cat) => ({ categoryName: cat.categoryName })),
+          flattenedCategory,
           "categoryName",
           row.categoryName
         )}
       </TableCell>
 
       <TableCell sx={{ width: "25%" }}>
-        <TextField
-          variant="outlined"
-          size="small"
-          value={row.fullname || ""}
-          onChange={(e) => handleInputChange("fullname", e.target.value)}
-          fullWidth
-        />
+        {row.categoryName.match(/Upad|Upaad|upad|upaad/i) ? (
+          renderUpadNameAutocomplete(
+            flattenedUpadName,
+            "fullname",
+            row.fullname
+          )
+        ) : (
+          <TextField
+            variant="outlined"
+            size="small"
+            value={row.fullname || ""}
+            onChange={(e) => handleInputChange("fullname", e.target.value)}
+            fullWidth
+          />
+        )}
       </TableCell>
 
       <TableCell sx={{ width: "25%" }}>
@@ -196,6 +234,7 @@ const OfficeBookTable = ({
         categoryName: "",
         expenseName: "",
         createDate: dayjs().format("DD-MM-YYYY"),
+        fullname_id: "",
       },
     ]);
   };
