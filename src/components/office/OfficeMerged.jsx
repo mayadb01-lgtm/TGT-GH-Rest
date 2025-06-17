@@ -450,8 +450,7 @@ const OfficeMerged = () => {
             0
           ) || 0;
 
-      const cash =
-        ghCashIn + restCashIn + officeCashIn - officeCashOut;
+      const cash = ghCashIn + restCashIn + officeCashIn - officeCashOut;
 
       // TODO:CARD
       const ghCardIn =
