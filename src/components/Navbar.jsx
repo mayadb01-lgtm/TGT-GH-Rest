@@ -98,15 +98,15 @@ const Navbar = () => {
   const navbarHeading = () => {
     switch (location.pathname) {
       case "/admin/restaurant":
-        return "TGT Restaurant - Admin";
+        return `${import.meta.env.VITE_REACT_APP_BUSINESS_NAME} Restaurant - Admin`;
       case "/restaurant":
-        return "TGT Restaurant";
+        return `${import.meta.env.VITE_REACT_APP_BUSINESS_NAME} Restaurant`;
       case "/admin/hotel":
-        return "TGT Hotel - Admin";
+        return `${import.meta.env.VITE_REACT_APP_BUSINESS_NAME} Hotel - Admin`;
       case "/hotel":
-        return "TGT Hotel";
+        return `${import.meta.env.VITE_REACT_APP_BUSINESS_NAME} Hotel`;
       default:
-        return "TGT Business";
+        return `${import.meta.env.VITE_REACT_APP_BUSINESS_NAME}`;
     }
   };
 
