@@ -20,52 +20,47 @@ export const typeColors = {
   Other: "rgb(255, 170, 50)",
 };
 
-export const processEntriesByPaymentMode = (data, mode) => {
-  if (data?.length === 0) return [];
-  return data?.filter((row) => row.modeOfPayment === mode);
-};
+// export const roomCosts = {
+//   1: 1800,
+//   2: 1800,
+//   3: 1800,
+//   4: 1800,
+//   5: 1800,
+//   6: 2200,
+//   7: 2200,
+//   8: 1500,
+//   9: 1500,
+//   10: 1500,
+//   11: 1500,
+// };
 
-export const roomCosts = {
-  1: 1800,
-  2: 1800,
-  3: 1800,
-  4: 1800,
-  5: 1800,
-  6: 2200,
-  7: 2200,
-  8: 1500,
-  9: 1500,
-  10: 1500,
-  11: 1500,
-};
+// export const roomType = {
+//   1: "Deluxe",
+//   2: "Deluxe",
+//   3: "Deluxe",
+//   4: "Deluxe",
+//   5: "Deluxe",
+//   6: "3 Bed",
+//   7: "3 Bed",
+//   8: "2 Bed",
+//   9: "2 Bed",
+//   10: "2 Bed",
+//   11: "2 Bed",
+// };
 
-export const roomType = {
-  1: "Deluxe",
-  2: "Deluxe",
-  3: "Deluxe",
-  4: "Deluxe",
-  5: "Deluxe",
-  6: "3 Bed",
-  7: "3 Bed",
-  8: "2 Bed",
-  9: "2 Bed",
-  10: "2 Bed",
-  11: "2 Bed",
-};
-
-export const roomNumber = {
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
-  6: 6,
-  7: 7,
-  8: 8,
-  9: 9,
-  10: 10,
-  11: 11,
-};
+// export const roomNumber = {
+//   1: 1,
+//   2: 2,
+//   3: 3,
+//   4: 4,
+//   5: 5,
+//   6: 6,
+//   7: 7,
+//   8: 8,
+//   9: 9,
+//   10: 10,
+//   11: 11,
+// };
 
 export const initializePendingJamaRows = () => {
   return Array.from({ length: 10 }, (_, idx) => ({
@@ -82,6 +77,7 @@ export const initializePendingJamaRows = () => {
     checkInTime: "10:00 AM",
     checkOutTime: "10:00 AM",
     noOfPeople: 0,
+    discount: 0,
   }));
 };
 
@@ -137,25 +133,6 @@ export const processUpdateEntries = (data, period, selectedDate) => {
 };
 
 // Table Component
-
-export const initializeRows = (period, rowsLength, selectedDate) => {
-  return Array.from({ length: rowsLength }, (_, i) => ({
-    id: `${period} - ${i + 1}`,
-    roomNo: roomNumber[i + 1] || 0,
-    cost: roomCosts[i + 1] || 0,
-    roomType: roomType[i + 1] || "",
-    rate: 0,
-    noOfPeople: 0,
-    type: "",
-    modeOfPayment: "",
-    fullname: "",
-    mobileNumber: 0,
-    checkInTime: "10:00 AM",
-    checkOutTime: "10:00 AM",
-    period: period,
-    createDate: selectedDate || "",
-  }));
-};
 
 export const currentDateTime = new Date().toString();
 
@@ -219,6 +196,7 @@ export const initializeReservationData = () => {
     rate: 0,
     modeOfPayment: "",
     period: "reservation",
+    discount: 0,
   }));
 };
 

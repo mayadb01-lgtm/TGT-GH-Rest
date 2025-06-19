@@ -16,7 +16,6 @@ const EntryAccordion = ({
   period,
   onSubmit,
   bgColor,
-  tableData,
   selectedDate,
 }) => {
   return (
@@ -52,7 +51,6 @@ const EntryAccordion = ({
             title={`${title} Table`}
             rowsLength={11}
             onSubmit={onSubmit}
-            tableData={tableData}
             selectedDate={selectedDate}
           />
         </Suspense>
