@@ -215,15 +215,21 @@ const GHDashboard = () => {
           rows={[...entries, totalRow]}
           columns={columns}
           pageSize={5}
+          WebkitFontSmoothing="auto"
+          letterSpacing={"normal"}
           sx={{
             mt: 2,
             height: 400,
-            width: "95%",
             "& .MuiDataGrid-columnHeaderTitle": {
               fontWeight: "bold",
             },
+            "& .MuiDataGrid-cell:hover": {
+              color: "primary.main",
+            },
+            "& .MuiDataGrid-columnHeader, .MuiDataGrid-cell": {
+              border: "1px solid #f0f0f0",
+            },
           }}
-          disableSelectionOnClick
           getRowId={(row) => row._id}
         />
       ) : (
