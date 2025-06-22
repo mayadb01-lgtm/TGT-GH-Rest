@@ -777,43 +777,6 @@ const OfficeMerged = () => {
         <CircularProgress sx={{ mt: 2 }} />
       ) : (
         <Box sx={{ width: "100%", height: "100%" }}>
-          <Box sx={{ overflowX: "auto" }}>
-            <DataGrid
-              rows={[...preparedRows, totalsRow]}
-              columns={visibleColumns}
-              pageSize={5}
-              showCellVerticalBorder
-              showColumnVerticalBorder
-              sx={{
-                mt: 2,
-                flexGrow: 1,
-                height: "100%",
-                width: "100%",
-                alignItems:
-                  showCardDetails ||
-                  showCashDetails ||
-                  showPPDetails ||
-                  showPPCDetails ||
-                  showPPSDetails
-                    ? "flex-start"
-                    : "center",
-                overflow: "auto",
-                "& .MuiDataGrid-columnHeaderTitle": {
-                  fontWeight: "bold",
-                },
-                "& .entry-in": {
-                  color: "green",
-                },
-                "& .entry-out": {
-                  color: "red",
-                },
-                "& .entry-bold": {
-                  fontWeight: "bold",
-                },
-              }}
-            />
-          </Box>
-
           <Box
             width={{ xs: "100%", md: "100%", lg: "100%" }}
             sx={{ mt: 2, marginInline: "auto" }}
@@ -922,6 +885,42 @@ const OfficeMerged = () => {
                 </Stack>
               </Box>
             )}
+          </Box>
+          <Box sx={{ overflowX: "auto" }}>
+            <DataGrid
+              rows={[...preparedRows, totalsRow]}
+              columns={visibleColumns}
+              pageSize={5}
+              showCellVerticalBorder
+              showColumnVerticalBorder
+              sx={{
+                mt: 2,
+                flexGrow: 1,
+                height: "100%",
+                width: "100%",
+                alignItems:
+                  showCardDetails ||
+                  showCashDetails ||
+                  showPPDetails ||
+                  showPPCDetails ||
+                  showPPSDetails
+                    ? "flex-start"
+                    : "center",
+                overflow: "auto",
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  fontWeight: "bold",
+                },
+                "& .entry-in": {
+                  color: "green",
+                },
+                "& .entry-out": {
+                  color: "red",
+                },
+                "& .entry-bold": {
+                  fontWeight: "bold",
+                },
+              }}
+            />
           </Box>
         </Box>
       )}

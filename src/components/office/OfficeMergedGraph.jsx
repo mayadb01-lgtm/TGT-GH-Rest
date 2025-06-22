@@ -19,18 +19,46 @@ import { formatChartData } from "../charts/chartUtils";
 import LineChartComponent from "../charts/LineChartComponent";
 import PieChartComponent from "../charts/PieChartComponent";
 import { getOfficeBookByDateRange } from "../../redux/actions/officeBookAction";
+import { GH_MODE_OF_PAYMENT_OPTIONS } from "../../utils/utils";
+import { getEntriesByDateRange } from "../../redux/actions/entryAction";
+import { getRestEntriesByDateRange } from "../../redux/actions/restEntryAction";
 
 const OfficeMergedGraph = () => {
   const dispatch = useAppDispatch();
-  const { loading, officeBook } = useAppSelector((state) => state.officeBook);
+  const { loading: ghLoading, entries } = useAppSelector(
+    (state) => state.entry
+  );
+  const { loading: restLoading, restEntries } = useAppSelector(
+    (state) => state.restEntry
+  );
+  const { loading: officeLoading, officeBook } = useAppSelector(
+    (state) => state.officeBook
+  );
+  const formatDate = (date) =>
+    dayjs(date, ["DD-MM-YYYY", "YYYY-MM-DD", "MM-DD-YYYY"]).format(
+      "DD-MM-YYYY"
+    );
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
   const [endDate, setEndDate] = useState(dayjs());
   const [isFullScreen, setIsFullScreen] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await dispatch(
           getOfficeBookByDateRange(
+            startDate.format("DD-MM-YYYY"),
+            endDate.format("DD-MM-YYYY")
+          )
+        );
+        await dispatch(
+          getEntriesByDateRange(
+            startDate.format("DD-MM-YYYY"),
+            endDate.format("DD-MM-YYYY")
+          )
+        );
+        await dispatch(
+          getRestEntriesByDateRange(
             startDate.format("DD-MM-YYYY"),
             endDate.format("DD-MM-YYYY")
           )
@@ -52,70 +80,62 @@ const OfficeMergedGraph = () => {
     []
   );
 
-  // Prepare - Chart 1 data = Expenses by category
-  const pieChartOfficeCategoryExpensesInData = useMemo(
-    () =>
-      officeBook?.length
-        ? formatChartData(officeBook, "officeCategoryExpensesIn")
-        : [],
-    [officeBook]
+  // Prepare - Chart 1 data = Total Sales of GH + Rest + OfficeIn
+
+  const ghSalesTotal =
+    (entries &&
+      entries.length > 0 &&
+      entries
+        ?.map((entry) =>
+          entry?.entry
+            ?.filter(
+              (item) =>
+                GH_MODE_OF_PAYMENT_OPTIONS.includes(item.modeOfPayment) &&
+                item.period !== "UnPaid"
+            )
+            .map((item) => item.rate)
+            .reduce((a, b) => a + b, 0)
+        )
+        .reduce((a, b) => a + b, 0)) ||
+    0;
+
+  const restSalesTotal =
+    (restEntries &&
+      restEntries.reduce((total, entry) => total + entry.grandTotal, 0)) ||
+    0;
+
+  const officeInSalesTotal =
+    officeBook
+      ?.flatMap((entry) => (entry.officeIn ? entry.officeIn : []))
+      ?.filter((entry) => entry.categoryName !== "Banquet")
+      .reduce((total, entry) => total + entry.amount, 0) || 0;
+
+  const officeInCategoryBenquetTotal =
+    officeBook
+      ?.flatMap((entry) => (entry.officeIn ? entry.officeIn : []))
+      ?.filter((entry) => entry.categoryName === "Banquet")
+      ?.reduce((total, entry) => total + entry.amount, 0) || 0;
+
+  const pieChartTotalMergedSalesData = useMemo(
+    () => [
+      { name: "GH Sales", value: ghSalesTotal },
+      { name: "Rest Sales", value: restSalesTotal },
+      { name: "Office Sales", value: officeInSalesTotal },
+      { name: "Banquet", value: officeInCategoryBenquetTotal },
+    ],
+    [
+      ghSalesTotal,
+      restSalesTotal,
+      officeInSalesTotal,
+      officeInCategoryBenquetTotal,
+    ]
   );
 
-  const totalOfficeCategoryExpensesInAmount =
-    pieChartOfficeCategoryExpensesInData.reduce(
-      (sum, entry) => sum + entry.value,
-      0
-    );
-
-  // // Prepare - Chart 2 data = Office In & Office Out
-  const pieChartOfficeCategoryExpensesOutData = useMemo(
-    () =>
-      officeBook?.length
-        ? formatChartData(officeBook, "officeCategoryExpensesOut")
-        : [],
-    [officeBook]
-  );
-
-  const totalOfficeCategoryExpensesOutAmount =
-    pieChartOfficeCategoryExpensesOutData.reduce(
-      (sum, entry) => sum + entry.value,
-      0
-    );
-
-  // // Prepare - Chart 2 data = Expenses by payment method
-  // const upaadLineChartData = useMemo(
-  //   () => (restEntries?.length ? formatChartData(restEntries, "upaad") : []),
-  //   [restEntries]
-  // );
-
-  // const totalUpaadAmount = upaadLineChartData.reduce(
-  //   (sum, entry) => sum + entry.amount,
-  //   0
-  // );
-
-  // // Prepare - Chart 3 data = Expenses by payment method
-  // const paymentMethodLineChartData = useMemo(
-  //   () =>
-  //     restEntries?.length ? formatChartData(restEntries, "paymentMethods") : [],
-  //   [restEntries]
-  // );
-
-  // const totalPaymentMethodAmount = paymentMethodLineChartData.reduce(
-  //   (sum, entry) => sum + entry.value,
-  //   0
-  // );
-
-  // // Prepare - Chart 4 data = Sales Per Day
-  // const salesPerDayLineChartData = useMemo(
-  //   () =>
-  //     restEntries?.length ? formatChartData(restEntries, "salesPerDay") : [],
-  //   [restEntries]
-  // );
-
-  // const totalSalesPerDayAmount = salesPerDayLineChartData.reduce(
-  //   (sum, entry) => sum + entry.amount,
-  //   0
-  // );
+  const totalMergedSalesAmount =
+    ghSalesTotal +
+    restSalesTotal +
+    officeInSalesTotal +
+    officeInCategoryBenquetTotal;
 
   const chartBoxStyle = {
     width: "100%",
@@ -164,7 +184,7 @@ const OfficeMergedGraph = () => {
         />
       </Stack>
 
-      {loading ? (
+      {ghLoading || restLoading || officeLoading ? (
         <Stack alignItems="center" mt={4}>
           <CircularProgress />
         </Stack>
@@ -205,7 +225,7 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    🏠 Office Category In
+                    Sales - GH+Rest+OfficeIn
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -213,15 +233,14 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    Total Spent: ₹
-                    {totalOfficeCategoryExpensesInAmount.toFixed(2)}
+                    Total Spent: ₹{totalMergedSalesAmount.toFixed(2)}
                   </Typography>
                 </Stack>
-                {pieChartOfficeCategoryExpensesInData.length === 0 ? (
+                {pieChartTotalMergedSalesData.length === 0 ? (
                   <Typography>No expense data available</Typography>
                 ) : (
                   <PieChartComponent
-                    data={pieChartOfficeCategoryExpensesInData}
+                    data={pieChartTotalMergedSalesData}
                     isFullScreen={isFullScreen}
                   />
                 )}
@@ -229,7 +248,7 @@ const OfficeMergedGraph = () => {
             </Grid>
 
             {/* Pie Chart - Office In and Out */}
-            <Grid item xs={12} md={12} sx={chartBoxStyle}>
+            {/* <Grid item xs={12} md={12} sx={chartBoxStyle}>
               <Box width="90%" height="90%">
                 <Stack
                   direction="row"
@@ -264,7 +283,7 @@ const OfficeMergedGraph = () => {
                   />
                 )}
               </Box>
-            </Grid>
+            </Grid> */}
           </Stack>
         </Grid>
       )}
