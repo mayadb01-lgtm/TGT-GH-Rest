@@ -48,10 +48,6 @@ const OfficeMergedGraph = () => {
   const { loading: officeLoading, officeBook } = useAppSelector(
     (state) => state.officeBook
   );
-  const formatDate = (date) =>
-    dayjs(date, ["DD-MM-YYYY", "YYYY-MM-DD", "MM-DD-YYYY"]).format(
-      "DD-MM-YYYY"
-    );
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
   const [endDate, setEndDate] = useState(dayjs());
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -124,11 +120,6 @@ const OfficeMergedGraph = () => {
   );
   const totalMergedSalesAmount =
     ghSalesTotal + restSalesTotal + officeSalesTotal + officeBanquetTotal;
-  const isEmptyData =
-    ghSalesTotal === 0 &&
-    restSalesTotal === 0 &&
-    officeSalesTotal === 0 &&
-    officeBanquetTotal === 0;
 
   // Prepare - Chart 2 data = Total Expenses
   const restExpensesTotal = (restEntries || [])
@@ -255,7 +246,7 @@ const OfficeMergedGraph = () => {
                     Total Spent: ₹{totalMergedSalesAmount.toFixed(2)}
                   </Typography>
                 </Stack>
-                {pieChartTotalMergedSalesData.length === 0 ? (
+                {totalMergedSalesAmount === 0 ? (
                   <Typography>No expense data available</Typography>
                 ) : (
                   <PieChartComponent
@@ -292,7 +283,7 @@ const OfficeMergedGraph = () => {
                     Total Spent: ₹{totalExpensesAmount.toFixed(2)}
                   </Typography>
                 </Stack>
-                {pieChartTotalExpensesData.length === 0 ? (
+                {totalExpensesAmount === 0 ? (
                   <Typography>No expense data available</Typography>
                 ) : (
                   <PieChartComponent
