@@ -95,7 +95,6 @@ const OfficeMergedGraph = () => {
   );
 
   // Prepare - Chart 1 data = Total Sales of GH + Rest + OfficeIn
-  // Derived data
   const ghSalesTotal = sumValidEntryRates(
     entries || [],
     GH_MODE_OF_PAYMENT_OPTIONS
@@ -114,7 +113,6 @@ const OfficeMergedGraph = () => {
   const officeBanquetTotal = officeSalesEntries
     .filter((entry) => entry.categoryName === "Banquet")
     .reduce((sum, entry) => sum + entry.amount, 0);
-
   const pieChartTotalMergedSalesData = useMemo(
     () => [
       { name: "GH Sales", value: ghSalesTotal },
@@ -124,15 +122,39 @@ const OfficeMergedGraph = () => {
     ],
     [ghSalesTotal, restSalesTotal, officeSalesTotal, officeBanquetTotal]
   );
-
   const totalMergedSalesAmount =
     ghSalesTotal + restSalesTotal + officeSalesTotal + officeBanquetTotal;
-
   const isEmptyData =
     ghSalesTotal === 0 &&
     restSalesTotal === 0 &&
     officeSalesTotal === 0 &&
     officeBanquetTotal === 0;
+
+  // Prepare - Chart 2 data = Total Expenses
+  const restExpensesTotal = (restEntries || [])
+    .filter((entry) => entry?.expenses)
+    .reduce(
+      (total, entry) =>
+        total +
+        entry.expenses.reduce((acc, item) => acc + (item.amount || 0), 0),
+      0
+    );
+
+  const officeExpensesTotal = (officeBook || []).reduce(
+    (total, entry) =>
+      total +
+      (entry.officeOut || []).reduce((acc, item) => acc + item.amount, 0),
+    0
+  );
+
+  const pieChartTotalExpensesData = useMemo(
+    () => [
+      { name: "Rest Expenses", value: restExpensesTotal },
+      { name: "Office Expenses", value: officeExpensesTotal },
+    ],
+    [restExpensesTotal, officeExpensesTotal]
+  );
+  const totalExpensesAmount = restExpensesTotal + officeExpensesTotal;
 
   const chartBoxStyle = {
     width: "100%",
@@ -207,7 +229,7 @@ const OfficeMergedGraph = () => {
             display="flex"
             width={"100%"}
           >
-            {/* Pie Chart - Expenses */}
+            {/* Pie Chart - Total Sales */}
             <Grid item xs={12} md={12} sx={chartBoxStyle}>
               <Box width="90%" height="90%">
                 <Stack
@@ -244,8 +266,8 @@ const OfficeMergedGraph = () => {
               </Box>
             </Grid>
 
-            {/* Pie Chart - Office In and Out */}
-            {/* <Grid item xs={12} md={12} sx={chartBoxStyle}>
+            {/* Pie Chart - Total Expenses */}
+            <Grid item xs={12} md={12} sx={chartBoxStyle}>
               <Box width="90%" height="90%">
                 <Stack
                   direction="row"
@@ -259,7 +281,7 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    🏠 Office Category Out
+                    Expenses - Rest+OfficeOut
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -267,20 +289,19 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    Total Spent: ₹
-                    {totalOfficeCategoryExpensesOutAmount.toFixed(2)}
+                    Total Spent: ₹{totalExpensesAmount.toFixed(2)}
                   </Typography>
                 </Stack>
-                {pieChartOfficeCategoryExpensesOutData.length === 0 ? (
+                {pieChartTotalExpensesData.length === 0 ? (
                   <Typography>No expense data available</Typography>
                 ) : (
                   <PieChartComponent
-                    data={pieChartOfficeCategoryExpensesOutData}
+                    data={pieChartTotalExpensesData}
                     isFullScreen={isFullScreen}
                   />
                 )}
               </Box>
-            </Grid> */}
+            </Grid>
           </Stack>
         </Grid>
       )}
