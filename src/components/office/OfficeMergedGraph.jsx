@@ -23,6 +23,20 @@ import { GH_MODE_OF_PAYMENT_OPTIONS } from "../../utils/utils";
 import { getEntriesByDateRange } from "../../redux/actions/entryAction";
 import { getRestEntriesByDateRange } from "../../redux/actions/restEntryAction";
 
+// Utility helper for GH sales sum
+const sumValidEntryRates = (entries, validModes) => {
+  return entries.reduce((sum, e) => {
+    const subtotal =
+      e.entry
+        ?.filter(
+          (item) =>
+            validModes.includes(item.modeOfPayment) && item.period !== "UnPaid"
+        )
+        .reduce((acc, i) => acc + i.rate, 0) || 0;
+    return sum + subtotal;
+  }, 0);
+};
+
 const OfficeMergedGraph = () => {
   const dispatch = useAppDispatch();
   const { loading: ghLoading, entries } = useAppSelector(
@@ -81,61 +95,44 @@ const OfficeMergedGraph = () => {
   );
 
   // Prepare - Chart 1 data = Total Sales of GH + Rest + OfficeIn
+  // Derived data
+  const ghSalesTotal = sumValidEntryRates(
+    entries || [],
+    GH_MODE_OF_PAYMENT_OPTIONS
+  );
+  const restSalesTotal = (restEntries || []).reduce(
+    (total, entry) => total + entry.grandTotal,
+    0
+  );
 
-  const ghSalesTotal =
-    (entries &&
-      entries.length > 0 &&
-      entries
-        ?.map((entry) =>
-          entry?.entry
-            ?.filter(
-              (item) =>
-                GH_MODE_OF_PAYMENT_OPTIONS.includes(item.modeOfPayment) &&
-                item.period !== "UnPaid"
-            )
-            .map((item) => item.rate)
-            .reduce((a, b) => a + b, 0)
-        )
-        .reduce((a, b) => a + b, 0)) ||
-    0;
-
-  const restSalesTotal =
-    (restEntries &&
-      restEntries.reduce((total, entry) => total + entry.grandTotal, 0)) ||
-    0;
-
-  const officeInSalesTotal =
-    officeBook
-      ?.flatMap((entry) => (entry.officeIn ? entry.officeIn : []))
-      ?.filter((entry) => entry.categoryName !== "Banquet")
-      .reduce((total, entry) => total + entry.amount, 0) || 0;
-
-  const officeInCategoryBenquetTotal =
-    officeBook
-      ?.flatMap((entry) => (entry.officeIn ? entry.officeIn : []))
-      ?.filter((entry) => entry.categoryName === "Banquet")
-      ?.reduce((total, entry) => total + entry.amount, 0) || 0;
+  const officeSalesEntries = (officeBook || []).flatMap(
+    (entry) => entry.officeIn || []
+  );
+  const officeSalesTotal = officeSalesEntries
+    .filter((entry) => entry.categoryName !== "Banquet")
+    .reduce((sum, entry) => sum + entry.amount, 0);
+  const officeBanquetTotal = officeSalesEntries
+    .filter((entry) => entry.categoryName === "Banquet")
+    .reduce((sum, entry) => sum + entry.amount, 0);
 
   const pieChartTotalMergedSalesData = useMemo(
     () => [
       { name: "GH Sales", value: ghSalesTotal },
       { name: "Rest Sales", value: restSalesTotal },
-      { name: "Office Sales", value: officeInSalesTotal },
-      { name: "Banquet", value: officeInCategoryBenquetTotal },
+      { name: "Office Sales", value: officeSalesTotal },
+      { name: "Banquet", value: officeBanquetTotal },
     ],
-    [
-      ghSalesTotal,
-      restSalesTotal,
-      officeInSalesTotal,
-      officeInCategoryBenquetTotal,
-    ]
+    [ghSalesTotal, restSalesTotal, officeSalesTotal, officeBanquetTotal]
   );
 
   const totalMergedSalesAmount =
-    ghSalesTotal +
-    restSalesTotal +
-    officeInSalesTotal +
-    officeInCategoryBenquetTotal;
+    ghSalesTotal + restSalesTotal + officeSalesTotal + officeBanquetTotal;
+
+  const isEmptyData =
+    ghSalesTotal === 0 &&
+    restSalesTotal === 0 &&
+    officeSalesTotal === 0 &&
+    officeBanquetTotal === 0;
 
   const chartBoxStyle = {
     width: "100%",
