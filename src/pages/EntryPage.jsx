@@ -642,6 +642,7 @@ const EntryPage = () => {
                   <EntryAccordion
                     title="Extra Day Entries"
                     period="extraDay"
+                    onSubmit={setExtraDayData}
                     bgColor="#FAC172"
                     selectedDate={selectedDate}
                   />
