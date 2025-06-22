@@ -38,6 +38,8 @@ import OfficeMerged from "../components/office/OfficeMerged";
 import GHUpaidEntriesDashboard from "../components/guest-house/GHUpaidEntriesDashboard";
 import OfficeHome from "../components/office/OfficeHome";
 import OfficeMergedGraph from "../components/office/OfficeMergedGraph";
+import RestAapvanaDashboard from "../components/restaurant/RestAapvanaDashboard";
+import RestLevanaDashboard from "../components/restaurant/RestLevanaDashboard";
 
 const DashboardHeader = ({ onNavigate }) => {
   const navigate = useNavigate();
@@ -128,12 +130,12 @@ const NAVIGATION = [
     children: [
       {
         segment: "sales-report",
-        title: "Rest - Sales Report",
+        title: "Rest - Sales",
         icon: <CurrencyRupeeIcon />,
       },
       {
         segment: "upaad-report",
-        title: "Rest - Upaad Report",
+        title: "Rest - Upaad",
         icon: <PaymentsIcon />,
       },
       {
@@ -145,6 +147,16 @@ const NAVIGATION = [
         segment: "bank-books",
         title: "Rest - Bank Books",
         icon: <BookOutlined />,
+      },
+      {
+        segment: "aapvana-report",
+        title: "Rest - Aapvana",
+        icon: <CurrencyRupeeIcon />,
+      },
+      {
+        segment: "levana-report",
+        title: "Rest - Levana",
+        icon: <CurrencyRupeeIcon />,
       },
     ],
   },
@@ -230,6 +242,14 @@ const DashboardPage = () => {
     },
     { path: "res-reports/expenses-report", element: <RestExpensesDashboard /> },
     { path: "res-reports/bank-books", element: <BankBooksDashboard /> },
+    {
+      path: "res-reports/aapvana-report",
+      element: <RestAapvanaDashboard />,
+    },
+    {
+      path: "res-reports/levana-report",
+      element: <RestLevanaDashboard />,
+    },
     { path: "manage-staff", element: <RestStaffDashboard /> },
     { path: "categories-expenses", element: <RestCategoryExpensesDashboard /> },
     { path: "pending-users", element: <RestPendingUsersDashboard /> },
