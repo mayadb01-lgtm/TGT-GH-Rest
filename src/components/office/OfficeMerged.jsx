@@ -715,7 +715,7 @@ const OfficeMerged = () => {
         }}
       >
         <Typography variant="h5" fontWeight={600} color="text.primary">
-          Merged Dashboard
+          Merged Report
         </Typography>
       </Box>
       <Stack direction="row" spacing={2} alignItems="center" mt={1}>

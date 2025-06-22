@@ -129,7 +129,7 @@ const OfficeHome = () => {
   return (
     <Box sx={{ px: 2, py: 2, bgcolor: "#f5f5f5", minHeight: "100vh" }}>
       <Typography variant="h5" fontWeight={700} textAlign="center" mb={3}>
-        🏢 Office Dashboard
+        🏢 Office Book Graph
       </Typography>
       <Stack
         direction={{ xs: "column", sm: "row" }}

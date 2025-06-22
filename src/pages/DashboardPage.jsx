@@ -191,7 +191,7 @@ const NAVIGATION = [
   },
   {
     segment: "merged-reports",
-    title: "Merged Reports",
+    title: "Merged Report",
     icon: <BarChartIcon />,
   },
 ];
