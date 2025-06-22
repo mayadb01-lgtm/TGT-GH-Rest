@@ -20,7 +20,7 @@ import LineChartComponent from "../charts/LineChartComponent";
 import PieChartComponent from "../charts/PieChartComponent";
 import { getOfficeBookByDateRange } from "../../redux/actions/officeBookAction";
 
-const OfficeHome = () => {
+const OfficeMergedGraph = () => {
   const dispatch = useAppDispatch();
   const { loading, officeBook } = useAppSelector((state) => state.officeBook);
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
@@ -272,4 +272,4 @@ const OfficeHome = () => {
   );
 };
 
-export default OfficeHome;
+export default OfficeMergedGraph;

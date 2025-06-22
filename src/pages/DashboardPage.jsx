@@ -37,6 +37,7 @@ import OfficeCategoryDashboard from "../components/office/OfficeCategoryDashboar
 import OfficeMerged from "../components/office/OfficeMerged";
 import GHUpaidEntriesDashboard from "../components/guest-house/GHUpaidEntriesDashboard";
 import OfficeHome from "../components/office/OfficeHome";
+import OfficeMergedGraph from "../components/office/OfficeMergedGraph";
 
 const DashboardHeader = ({ onNavigate }) => {
   const navigate = useNavigate();
@@ -170,7 +171,12 @@ const NAVIGATION = [
     title: "Office Category",
     icon: <CategoryIcon />,
   },
-  { kind: "header", title: "Reports" },
+  { kind: "header", title: "Merged Reports" },
+  {
+    segment: "merged-graph",
+    title: "Merged Graph",
+    icon: <PieChartIcon />,
+  },
   {
     segment: "merged-reports",
     title: "Merged Reports",
@@ -230,6 +236,7 @@ const DashboardPage = () => {
     { path: "office", element: <OfficeHome /> },
     { path: "office-book", element: <OfficeBookDashboard /> },
     { path: "office-category", element: <OfficeCategoryDashboard /> },
+    { path: "merged-graph", element: <OfficeMergedGraph /> },
     { path: "merged-reports", element: <OfficeMerged /> },
     { path: "*", element: <Typography>404: Page Not Found</Typography> },
   ]);

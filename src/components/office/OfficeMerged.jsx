@@ -718,7 +718,7 @@ const OfficeMerged = () => {
           Merged Dashboard
         </Typography>
       </Box>
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center" mt={1}>
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
           Select Date Range
         </Typography>
