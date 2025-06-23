@@ -149,22 +149,8 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
 
   // Set Other Fields from date, roomNo, fullname, mobileNumber, rate
 
-  const getCreateDate = (
-    date,
-    roomNo,
-    fullname,
-    mobileNumber,
-    rate,
-    discount
-  ) => {
-    const entry = getOtherFields(
-      date,
-      roomNo,
-      fullname,
-      mobileNumber,
-      rate,
-      discount || 0
-    );
+  const getCreateDate = (date, roomNo, fullname, mobileNumber, rate) => {
+    const entry = getOtherFields(date, roomNo, fullname, mobileNumber, rate);
     return entry?.createDate;
   };
 
@@ -181,7 +167,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
     );
     const row = pendingJamaRows.find((row) => row.id === id);
     if (
-      entries.length === 0 &&
+      entries.length !== 0 &&
       row.date &&
       row.roomNo &&
       row.fullname &&
@@ -193,8 +179,7 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
         row.roomNo,
         row.fullname,
         row.mobileNumber,
-        row.rate,
-        row?.discount || 0
+        row.rate
       );
       setPendingJamaRows((prevRows) =>
         prevRows.map((prevRow) =>
@@ -204,6 +189,13 @@ const PendingJamaTable = ({ pendingJamaRows, setPendingJamaRows }) => {
                 createDate: prevRow.createDate
                   ? prevRow.createDate
                   : createDateFound,
+                cost: row?.cost || prevRow.cost,
+                roomType: row?.roomType || prevRow.roomType,
+                type: row?.type || prevRow.type,
+                roomType: row?.roomType || prevRow.roomType,
+                paidDate: row?.paidDate || prevRow.paidDate,
+                noOfPeople: row?.noOfPeople || prevRow.noOfPeople,
+                discount: row?.discount || prevRow.discount,
               }
             : prevRow
         )
