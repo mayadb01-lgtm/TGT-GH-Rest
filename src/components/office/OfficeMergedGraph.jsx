@@ -147,6 +147,36 @@ const OfficeMergedGraph = () => {
   );
   const totalExpensesAmount = restExpensesTotal + officeExpensesTotal;
 
+  // Prepare - Chart 3 data = Aapvana & Levana
+  const restAapvanaTotal =
+    (restEntries || [])
+      .filter((entry) => entry?.pending && entry?.pending.length > 0)
+      .reduce(
+        (total, entry) =>
+          total +
+          entry.pending.reduce((acc, item) => acc + (item.amount || 0), 0),
+        0
+      ) || 0;
+
+  const restLevanaTotal =
+    (restEntries || [])
+      .filter((entry) => entry?.pendingUsers && entry?.pendingUsers.length > 0)
+      .reduce(
+        (total, entry) =>
+          total +
+          entry.pendingUsers.reduce((acc, item) => acc + (item.amount || 0), 0),
+        0
+      ) || 0;
+
+  const pieChartTotalAppvanaLevanaData = useMemo(
+    () => [
+      { name: "Rest Aapvana", value: restAapvanaTotal },
+      { name: "Rest Levana", value: restLevanaTotal },
+    ],
+    [restAapvanaTotal, restLevanaTotal]
+  );
+  const totalAppvanaLevanaAmount = restAapvanaTotal + restLevanaTotal;
+
   const chartBoxStyle = {
     width: "100%",
     height: isFullScreen ? "80vh" : { xs: "320px", sm: "550px" },
@@ -251,6 +281,88 @@ const OfficeMergedGraph = () => {
                 ) : (
                   <PieChartComponent
                     data={pieChartTotalMergedSalesData}
+                    isFullScreen={isFullScreen}
+                  />
+                )}
+              </Box>
+            </Grid>
+
+            {/* Pie Chart - Total Expenses */}
+            <Grid item xs={12} md={12} sx={chartBoxStyle}>
+              <Box width="90%" height="90%">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    color="primary"
+                  >
+                    Expenses - Rest+OfficeOut
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    color="primary"
+                  >
+                    Total Spent: ₹{totalExpensesAmount.toFixed(2)}
+                  </Typography>
+                </Stack>
+                {totalExpensesAmount === 0 ? (
+                  <Typography>No expense data available</Typography>
+                ) : (
+                  <PieChartComponent
+                    data={pieChartTotalExpensesData}
+                    isFullScreen={isFullScreen}
+                  />
+                )}
+              </Box>
+            </Grid>
+          </Stack>
+          <Stack
+            direction={isFullScreen ? "column" : "row"}
+            spacing={2}
+            alignItems="center"
+            mb={2}
+            display="flex"
+            width={"100%"}
+          >
+            {/* Pie Chart - Total Sales */}
+            <Grid item xs={12} md={12} sx={chartBoxStyle}>
+              <Box width="90%" height="90%">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    color="primary"
+                  >
+                    Sales - GH+Rest+OfficeIn
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    color="primary"
+                  >
+                    Total Spent: ₹{totalAppvanaLevanaAmount.toFixed(2)}
+                  </Typography>
+                </Stack>
+                {totalAppvanaLevanaAmount === 0 ? (
+                  <Typography>No expense data available</Typography>
+                ) : (
+                  <PieChartComponent
+                    data={pieChartTotalAppvanaLevanaData}
                     isFullScreen={isFullScreen}
                   />
                 )}
