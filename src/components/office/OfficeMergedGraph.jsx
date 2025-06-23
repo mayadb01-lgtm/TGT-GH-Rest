@@ -55,24 +55,26 @@ const OfficeMergedGraph = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch(
-          getOfficeBookByDateRange(
-            startDate.format("DD-MM-YYYY"),
-            endDate.format("DD-MM-YYYY")
-          )
-        );
-        await dispatch(
-          getEntriesByDateRange(
-            startDate.format("DD-MM-YYYY"),
-            endDate.format("DD-MM-YYYY")
-          )
-        );
-        await dispatch(
-          getRestEntriesByDateRange(
-            startDate.format("DD-MM-YYYY"),
-            endDate.format("DD-MM-YYYY")
-          )
-        );
+        await Promise.all([
+          dispatch(
+            getOfficeBookByDateRange(
+              startDate.format("DD-MM-YYYY"),
+              endDate.format("DD-MM-YYYY")
+            )
+          ),
+          dispatch(
+            getEntriesByDateRange(
+              startDate.format("DD-MM-YYYY"),
+              endDate.format("DD-MM-YYYY")
+            )
+          ),
+          dispatch(
+            getRestEntriesByDateRange(
+              startDate.format("DD-MM-YYYY"),
+              endDate.format("DD-MM-YYYY")
+            )
+          ),
+        ]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -91,24 +93,30 @@ const OfficeMergedGraph = () => {
   );
 
   // Prepare - Chart 1 data = Total Sales of GH + Rest + OfficeIn
-  const ghSalesTotal = sumValidEntryRates(
-    entries || [],
-    GH_MODE_OF_PAYMENT_OPTIONS
-  );
-  const restSalesTotal = (restEntries || []).reduce(
-    (total, entry) => total + entry.grandTotal,
-    0
+  const ghSalesTotal = useMemo(
+    () => sumValidEntryRates(entries || [], GH_MODE_OF_PAYMENT_OPTIONS),
+    [entries]
   );
 
-  const officeSalesEntries = (officeBook || []).flatMap(
-    (entry) => entry.officeIn || []
-  );
-  const officeSalesTotal = officeSalesEntries
-    .filter((entry) => entry.categoryName !== "Banquet")
-    .reduce((sum, entry) => sum + entry.amount, 0);
-  const officeBanquetTotal = officeSalesEntries
-    .filter((entry) => entry.categoryName === "Banquet")
-    .reduce((sum, entry) => sum + entry.amount, 0);
+  const restSalesTotal =
+    (restEntries &&
+      restEntries?.reduce((total, entry) => total + entry.grandTotal, 0)) ||
+    0;
+
+  const officeSalesEntries =
+    (officeBook && officeBook?.flatMap((entry) => entry.officeIn || [])) || [];
+  const officeSalesTotal =
+    (officeSalesEntries &&
+      officeSalesEntries
+        ?.filter((entry) => entry.categoryName !== "Banquet")
+        ?.reduce((sum, entry) => sum + entry.amount, 0)) ||
+    0;
+  const officeBanquetTotal =
+    (officeSalesEntries &&
+      officeSalesEntries
+        ?.filter((entry) => entry.categoryName === "Banquet")
+        ?.reduce((sum, entry) => sum + entry.amount, 0)) ||
+    0;
   const pieChartTotalMergedSalesData = useMemo(
     () => [
       { name: "GH Sales", value: ghSalesTotal },
@@ -119,24 +127,30 @@ const OfficeMergedGraph = () => {
     [ghSalesTotal, restSalesTotal, officeSalesTotal, officeBanquetTotal]
   );
   const totalMergedSalesAmount =
-    ghSalesTotal + restSalesTotal + officeSalesTotal + officeBanquetTotal;
+    ghSalesTotal + restSalesTotal + officeSalesTotal + officeBanquetTotal || 0;
 
   // Prepare - Chart 2 data = Total Expenses
-  const restExpensesTotal = (restEntries || [])
-    .filter((entry) => entry?.expenses)
-    .reduce(
-      (total, entry) =>
-        total +
-        entry.expenses.reduce((acc, item) => acc + (item.amount || 0), 0),
-      0
-    );
+  const restExpensesTotal =
+    (restEntries &&
+      restEntries
+        ?.filter((entry) => entry?.expenses)
+        ?.reduce(
+          (total, entry) =>
+            total +
+            entry.expenses.reduce((acc, item) => acc + (item.amount || 0), 0),
+          0
+        )) ||
+    0;
 
-  const officeExpensesTotal = (officeBook || []).reduce(
-    (total, entry) =>
-      total +
-      (entry.officeOut || []).reduce((acc, item) => acc + item.amount, 0),
-    0
-  );
+  const officeExpensesTotal =
+    (officeBook &&
+      officeBook?.reduce(
+        (total, entry) =>
+          total +
+          (entry.officeOut || []).reduce((acc, item) => acc + item.amount, 0),
+        0
+      )) ||
+    0;
 
   const pieChartTotalExpensesData = useMemo(
     () => [
@@ -145,7 +159,7 @@ const OfficeMergedGraph = () => {
     ],
     [restExpensesTotal, officeExpensesTotal]
   );
-  const totalExpensesAmount = restExpensesTotal + officeExpensesTotal;
+  const totalExpensesAmount = restExpensesTotal + officeExpensesTotal || 0;
 
   // Prepare - Chart 3 data = Aapvana & Levana
   const restAapvanaTotal =
@@ -154,19 +168,26 @@ const OfficeMergedGraph = () => {
       .reduce(
         (total, entry) =>
           total +
-          entry.pending.reduce((acc, item) => acc + (item.amount || 0), 0),
+          entry?.pending.reduce((acc, item) => acc + (item.amount || 0), 0),
         0
       ) || 0;
 
   const restLevanaTotal =
-    (restEntries || [])
-      .filter((entry) => entry?.pendingUsers && entry?.pendingUsers.length > 0)
-      .reduce(
-        (total, entry) =>
-          total +
-          entry.pendingUsers.reduce((acc, item) => acc + (item.amount || 0), 0),
-        0
-      ) || 0;
+    (restEntries &&
+      restEntries
+        ?.filter(
+          (entry) => entry?.pendingUsers && entry?.pendingUsers.length > 0
+        )
+        ?.reduce(
+          (total, entry) =>
+            total +
+            entry?.pendingUsers.reduce(
+              (acc, item) => acc + (item.amount || 0),
+              0
+            ),
+          0
+        )) ||
+    0;
 
   const pieChartTotalAppvanaLevanaData = useMemo(
     () => [
@@ -175,7 +196,7 @@ const OfficeMergedGraph = () => {
     ],
     [restAapvanaTotal, restLevanaTotal]
   );
-  const totalAppvanaLevanaAmount = restAapvanaTotal + restLevanaTotal;
+  const totalAppvanaLevanaAmount = restAapvanaTotal + restLevanaTotal || 0;
 
   const chartBoxStyle = {
     width: "100%",
@@ -347,7 +368,7 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    Sales - GH+Rest+OfficeIn
+                    Rest - Aapvana & Levana
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -384,7 +405,7 @@ const OfficeMergedGraph = () => {
                     gutterBottom
                     color="primary"
                   >
-                    Expenses - Rest+OfficeOut
+                    Dummy Graph
                   </Typography>
                   <Typography
                     variant="subtitle1"
