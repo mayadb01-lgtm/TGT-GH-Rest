@@ -190,9 +190,6 @@ const TableComponent = ({ period, rowsLength, onSubmit, selectedDate }) => {
       return false;
     }
   };
-  console.log("rooms", rooms);
-  console.log("Room Details", roomDetails);
-
   if (rows.length === 0) {
     return (
       <Box
