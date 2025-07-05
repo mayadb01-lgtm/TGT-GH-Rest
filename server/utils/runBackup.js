@@ -5,9 +5,19 @@ import AdmZip from "adm-zip";
 
 const runBackup = async (models) => {
   const backupDir = path.join("backup");
+  const backupZipPath = path.join("backup.zip");
+
+  // Ensure backup directory exists and is clean
   await fs.ensureDir(backupDir);
   await fs.emptyDir(backupDir);
 
+  // Remove old ZIP file if it exists
+  if (await fs.pathExists(backupZipPath)) {
+    await fs.remove(backupZipPath);
+    console.log("🗑️ Old backup.zip removed");
+  }
+
+  // Loop through models and export data
   for (const model of models) {
     try {
       if (!model || !model.modelName) {
@@ -26,9 +36,10 @@ const runBackup = async (models) => {
     }
   }
 
+  // Zip the backup folder
   const zip = new AdmZip();
   zip.addLocalFolder(backupDir);
-  zip.writeZip("backup.zip");
+  zip.writeZip(backupZipPath);
 
   console.log("✅ Backup completed and saved as backup.zip");
 };
