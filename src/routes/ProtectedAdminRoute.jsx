@@ -116,7 +116,7 @@ const ProtectedAdminRoute = ({ children }) => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Extra Security Layer
+              Extra Security Layer 🔐
             </Typography>
             <Typography
               variant="body2"
