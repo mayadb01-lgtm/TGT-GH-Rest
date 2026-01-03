@@ -23,9 +23,8 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import dayjs from "dayjs";
-import { getRestEntriesByDateRange } from "../../redux/actions/restEntryAction";
+import { getOfficeBookByDateRange } from "../../redux/actions/officeBookAction";
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -40,40 +39,56 @@ import { TrendingUp, TrendingDown, ShowChart } from "@mui/icons-material";
 
 dayjs.locale("en-gb");
 
-const RestSalesGoalDashboard = () => {
+// Constants
+const STORAGE_KEY = "moti_baada_yearly_sales_goal";
+const MIN_GOAL = 0;
+const GOAL_STEP = 1000;
+const DAYS_PER_MONTH = 30;
+const DAYS_PER_YEAR = 365;
+const MONTHS_PER_YEAR = 12;
+const DAYS_PER_WEEK = 7;
+
+// Thresholds for view modes
+const DAILY_VIEW_THRESHOLD = 31;
+const WEEKLY_VIEW_THRESHOLD = 180;
+
+// Performance thresholds
+const PERFORMANCE_THRESHOLDS = {
+  excellent: 100,
+  good: 75,
+  fair: 50,
+};
+
+const OfficeMotiBaadaSalesGoalDashboard = () => {
   const dispatch = useAppDispatch();
-  const { loading, restEntries } = useAppSelector((state) => state.restEntry);
-  const [startDate, setStartDate] = useState(dayjs().startOf("month"));
-  const [endDate, setEndDate] = useState(dayjs());
+  const { loading, officeBook } = useAppSelector((state) => state.officeBook);
+
+  // State management
+  const [startDate, setStartDate] = useState(() => dayjs().startOf("month"));
+  const [endDate, setEndDate] = useState(() => dayjs());
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [viewMode, setViewMode] = useState("auto");
-
   const [yearlyGoal, setYearlyGoal] = useState(() => {
-    const saved = localStorage.getItem("rest_yearly_sales_goal");
-    return saved ? parseFloat(saved) : 0;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? parseFloat(saved) : MIN_GOAL;
+    } catch (error) {
+      console.error("Error loading saved goal:", error);
+      return MIN_GOAL;
+    }
   });
 
-  useEffect(() => {
-    dispatch(
-      getRestEntriesByDateRange(
-        startDate.format("DD-MM-YYYY"),
-        endDate.format("DD-MM-YYYY")
-      )
-    );
-  }, [dispatch, startDate, endDate]);
-
-  useEffect(() => {
-    if (yearlyGoal > 0) {
-      localStorage.setItem("rest_yearly_sales_goal", yearlyGoal.toString());
-    }
-  }, [yearlyGoal]);
-
+  // Event handlers
   const handleStartDateChange = useCallback((newDate) => {
-    if (newDate) setStartDate(newDate);
+    if (newDate?.isValid()) {
+      setStartDate(newDate);
+    }
   }, []);
 
   const handleEndDateChange = useCallback((newDate) => {
-    if (newDate) setEndDate(newDate);
+    if (newDate?.isValid()) {
+      setEndDate(newDate);
+    }
   }, []);
 
   const { goToPreviousRange, goToNextRange } = useDateNavigation({
@@ -84,59 +99,104 @@ const RestSalesGoalDashboard = () => {
   });
 
   const handleYearlyGoalChange = useCallback((e) => {
-    const value = parseFloat(e.target.value) || 0;
-    if (value >= 0) {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value) && value >= MIN_GOAL) {
       setYearlyGoal(value);
     }
   }, []);
 
-  const monthlyGoal = useMemo(() => yearlyGoal / 12, [yearlyGoal]);
+  const handleViewModeChange = useCallback((e, newMode) => {
+    if (newMode) {
+      setViewMode(newMode);
+    }
+  }, []);
 
+  const toggleFullScreen = useCallback(() => {
+    setIsFullScreen((prev) => !prev);
+  }, []);
+
+  // Fetch office book data
+  useEffect(() => {
+    if (startDate && endDate) {
+      dispatch(
+        getOfficeBookByDateRange(
+          startDate.format("DD-MM-YYYY"),
+          endDate.format("DD-MM-YYYY")
+        )
+      );
+    }
+  }, [dispatch, startDate, endDate]);
+
+  // Persist yearly goal to localStorage
+  useEffect(() => {
+    if (yearlyGoal > MIN_GOAL) {
+      try {
+        localStorage.setItem(STORAGE_KEY, yearlyGoal.toString());
+      } catch (error) {
+        console.error("Error saving goal:", error);
+      }
+    }
+  }, [yearlyGoal]);
+
+  // Computed values
+  const monthlyGoal = useMemo(() => yearlyGoal / MONTHS_PER_YEAR, [yearlyGoal]);
+
+  // Currency formatter
   const formatIndianCurrency = useCallback((amount) => {
-    if (amount >= 10000000) {
+    const absAmount = Math.abs(amount);
+    if (absAmount >= 10000000) {
       return `₹${(amount / 10000000).toFixed(2)} Cr`;
-    } else if (amount >= 100000) {
+    } else if (absAmount >= 100000) {
       return `₹${(amount / 100000).toFixed(2)} L`;
-    } else if (amount >= 1000) {
+    } else if (absAmount >= 1000) {
       return `₹${(amount / 1000).toFixed(2)} K`;
     }
     return `₹${amount.toFixed(0)}`;
   }, []);
 
-  // Process actual sales data
+  // Process actual sales data from office book
   const actualSalesData = useMemo(() => {
-    if (!restEntries || restEntries.length === 0) return [];
+    if (!officeBook?.length) return [];
 
     const dateMap = new Map();
 
-    restEntries.forEach((entry) => {
+    officeBook.forEach((entry) => {
       const date = entry.createDate;
-      const total = entry.grandTotal;
+      if (!date) return;
 
-      if (dateMap.has(date)) {
-        dateMap.set(date, dateMap.get(date) + total);
-      } else {
-        dateMap.set(date, total);
+      // Calculate daily total from officeIn entries (Moti Baada only)
+      const dailyTotal =
+        entry?.officeIn
+          ?.filter((item) => {
+            const category = (
+              item.categoryName ||
+              item.category ||
+              ""
+            ).toLowerCase();
+            return category === "moti baada";
+          })
+          .reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
+
+      if (dailyTotal > 0) {
+        dateMap.set(date, (dateMap.get(date) || 0) + dailyTotal);
       }
     });
 
-    const sortedData = Array.from(dateMap.entries())
+    return Array.from(dateMap.entries())
       .map(([date, amount]) => ({
         date: dayjs(date, "DD-MM-YYYY"),
         amount,
       }))
       .sort((a, b) => a.date.valueOf() - b.date.valueOf());
-
-    return sortedData;
-  }, [restEntries]);
+  }, [officeBook]);
 
   // Determine effective view mode
   const effectiveViewMode = useMemo(() => {
     if (viewMode !== "auto") return viewMode;
 
     const days = endDate.diff(startDate, "day") + 1;
-    if (days <= 31) return "daily";
-    if (days <= 180) return "weekly";
+    if (days <= DAILY_VIEW_THRESHOLD) return "daily";
+    if (days <= WEEKLY_VIEW_THRESHOLD) return "weekly";
     return "monthly";
   }, [viewMode, startDate, endDate]);
 
@@ -173,40 +233,46 @@ const RestSalesGoalDashboard = () => {
         const matchingEntry = actualSalesData.find(
           (entry) => entry.date.format("DD-MM") === label
         );
-        return matchingEntry ? matchingEntry.amount : 0;
+        return matchingEntry?.amount || 0;
       });
-    } else if (effectiveViewMode === "weekly") {
+    }
+
+    if (effectiveViewMode === "weekly") {
       return dateRangeLabels.map((label) => {
         const weekStart = dayjs(label, "DD-MM").year(startDate.year());
-        const weekEnd = weekStart.add(6, "day");
+        const weekEnd = weekStart.add(DAYS_PER_WEEK - 1, "day");
 
         return actualSalesData
           .filter((entry) => {
             const entryTime = entry.date.valueOf();
-            const weekStartTime = weekStart.valueOf();
-            const weekEndTime = weekEnd.valueOf();
-            return entryTime >= weekStartTime && entryTime <= weekEndTime;
+            return (
+              entryTime >= weekStart.valueOf() && entryTime <= weekEnd.valueOf()
+            );
           })
           .reduce((sum, entry) => sum + entry.amount, 0);
       });
-    } else {
-      return dateRangeLabels.map((label) => {
-        return actualSalesData
-          .filter((entry) => entry.date.format("MMM YY") === label)
-          .reduce((sum, entry) => sum + entry.amount, 0);
-      });
     }
+
+    return dateRangeLabels.map((label) => {
+      return actualSalesData
+        .filter((entry) => entry.date.format("MMM YY") === label)
+        .reduce((sum, entry) => sum + entry.amount, 0);
+    });
   }, [dateRangeLabels, actualSalesData, effectiveViewMode, startDate]);
 
   // Goal line values
   const goalLineValues = useMemo(() => {
+    const dailyGoal = monthlyGoal / DAYS_PER_MONTH;
+
     if (effectiveViewMode === "daily") {
-      return dateRangeLabels.map(() => monthlyGoal / 30);
-    } else if (effectiveViewMode === "weekly") {
-      return dateRangeLabels.map(() => (monthlyGoal * 7) / 30);
-    } else {
-      return dateRangeLabels.map(() => monthlyGoal);
+      return dateRangeLabels.map(() => dailyGoal);
     }
+
+    if (effectiveViewMode === "weekly") {
+      return dateRangeLabels.map(() => dailyGoal * DAYS_PER_WEEK);
+    }
+
+    return dateRangeLabels.map(() => monthlyGoal);
   }, [dateRangeLabels, monthlyGoal, effectiveViewMode]);
 
   // Prepare chart data
@@ -225,11 +291,13 @@ const RestSalesGoalDashboard = () => {
       0
     );
     const days = endDate.diff(startDate, "day") + 1;
-    const totalGoalForPeriod = (monthlyGoal / 30) * days;
+    const totalGoalForPeriod = (monthlyGoal / DAYS_PER_MONTH) * days;
     const achievementPercent =
       totalGoalForPeriod === 0
         ? 0
-        : ((totalActualSales / totalGoalForPeriod) * 100).toFixed(1);
+        : parseFloat(
+            ((totalActualSales / totalGoalForPeriod) * 100).toFixed(1)
+          );
 
     const gapAmount = totalActualSales - totalGoalForPeriod;
     const isAboveGoal = gapAmount >= 0;
@@ -250,13 +318,13 @@ const RestSalesGoalDashboard = () => {
     ).length;
     const daysBelowGoal = actualSalesValues.length - daysAboveGoal;
 
-    const avgDailySales = totalActualSales / days;
-    const projectedAnnual = avgDailySales * 365;
+    const avgDailySales = days > 0 ? totalActualSales / days : 0;
+    const projectedAnnual = avgDailySales * DAYS_PER_YEAR;
 
     return {
       totalActualSales,
       totalGoalForPeriod,
-      achievementPercent: parseFloat(achievementPercent),
+      achievementPercent,
       gapAmount,
       isAboveGoal,
       bestSale,
@@ -278,9 +346,19 @@ const RestSalesGoalDashboard = () => {
     dateRangeLabels,
   ]);
 
-  // Custom Tooltip
-  const CustomTooltip = ({ payload, label }) => {
-    if (payload?.length) {
+  // Get performance color
+  const getPerformanceColor = useCallback((percent) => {
+    if (percent >= PERFORMANCE_THRESHOLDS.excellent) return "success.main";
+    if (percent >= PERFORMANCE_THRESHOLDS.good) return "info.main";
+    if (percent >= PERFORMANCE_THRESHOLDS.fair) return "warning.main";
+    return "error.main";
+  }, []);
+
+  // Custom Tooltip Component (memoized)
+  const CustomTooltip = useCallback(
+    ({ payload, label }) => {
+      if (!payload?.length) return null;
+
       const actual =
         payload.find((p) => p.dataKey === "actualSales")?.value || 0;
       const goal = payload.find((p) => p.dataKey === "goalSales")?.value || 0;
@@ -307,9 +385,14 @@ const RestSalesGoalDashboard = () => {
           </Typography>
         </Paper>
       );
-    }
-    return null;
-  };
+    },
+    [formatIndianCurrency]
+  );
+
+  // Derived states for conditional rendering
+  const hasData = officeBook?.length > 0;
+  const hasGoal = yearlyGoal > MIN_GOAL;
+  const showMetrics = hasGoal && !loading && hasData;
 
   return (
     <Box
@@ -321,7 +404,7 @@ const RestSalesGoalDashboard = () => {
       }}
     >
       <Typography variant="h5" fontWeight={700} textAlign="center" mb={1}>
-        🍽️ Restaurant Sales Goal Dashboard
+        🏢 Office Moti Baada Sales Goal Dashboard
       </Typography>
 
       {/* Date Range + View Mode */}
@@ -340,6 +423,7 @@ const RestSalesGoalDashboard = () => {
             onChange={handleStartDateChange}
             format="DD-MM-YYYY"
             slotProps={{ textField: { size: "small" } }}
+            maxDate={endDate}
           />
           <DatePicker
             label="End Date"
@@ -347,6 +431,7 @@ const RestSalesGoalDashboard = () => {
             onChange={handleEndDateChange}
             format="DD-MM-YYYY"
             slotProps={{ textField: { size: "small" } }}
+            minDate={startDate}
           />
         </LocalizationProvider>
         <Box
@@ -395,21 +480,27 @@ const RestSalesGoalDashboard = () => {
         <ToggleButtonGroup
           value={viewMode}
           exclusive
-          onChange={(e, newMode) => newMode && setViewMode(newMode)}
+          onChange={handleViewModeChange}
           size="small"
+          aria-label="View mode selector"
         >
-          <ToggleButton value="auto">Auto</ToggleButton>
-          <ToggleButton value="daily">Daily</ToggleButton>
-          <ToggleButton value="weekly">Weekly</ToggleButton>
-          <ToggleButton value="monthly">Monthly</ToggleButton>
+          <ToggleButton value="auto" aria-label="Auto view">
+            Auto
+          </ToggleButton>
+          <ToggleButton value="daily" aria-label="Daily view">
+            Daily
+          </ToggleButton>
+          <ToggleButton value="weekly" aria-label="Weekly view">
+            Weekly
+          </ToggleButton>
+          <ToggleButton value="monthly" aria-label="Monthly view">
+            Monthly
+          </ToggleButton>
         </ToggleButtonGroup>
 
         <FormControlLabel
           control={
-            <Checkbox
-              checked={isFullScreen}
-              onChange={() => setIsFullScreen((prev) => !prev)}
-            />
+            <Checkbox checked={isFullScreen} onChange={toggleFullScreen} />
           }
           label="Full Screen"
         />
@@ -430,7 +521,11 @@ const RestSalesGoalDashboard = () => {
               placeholder="e.g., 1200000"
               size="small"
               fullWidth
-              inputProps={{ min: 12000, step: 1000 }}
+              inputProps={{
+                min: MIN_GOAL,
+                step: GOAL_STEP,
+                "aria-label": "Yearly sales goal input",
+              }}
             />
             <Stack direction="row" spacing={2} mt={1.5}>
               <Box flex={1}>
@@ -458,7 +553,7 @@ const RestSalesGoalDashboard = () => {
             <Typography variant="subtitle1" fontWeight={600} mb={1}>
               📈 Performance
             </Typography>
-            {yearlyGoal > 0 && !loading && restEntries.length > 0 ? (
+            {showMetrics ? (
               <Stack spacing={1}>
                 <Box>
                   <LinearProgress
@@ -469,22 +564,19 @@ const RestSalesGoalDashboard = () => {
                       borderRadius: 1,
                       bgcolor: "#e0e0e0",
                       "& .MuiLinearProgress-bar": {
-                        bgcolor:
-                          metrics.achievementPercent >= 100
-                            ? "success.main"
-                            : metrics.achievementPercent >= 75
-                              ? "info.main"
-                              : metrics.achievementPercent >= 50
-                                ? "warning.main"
-                                : "error.main",
+                        bgcolor: getPerformanceColor(
+                          metrics.achievementPercent
+                        ),
                       },
                     }}
+                    aria-label={`Achievement percentage: ${metrics.achievementPercent}%`}
                   />
                   <Typography
                     variant="h5"
                     fontWeight={700}
                     color={
-                      metrics.achievementPercent >= 100
+                      metrics.achievementPercent >=
+                      PERFORMANCE_THRESHOLDS.excellent
                         ? "success.main"
                         : "warning.main"
                     }
@@ -523,7 +615,7 @@ const RestSalesGoalDashboard = () => {
               </Stack>
             ) : (
               <Typography variant="body2" color="text.secondary" py={3}>
-                {yearlyGoal === 0
+                {!hasGoal
                   ? "Set goal to see metrics"
                   : loading
                     ? "Loading..."
@@ -535,7 +627,7 @@ const RestSalesGoalDashboard = () => {
       </Grid>
 
       {/* Compact Metrics Cards */}
-      {yearlyGoal > 0 && !loading && restEntries.length > 0 && (
+      {showMetrics && (
         <Grid container spacing={1} mb={2}>
           <Grid size={{ xs: 6, sm: 3 }}>
             <Paper elevation={1} sx={{ p: 1.5, textAlign: "center" }}>
@@ -635,7 +727,7 @@ const RestSalesGoalDashboard = () => {
 
       <Divider sx={{ mb: 2 }} />
 
-      {/* Chart - MAXIMIZED */}
+      {/* Chart Section */}
       {loading ? (
         <Stack alignItems="center" mt={4}>
           <CircularProgress />
@@ -643,7 +735,7 @@ const RestSalesGoalDashboard = () => {
             Loading sales data...
           </Typography>
         </Stack>
-      ) : restEntries.length === 0 ? (
+      ) : !hasData ? (
         <Paper
           elevation={1}
           sx={{ p: 3, textAlign: "center", borderRadius: 2 }}
@@ -655,7 +747,7 @@ const RestSalesGoalDashboard = () => {
             Select a different date range
           </Typography>
         </Paper>
-      ) : yearlyGoal === 0 ? (
+      ) : !hasGoal ? (
         <Paper
           elevation={1}
           sx={{ p: 3, textAlign: "center", borderRadius: 2 }}
@@ -711,7 +803,7 @@ const RestSalesGoalDashboard = () => {
                   position: "insideLeft",
                   style: { fontWeight: "bold" },
                 }}
-                tickFormatter={(value) => formatIndianCurrency(value)}
+                tickFormatter={formatIndianCurrency}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -721,6 +813,7 @@ const RestSalesGoalDashboard = () => {
                 fill="#3B82F6"
                 fillOpacity={0.1}
                 stroke="none"
+                isAnimationActive={false}
               />
               <Line
                 type="monotone"
@@ -729,6 +822,7 @@ const RestSalesGoalDashboard = () => {
                 strokeWidth={3}
                 name="Sales Goal"
                 dot={false}
+                isAnimationActive={false}
               />
               <Line
                 type="monotone"
@@ -736,6 +830,7 @@ const RestSalesGoalDashboard = () => {
                 stroke="#3B82F6"
                 strokeWidth={3}
                 name="Actual Sales"
+                isAnimationActive={false}
               />
             </ComposedChart>
           </ResponsiveContainer>
@@ -745,4 +840,4 @@ const RestSalesGoalDashboard = () => {
   );
 };
 
-export default RestSalesGoalDashboard;
+export default OfficeMotiBaadaSalesGoalDashboard;
