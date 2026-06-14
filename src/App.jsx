@@ -19,17 +19,20 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.jsx"));
 const AdminSignupPage = lazy(() => import("./pages/AdminSignupPage.jsx"));
 const AdminResetPasswordPage = lazy(
-  () => import("./pages/AdminResetPasswordPage.jsx")
+  () => import("./pages/AdminResetPasswordPage.jsx"),
 );
 const UserResetPasswordPage = lazy(
-  () => import("./pages/UserResetPasswordPage.jsx")
+  () => import("./pages/UserResetPasswordPage.jsx"),
 );
 const Home = lazy(() => import("./pages/Home.jsx"));
 const RestEntryPage = lazy(
-  () => import("./pages/restaurant/RestEntryPage.jsx")
+  () => import("./pages/restaurant/RestEntryPage.jsx"),
 );
 const OfficeEntryPage = lazy(
-  () => import("./pages/office/OfficeEntryPage.jsx")
+  () => import("./pages/office/OfficeEntryPage.jsx"),
+);
+const StaffSalaryEntryPage = lazy(
+  () => import("./pages/staffSalary/StaffSalaryEntryPage.jsx"),
 );
 
 const App = () => {
@@ -84,6 +87,15 @@ const App = () => {
             }
           />
           <Route
+            path="/staff-salary"
+            element={
+              <ProtectedRoute>
+                <Navbar />
+                <StaffSalaryEntryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/hotel"
             element={
               <ProtectedAdminRoute>
@@ -107,6 +119,15 @@ const App = () => {
               <ProtectedAdminRoute>
                 <Navbar />
                 <OfficeEntryPage />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/staff-salary"
+            element={
+              <ProtectedAdminRoute>
+                <Navbar />
+                <StaffSalaryEntryPage />
               </ProtectedAdminRoute>
             }
           />

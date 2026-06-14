@@ -19,7 +19,7 @@ const Home = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const { isAdminAuthenticated, admin } = useAppSelector(
-    (state) => state.admin
+    (state) => state.admin,
   );
   const { isAuthenticated, user } = useAppSelector((state) => state.user);
 
@@ -43,6 +43,12 @@ const Home = () => {
       title: "O B",
       icon: <MenuBookOutlinedIcon fontSize="large" />,
       color: "#80CBC4",
+    },
+    {
+      path: isAdminAuthenticated ? "/admin/staff-salary" : "/staff-salary",
+      title: "S S",
+      icon: <BookOutlined fontSize="large" />,
+      color: "#FF6F00",
     },
   ];
 

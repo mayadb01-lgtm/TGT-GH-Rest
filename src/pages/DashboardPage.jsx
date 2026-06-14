@@ -47,6 +47,8 @@ import AapvanaLevanaBalance from "../components/restaurant/RestAapvanaLevana";
 import OfficeBanquetSalesGoalDashboard from "../components/office/OfficeBanquetSalesGoalDashboard";
 import OfficeBakeryBaadaSalesGoalDashboard from "../components/office/OfficeBakeryBaadaSalesGoalDashboard";
 import OfficeMotiBaadaSalesGoalDashboard from "../components/office/OfficeMotiBaadaSalesGoalDashboard";
+// Staff Salary
+import StaffSalaryDashboard from "../components/restaurant/StaffSalaryDashboard";
 
 const DashboardHeader = ({ onNavigate }) => {
   const navigate = useNavigate();
@@ -195,6 +197,12 @@ const NAVIGATION = [
     title: "Office Category",
     icon: <CategoryIcon />,
   },
+  { kind: "header", title: "Staff Salary" },
+  {
+    segment: "staff-salary",
+    title: "Staff Salary",
+    icon: <BadgeIcon />,
+  },
   { kind: "header", title: "Merged Reports" },
   {
     segment: "merged-graph",
@@ -308,6 +316,7 @@ const DashboardPage = () => {
     { path: "office", element: <OfficeHome /> },
     { path: "office-book", element: <OfficeBookDashboard /> },
     { path: "office-category", element: <OfficeCategoryDashboard /> },
+    { path: "staff-salary", element: <StaffSalaryDashboard /> },
     { path: "merged-graph", element: <OfficeMergedGraph /> },
     { path: "merged-reports", element: <OfficeMerged /> },
     { path: "sales-goal/gh-sales-goal", element: <GHSalesGoalDashboard /> },

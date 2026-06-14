@@ -15,10 +15,10 @@ router.post("/create-entry", async (req, res) => {
       entries.every(
         (item) =>
           item.amount &&
-          item.fullname &&
+          item._id &&
           item.categoryName &&
           item.expenseName &&
-          item.modeOfPayment
+          item.modeOfPayment,
       );
 
     if (officeIn && !validateEntries(officeIn)) {
@@ -99,7 +99,7 @@ router.put("/update-entry/:date", async (req, res) => {
           item.categoryName &&
           item.expenseName &&
           item.modeOfPayment &&
-          item.createDate
+          item.createDate,
       );
 
     if (officeIn && !validateEntries(officeIn)) {
@@ -137,7 +137,7 @@ router.put("/update-entry/:date", async (req, res) => {
         entryCreateDate: reqBody.entryCreateDate || "",
         updatedDate: reqBody.updatedDate || "",
       },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({
@@ -261,7 +261,7 @@ router.get("/get-expenses", async (req, res) => {
       category.expense.map((exp) => ({
         _id: exp._id,
         expenseName: exp.expenseName,
-      }))
+      })),
     );
 
     res.status(200).json({
@@ -333,5 +333,60 @@ router.delete("/delete-category/:id", async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 });
+
+// Get Office Book Category Upaad by Month and Year// Get Office Staff Upaad by Month (Month, Year)
+router.get(
+  "/get-category-upaad-by-month-and-year/:month/:year",
+  async (req, res) => {
+    try {
+      const month = parseInt(req.params.month, 10);
+      const year = parseInt(req.params.year, 10);
+      const startDate = dayjs(`${year}-${month}-01`).startOf("month").toDate();
+      const endDate = dayjs(`${year}-${month}-01`).endOf("month").toDate();
+
+      const entries = await OfficeBook.find(
+        {
+          entryCreateDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+        {
+          officeOut: 1,
+        },
+      );
+
+      const officeBookCategoryUpaadEntries = entries.flatMap((entry) =>
+        entry.officeOut.filter(
+          (item) => item.categoryName && item.categoryName.match(/upad|upaad|Upad|Upaad|staff|Staff/i)
+        )
+      );
+
+      const officeBookCategoryUpaad = officeBookCategoryUpaadEntries.reduce((acc, item) => {
+        const staffName = item.fullname_id?.trim();
+
+        if (!staffName) {
+          return acc;
+        }
+
+        acc[staffName] = (acc[staffName] || 0) + (item.amount || 0);
+
+        return acc;
+      }, {});
+
+      res.status(200).json({
+        success: true,
+        data: { officeBookCategoryUpaad },
+      });
+    } catch (error) {
+      console.error("Get Office Staff Upaad Error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+);
 
 export default router;

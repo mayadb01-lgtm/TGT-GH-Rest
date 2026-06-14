@@ -12,7 +12,7 @@ export const createRestEntry = (restEntryData) => async (dispatch) => {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     console.log("Restaurant Entry created successfully", data);
     dispatch({ type: "CreateRestEntriesSuccess", payload: data.data });
@@ -32,7 +32,7 @@ export const getRestEntryByDate = (date) => async (dispatch) => {
   try {
     dispatch({ type: "GetRestEntriesByDateRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entry/${date}`
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entry/${date}`,
     );
     console.log("Rest Entries fetched successfully", data);
     dispatch({ type: "GetRestEntriesByDateSuccess", payload: data.data });
@@ -54,7 +54,7 @@ export const deleteRestEntryByDate = (date) => async (dispatch) => {
   try {
     dispatch({ type: "DeleteRestEntryRequest" });
     const { data } = await axios.delete(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/delete-entry/${date}`
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/delete-entry/${date}`,
     );
     console.log("Restaurant Entry deleted successfully", data);
     dispatch({ type: "DeleteRestEntrySuccess", payload: data.data });
@@ -75,7 +75,7 @@ export const getRestEntriesByDateRange =
     try {
       dispatch({ type: "GetRestEntriesByDateRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entries/${startDate}/${endDate}`
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entries/${startDate}/${endDate}`,
       );
       console.log("Rest Entries fetched successfully", data);
       dispatch({
@@ -104,7 +104,7 @@ export const updateRestEntryByDate =
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       console.log("Restaurant Entry updated successfully", data);
       dispatch({ type: "UpdateRestEntrySuccess", payload: data.data });
@@ -116,7 +116,7 @@ export const updateRestEntryByDate =
       });
 
       toast.error(
-        error?.response?.data?.message || "An unknown error occurred"
+        error?.response?.data?.message || "An unknown error occurred",
       );
     }
   };
@@ -126,7 +126,7 @@ export const getUpadByDateRange = (startDate, endDate) => async (dispatch) => {
   try {
     dispatch({ type: "GetUpadByDateRangeRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-upad-entries/${startDate}/${endDate}`
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-upad-entries/${startDate}/${endDate}`,
     );
     console.log("Upad fetched successfully", data);
     dispatch({ type: "GetUpadByDateRangeSuccess", payload: data.data });
@@ -146,7 +146,7 @@ export const getAapvanaByDateRange =
     try {
       dispatch({ type: "GetAapvanaByDateRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-aapvana-entries/${startDate}/${endDate}`
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-aapvana-entries/${startDate}/${endDate}`,
       );
       console.log("Aapvana fetched successfully", data);
       dispatch({ type: "GetAapvanaByDateRangeSuccess", payload: data.data });
@@ -166,7 +166,7 @@ export const getLevanaByDateRange =
     try {
       dispatch({ type: "GetLevanaByDateRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-levana-entries/${startDate}/${endDate}`
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-levana-entries/${startDate}/${endDate}`,
       );
       console.log("Levana fetched successfully", data);
       dispatch({ type: "GetLevanaByDateRangeSuccess", payload: data.data });
@@ -186,7 +186,7 @@ export const getExpensesByDateRange =
     try {
       dispatch({ type: "GetExpensesByDateRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-expenses-entries/${startDate}/${endDate}`
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-expenses-entries/${startDate}/${endDate}`,
       );
       console.log("Expenses fetched successfully", data);
       dispatch({ type: "GetExpensesByDateRangeSuccess", payload: data.data });
@@ -205,7 +205,7 @@ export const getRestStaffGHLastSevenDays = () => async (dispatch) => {
   try {
     dispatch({ type: "GetPendingEntriesLastSevenDaysRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/aggregation/get-pending-rest`
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/aggregation/get-pending-rest`,
     );
     console.log("GH Name with Staff Options fetched successfully", data);
     dispatch({
@@ -228,7 +228,7 @@ export const getRestEntryByPaymentMethod =
     try {
       dispatch({ type: "GetRestEntryByPaymentMethodRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entries-by-payment-method/${startDate}/${endDate}`
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-entries-by-payment-method/${startDate}/${endDate}`,
       );
       console.log("Entry by Payment Method fetched successfully", data);
       dispatch({
@@ -244,3 +244,24 @@ export const getRestEntryByPaymentMethod =
       console.log("Error Catch", error?.response?.data?.message);
     }
   };
+
+// Get Staff Upaad by Month (Month Input) and Calculate Total Upaad for that Staff for that Month (StaffID, Month, Year)
+export const getStaffUpaadByMonth = (month, year) => async (dispatch) => {
+  try {
+    console.log("month", month);
+    console.log("year", year);
+    dispatch({ type: "GetStaffUpaadByMonthRequest" });
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-staff-total-upaad-by-month/${month}/${year}`,
+    );
+    console.log("Staff Upaad fetched successfully", data);
+    dispatch({ type: "GetStaffUpaadByMonthSuccess", payload: data.data });
+  } catch (error) {
+    dispatch({
+      type: "GetStaffUpaadByMonthFailure",
+      payload: error?.response?.data?.message,
+    });
+    toast.error(error?.response?.data?.message);
+    console.log("Error Catch", error?.response?.data?.message);
+  }
+};

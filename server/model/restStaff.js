@@ -6,6 +6,7 @@ const restStaffSchema = new Schema(
     fullname: { type: String, required: true },
     mobileNumber: { type: Number, required: true },
     category: { type: String, required: true },
+    perDayPay: { type: Number, default: 0, min: 0 },
     createDate: { type: String, required: true },
     updatedDateTime: { type: Date, default: Date.now() },
   },

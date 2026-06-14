@@ -5,6 +5,7 @@ const initialState = {
   restPendingNameOptions: [],
   loading: false,
   error: null,
+  staffTotalUpaad: {},
 };
 
 const restEntryReducer = createReducer(initialState, (builder) => {
@@ -40,7 +41,7 @@ const restEntryReducer = createReducer(initialState, (builder) => {
     .addCase("DeleteRestEntrySuccess", (state, action) => {
       state.loading = false;
       state.restEntries = state.restEntries.filter(
-        (entry) => entry._id !== action.payload
+        (entry) => entry._id !== action.payload,
       );
     })
     .addCase("DeleteRestEntryFailure", (state, action) => {
@@ -149,6 +150,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.restEntries = [];
+    })
+    // Get Staff Upaad by Month
+    .addCase("GetStaffUpaadByMonthRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetStaffUpaadByMonthSuccess", (state, action) => {
+      state.loading = false;
+      state.staffTotalUpaad = action.payload;
+    })
+    .addCase("GetStaffUpaadByMonthFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.staffTotalUpaad = {};
     });
 });
 

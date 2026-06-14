@@ -103,7 +103,7 @@ router.put("/update-entry/:date", async (req, res) => {
         updatedDateTime: reqBody.updatedDateTime,
         entryCreateDate: reqBody.entryCreateDate,
       },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({
@@ -296,7 +296,7 @@ router.get(
           computerAmount: 1,
           createDate: 1,
           entryCreateDate: 1,
-        }
+        },
       );
 
       const entriesByPaymentMethod = entries.map((entry) => ({
@@ -320,7 +320,49 @@ router.get(
         message: error.message,
       });
     }
-  }
+  },
 );
+
+// Get Staff Upaad by Month (StaffID, Month, Year)
+router.get("/get-staff-total-upaad-by-month/:month/:year", async (req, res) => {
+  try {
+    const month = parseInt(req.params.month, 10);
+    const year = parseInt(req.params.year, 10);
+    const startDate = dayjs(`${year}-${month}-01`).startOf("month").toDate();
+    const endDate = dayjs(`${year}-${month}-01`).endOf("month").toDate();
+
+    const entries = await RestEntry.find(
+      {
+        entryCreateDate: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      },
+      {
+        upad: 1,
+      },
+    );
+
+    const staffUpaadEntries = entries.flatMap((entry) => entry.upad);
+
+    const staffTotalUpaad = staffUpaadEntries.reduce((acc, upad) => {
+      acc[upad._id] = (acc[upad._id] || 0) + (upad.amount || 0);
+      return acc;
+    }, {});
+    console.log("staffTotalUpaad", staffTotalUpaad);
+
+    res.status(200).json({
+      success: true,
+      data: { staffTotalUpaad },
+    });
+  } catch (error) {
+    console.error("Get Staff Upaad by Month Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 
 export default router;

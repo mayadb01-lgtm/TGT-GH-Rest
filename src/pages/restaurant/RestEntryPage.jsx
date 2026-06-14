@@ -60,6 +60,7 @@ const RestEntryPage = () => {
     fullname: staff.fullname,
     mobileNumber: staff.mobileNumber,
     category: staff.category,
+    perDayPay: staff.perDayPay,
   })) || [];
 
   const pendingUsersFieldOptions = restPending?.filter((staff) => staff.category === "Pending")?.map((staff) => ({

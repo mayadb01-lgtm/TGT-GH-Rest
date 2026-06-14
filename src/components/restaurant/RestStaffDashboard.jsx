@@ -30,6 +30,7 @@ const RestStaffDashboard = () => {
     fullname: "",
     mobileNumber: "",
     category: "",
+    perDayPay: 0,
   });
   const [selectedId, setSelectedId] = useState(null);
 
@@ -44,11 +45,12 @@ const RestStaffDashboard = () => {
         fullname: staff.fullname,
         mobileNumber: staff.mobileNumber,
         category: staff.category || "Staff",
+        perDayPay: staff.perDayPay || 0,
       });
       setSelectedId(staff._id);
     } else {
       setEditMode(false);
-      setStaffData({ fullname: "", mobileNumber: "", category: "Staff" });
+      setStaffData({ fullname: "", mobileNumber: "", category: "Staff", perDayPay: 0 });
       setSelectedId(null);
     }
     setOpen(true);
@@ -115,7 +117,14 @@ const RestStaffDashboard = () => {
       headerName: "Category",
       width: 150,
       headerAlign: "center",
-      align: "center"
+      align: "center",
+    },
+    {
+      field: "perDayPay",
+      headerName: "Per Day Pay",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "actions",
@@ -245,6 +254,16 @@ const RestStaffDashboard = () => {
             value={staffData.mobileNumber}
             onChange={(e) =>
               setStaffData({ ...staffData, mobileNumber: e.target.value })
+            }
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Per Day Pay"
+            type="number"
+            value={staffData.perDayPay}
+            onChange={(e) =>
+              setStaffData({ ...staffData, perDayPay: Number(e.target.value) })
             }
             sx={{ mb: 2 }}
           />

@@ -11,6 +11,7 @@ router.post("/create-staff", async (req, res) => {
       fullname: reqBody.fullname,
       mobileNumber: reqBody.mobileNumber,
       category: reqBody.category || "Staff",
+      perDayPay: reqBody.perDayPay || 0,
       createDate: new Date().toLocaleDateString(),
       updatedDateTime: new Date().toString(),
     });
@@ -32,7 +33,7 @@ router.get("/get-staff-id-name-mobile", async (req, res) => {
   try {
     const staff = await RestStaff.find(
       {},
-      { id: 1, fullname: 1, mobileNumber: 1, category: 1 }
+      { id: 1, fullname: 1, mobileNumber: 1, category: 1, perDayPay: 1 }
     );
 
     res.status(200).json({
