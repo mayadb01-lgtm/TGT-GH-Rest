@@ -76,7 +76,7 @@ const ProtectedAdminRoute = ({ children }) => {
     return children;
   }
 
-  if (passedExtra) {
+  if (!passedExtra) {
     return (
       <Box
         sx={{
