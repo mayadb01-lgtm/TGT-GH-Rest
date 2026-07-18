@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid2";
 import {
   Box,
   Button,
+  Checkbox,
   Chip,
   Paper,
   Stack,
@@ -18,6 +19,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SkipPreviousRoundedIcon from "@mui/icons-material/SkipPreviousRounded";
+import SkipNextRoundedIcon from "@mui/icons-material/SkipNextRounded";
 import ModernLoader from "../../utils/util";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { getRestStaff } from "../../redux/actions/restStaffAction";
@@ -41,6 +44,7 @@ const tableColumns = [
   "Rest Upaad",
   "Office Upaad",
   "Current Balance",
+  "Salary Paid?",
 ];
 
 const buildDraftRows = (
@@ -49,14 +53,10 @@ const buildDraftRows = (
   officeBookCategoryUpaad = {},
 ) =>
   staff.map((s) => {
-    const total = 0;
-
-    const restaurantUpaad =
-      staffTotalUpaad?.staffTotalUpaad?.[s._id?.toString()] || 0;
-
-    const officeUpaad =
-      officeBookCategoryUpaad?.officeBookCategoryUpaad?.[s._id?.toString()] ||
-      0;
+    const restaurantUpaad = staffTotalUpaad?.[s._id?.toString()] || 0;
+    const officeUpaad = officeBookCategoryUpaad?.[s._id?.toString()] || 0;
+    const total = Number(s.perDayPay || 0) * Number(s.attendance || 0);
+    const currentBalance = total - restaurantUpaad - officeUpaad;
 
     return {
       staffId: s._id,
@@ -66,13 +66,16 @@ const buildDraftRows = (
       total,
       restaurantUpaad,
       officeUpaad,
-      currentBalance: total - restaurantUpaad - officeUpaad,
+      currentBalance,
+      salaryPaid: false,
     };
   });
 
 const StaffSalaryEntryPage = () => {
   const dispatch = useAppDispatch();
-  const { loading: staffLoading, restStaff } = useAppSelector((state) => state.restStaff);
+  const { loading: staffLoading, restStaff } = useAppSelector(
+    (state) => state.restStaff,
+  );
   const { loading: staffUpaadLoading, staffTotalUpaad } = useAppSelector(
     (state) => state.restEntry,
   );
@@ -99,23 +102,32 @@ const StaffSalaryEntryPage = () => {
     dispatch(getSalarySheet(month, year));
   }, [dispatch, month, year]);
 
-  // Sync rows when an existing salary sheet is fetched, created, or updated
   useEffect(() => {
-    if (salarySheet) {
-      // setRows(salarySheet.rows || []);
-      // Just Fetch Editable Columns = perDayPay, attendance
-      setRows(
-        buildDraftRows(restStaff, staffTotalUpaad, officeBookCategoryUpaad),
-      );
-      setRows(
-        salarySheet.rows.map((row) => ({
-          ...row,
+    if (salarySheet && salarySheet.rows?.length > 0) {
+      const allRows = salarySheet.rows.map((row) => {
+        const restaurantUpaad = staffTotalUpaad?.[row.staffId?.toString()] || 0;
+        const officeUpaad =
+          officeBookCategoryUpaad?.[row.staffId?.toString()] || 0;
+        const total = Number(row.perDayPay || 0) * Number(row.attendance || 0);
+
+        return {
+          staffId: row.staffId,
+          fullname: row.fullname,
           perDayPay: row.perDayPay || 0,
           attendance: row.attendance || 0,
-        })),
-      );
+          total,
+          restaurantUpaad,
+          officeUpaad,
+          currentBalance: total - restaurantUpaad - officeUpaad,
+          salaryPaid: Boolean(row.salaryPaid),
+        };
+      });
+
+      setRows(allRows);
+    } else {
+      setRows([]);
     }
-  }, [salarySheet]);
+  }, [salarySheet, staffTotalUpaad, officeBookCategoryUpaad]);
 
   useEffect(() => {
     if (
@@ -166,7 +178,18 @@ const StaffSalaryEntryPage = () => {
       `Are you sure you want to create salary sheet for ${selectedMonth.format("MMMM YYYY")}?`,
     );
     if (!confirmSubmit) return;
-    dispatch(createSalarySheet({ month, year, rows, remarks: "" }));
+    const editableRows = rows.map(
+      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+      }),
+    );
+    dispatch(
+      createSalarySheet({ month, year, rows: editableRows, remarks: "" }),
+    );
   };
 
   // Update
@@ -175,7 +198,18 @@ const StaffSalaryEntryPage = () => {
       `Are you sure you want to update salary sheet for ${selectedMonth.format("MMMM YYYY")}?`,
     );
     if (!confirmSubmit) return;
-    dispatch(updateSalarySheet(month, year, { rows }));
+    const editableRows = rows.map(
+      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+      }),
+    );
+    dispatch(
+      updateSalarySheet(month, year, { rows: editableRows, remarks: "" }),
+    );
   };
 
   // Delete
@@ -184,10 +218,24 @@ const StaffSalaryEntryPage = () => {
       `Are you sure you want to delete salary sheet for ${selectedMonth.format("MMMM YYYY")}?`,
     );
     if (!confirmSubmit) return;
-    dispatch(deleteSalarySheet(month, year)).then(() => resetForm());
+    dispatch(deleteSalarySheet(month, year));
+    resetForm();
   };
 
-  if (salaryLoading || staffUpaadLoading || officeBookCategoryUpaadLoading || staffLoading)
+  const goToPreviousMonth = () => {
+    setSelectedMonth(selectedMonth.subtract(1, "month"));
+  };
+
+  const goToNextMonth = () => {
+    setSelectedMonth(selectedMonth.add(1, "month"));
+  };
+
+  if (
+    salaryLoading ||
+    staffUpaadLoading ||
+    officeBookCategoryUpaadLoading ||
+    staffLoading
+  )
     return <ModernLoader />;
 
   return (
@@ -249,6 +297,49 @@ const StaffSalaryEntryPage = () => {
                     />
                   </LocalizationProvider>
                 </Grid>
+                {/* Previous and Next Month Button */}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  justifyContent="center"
+                  border={1}
+                  borderColor="divider"
+                  borderRadius={2}
+                  p={2}
+                >
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Month
+                  </Typography>
+
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={goToPreviousMonth}
+                      sx={{
+                        minWidth: "40px",
+                        padding: "4px",
+                      }}
+                    >
+                      <SkipPreviousRoundedIcon fontSize="small" />
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={goToNextMonth}
+                      sx={{
+                        minWidth: "40px",
+                        padding: "4px",
+                      }}
+                    >
+                      <SkipNextRoundedIcon fontSize="small" />
+                    </Button>
+                  </Stack>
+                </Box>
                 {isNew && (
                   <Grid>
                     <Chip
@@ -429,6 +520,19 @@ const StaffSalaryEntryPage = () => {
                           value={row.currentBalance || 0}
                           disabled
                           fullWidth
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Checkbox
+                          checked={Boolean(row.salaryPaid)}
+                          onChange={(e) =>
+                            handleRowChange(
+                              index,
+                              "salaryPaid",
+                              e.target.checked,
+                            )
+                          }
+                          color="success"
                         />
                       </TableCell>
                     </TableRow>

@@ -140,6 +140,25 @@ export const officeBookReducer = createReducer(initialState, (builder) => {
         state.error = action.payload;
         state.officeBookCategoryUpaad = {};
       },
+    )
+    // Get Office Book Category Upaad by Month Range
+    .addCase("GetOfficeBookCategoryUpaadByMonthRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase(
+      "GetOfficeBookCategoryUpaadByMonthRangeSuccess",
+      (state, action) => {
+        state.loading = false;
+        state.officeBookCategoryUpaad = action.payload;
+      },
+    )
+    .addCase(
+      "GetOfficeBookCategoryUpaadByMonthRangeFailure",
+      (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.officeBookCategoryUpaad = {};
+      },
     );
 });
 

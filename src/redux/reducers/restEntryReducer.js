@@ -163,6 +163,19 @@ const restEntryReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.error = action.payload;
       state.staffTotalUpaad = {};
+    })
+    // Get Staff Upaad by Month Range
+    .addCase("GetStaffUpaadByMonthRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetStaffUpaadByMonthRangeSuccess", (state, action) => {
+      state.loading = false;
+      state.staffTotalUpaad = action.payload;
+    })
+    .addCase("GetStaffUpaadByMonthRangeFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.staffTotalUpaad = {};
     });
 });
 

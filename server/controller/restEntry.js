@@ -349,11 +349,10 @@ router.get("/get-staff-total-upaad-by-month/:month/:year", async (req, res) => {
       acc[upad._id] = (acc[upad._id] || 0) + (upad.amount || 0);
       return acc;
     }, {});
-    console.log("staffTotalUpaad", staffTotalUpaad);
 
     res.status(200).json({
       success: true,
-      data: { staffTotalUpaad },
+      data: staffTotalUpaad,
     });
   } catch (error) {
     console.error("Get Staff Upaad by Month Error:", error);
@@ -364,5 +363,62 @@ router.get("/get-staff-total-upaad-by-month/:month/:year", async (req, res) => {
     });
   }
 });
+
+router.get(
+  "/get-staff-total-upaad-by-month-range/:startDate/:endDate",
+  async (req, res) => {
+    try {
+      if (
+        !dayjs(req.params.startDate, "DD-MM-YYYY", true).isValid() ||
+        !dayjs(req.params.endDate, "DD-MM-YYYY", true).isValid()
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid date format. Use DD-MM-YYYY.",
+        });
+      }
+
+      const startDate = dayjs(req.params.startDate, "DD-MM-YYYY");
+      const endDate = dayjs(req.params.endDate, "DD-MM-YYYY");
+
+      const entries = await RestEntry.find(
+        {
+          entryCreateDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+        {
+          upad: 1,
+          entryCreateDate: 1,
+        },
+      );
+
+      // Group by "YYYY-MM" first, keeping staffId totals inside each month
+      const staffTotalUpaadByMonth = entries.reduce((acc, entry) => {
+        const monthKey = dayjs(entry.entryCreateDate).format("YYYY-MM");
+
+        if (!acc[monthKey]) {
+          acc[monthKey] = {};
+        }
+
+        (entry.upad || []).forEach((upad) => {
+          acc[monthKey][upad._id] =
+            (acc[monthKey][upad._id] || 0) + (upad.amount || 0);
+        });
+
+        return acc;
+      }, {});
+
+      res.status(200).json({
+        success: true,
+        data: staffTotalUpaadByMonth,
+      });
+    } catch (error) {
+      console.error("Get Staff Upaad by Month Range Error:", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+);
 
 export default router;

@@ -24,6 +24,29 @@ export const getSalarySheet = (month, year) => async (dispatch) => {
   }
 };
 
+// Get Salary Sheets by Month Range (Start Date, End Date - DD-MM-YYYY)
+export const getSalarySheetsByMonthRange =
+  (startDate, endDate) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetSalarySheetsByMonthRangeRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheets-by-month-range/${startDate}/${endDate}`,
+      );
+      console.log("Salary Sheets fetched successfully", data);
+      dispatch({
+        type: "GetSalarySheetsByMonthRangeSuccess",
+        payload: data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "GetSalarySheetsByMonthRangeFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };
+
 // Create Salary Sheet
 export const createSalarySheet = (salaryData) => async (dispatch) => {
   try {

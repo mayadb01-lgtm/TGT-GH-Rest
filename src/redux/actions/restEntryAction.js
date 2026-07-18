@@ -265,3 +265,25 @@ export const getStaffUpaadByMonth = (month, year) => async (dispatch) => {
     console.log("Error Catch", error?.response?.data?.message);
   }
 };
+
+export const getStaffUpaadByMonthRange =
+  (startMonth, endMonth) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetStaffUpaadByMonthRangeRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/restEntry/get-staff-total-upaad-by-month-range/${startMonth}/${endMonth}`,
+      );
+      console.log("Staff Upaad fetched successfully", data);
+      dispatch({
+        type: "GetStaffUpaadByMonthRangeSuccess",
+        payload: data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "GetStaffUpaadByMonthRangeFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };

@@ -2,6 +2,7 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   salarySheet: null,
+  salarySheets: [],
   salarySheetNotFound: false,
   loading: false,
   error: null,
@@ -27,6 +28,19 @@ const staffSalaryReducer = createReducer(initialState, (builder) => {
     .addCase("GetSalarySheetFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
+    })
+    // Get Salary Sheets by Month Range
+    .addCase("GetSalarySheetsByMonthRangeRequest", (state) => {
+      state.loading = true;
+    })
+    .addCase("GetSalarySheetsByMonthRangeSuccess", (state, action) => {
+      state.loading = false;
+      state.salarySheets = action.payload;
+    })
+    .addCase("GetSalarySheetsByMonthRangeFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.salarySheets = [];
     })
     // Create Salary Sheet
     .addCase("CreateSalarySheetRequest", (state) => {

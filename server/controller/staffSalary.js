@@ -1,4 +1,5 @@
 import { Router } from "express";
+import dayjs from "dayjs";
 import StaffSalary from "../model/staffSalary.js";
 import RestStaff from "../model/restStaff.js";
 const router = Router();
@@ -6,7 +7,6 @@ const router = Router();
 // Create Salary Sheet
 router.post("/create-salary-sheet", async (req, res) => {
   try {
-
     // Body
     const { month, year, rows, remarks } = req.body;
 
@@ -33,11 +33,22 @@ router.post("/create-salary-sheet", async (req, res) => {
       });
     }
 
+    // Only persist editable fields; calculated fields are derived on the client
+    const editableRows = rows.map(
+      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid: Boolean(salaryPaid),
+      }),
+    );
+
     // Create Salary Sheet
     const salarySheet = await StaffSalary.create({
       month,
       year,
-      rows,
+      rows: editableRows,
       remarks,
     });
 
@@ -81,6 +92,46 @@ router.get("/get-salary-sheet/:month/:year", async (req, res) => {
   }
 });
 
+// Get Salary Sheets by Month Range (Start Month, End Month)
+router.get(
+  "/get-salary-sheets-by-month-range/:startDate/:endDate",
+  async (req, res) => {
+    try {
+      const start = dayjs(req.params.startDate, "DD-MM-YYYY").startOf("month");
+      const end = dayjs(req.params.endDate, "DD-MM-YYYY").startOf("month");
+
+      // Build an explicit list of { month, year } pairs for every month in the
+      // range so the query stays correct across year boundaries.
+      const monthYearPairs = [];
+      let cursor = start;
+      while (cursor.isBefore(end) || cursor.isSame(end, "month")) {
+        monthYearPairs.push({
+          month: cursor.month() + 1,
+          year: cursor.year(),
+        });
+        cursor = cursor.add(1, "month");
+      }
+
+      const salarySheets = monthYearPairs.length
+        ? await StaffSalary.find({ $or: monthYearPairs }).sort({
+            year: 1,
+            month: 1,
+          })
+        : [];
+
+      res.status(200).json({
+        success: true,
+        data: salarySheets,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  },
+);
+
 // Update Salary Sheet rows by Month and Year
 router.put("/update-salary-sheet/:month/:year", async (req, res) => {
   try {
@@ -88,10 +139,21 @@ router.put("/update-salary-sheet/:month/:year", async (req, res) => {
     const year = Number(req.params.year);
     const { rows, remarks } = req.body;
 
+    // Only persist editable fields; calculated fields are derived on the client
+    const editableRows = rows.map(
+      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid: Boolean(salaryPaid),
+      }),
+    );
+
     const salarySheet = await StaffSalary.findOneAndUpdate(
       { month, year },
       {
-        rows,
+        rows: editableRows,
         remarks: remarks || "",
         updatedDate: new Date().toLocaleDateString(),
         updatedDateTime: new Date(),

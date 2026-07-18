@@ -1,17 +1,16 @@
 import { Schema, model } from "mongoose";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+
+dayjs.extend(customParseFormat);
 
 const staffSalaryRowSchema = new Schema(
   {
     staffId: { type: Schema.Types.ObjectId, ref: "RestStaff", required: true },
     fullname: { type: String, required: true, trim: true },
-    // mobileNumber: { type: Number, required: true },
-    // category: { type: String, required: true, trim: true },
     perDayPay: { type: Number, required: true, min: 0 },
     attendance: { type: Number, default: 0, min: 0 },
-    total: { type: Number, default: 0, min: 0 },
-    restaurantUpaad: { type: Number, default: 0, min: 0 },
-    officeUpaad: { type: Number, default: 0, min: 0 },
-    currentBalance: { type: Number, default: 0 },
+    salaryPaid: { type: Boolean, default: false },
     entryCreateDate: { type: Date },
     updatedDateTime: { type: Date, default: Date.now() },
     updatedDate: { type: String, default: "" },

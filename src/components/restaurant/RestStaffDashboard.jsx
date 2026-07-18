@@ -50,7 +50,12 @@ const RestStaffDashboard = () => {
       setSelectedId(staff._id);
     } else {
       setEditMode(false);
-      setStaffData({ fullname: "", mobileNumber: "", category: "Staff", perDayPay: 0 });
+      setStaffData({
+        fullname: "",
+        mobileNumber: "",
+        category: "Staff",
+        perDayPay: 0,
+      });
       setSelectedId(null);
     }
     setOpen(true);
@@ -77,7 +82,7 @@ const RestStaffDashboard = () => {
   const filteredStaff = restStaff.filter(
     (staff) =>
       staff.fullname.toLowerCase().includes(search.toLowerCase()) ||
-      String(staff.mobileNumber).includes(search)
+      String(staff.mobileNumber).includes(search),
   );
 
   const columns = [

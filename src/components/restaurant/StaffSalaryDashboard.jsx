@@ -1,19 +1,20 @@
-import { useState } from "react";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { useState, useEffect } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import {
+  Autocomplete,
   Box,
-  Button,
-  CircularProgress,
+  Chip,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { getOfficeBookCategoryUpaadByMonthRange } from "../../redux/actions/officeBookAction";
+import { getSalarySheetsByMonthRange } from "../../redux/actions/staffSalaryAction";
+import { getStaffUpaadByMonthRange } from "../../redux/actions/restEntryAction";
 
 dayjs.locale("en-gb");
 
@@ -29,6 +30,13 @@ const columns = [
     ),
   },
   {
+    field: "month",
+    headerName: "Month",
+    width: 150,
+    headerAlign: "center",
+    align: "center",
+  },
+  {
     field: "fullname",
     headerName: "Staff Name",
     width: 200,
@@ -42,7 +50,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`
+      `${Number(params.value || 0).toLocaleString("en-IN")}`,
   },
   {
     field: "attendance",
@@ -59,7 +67,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`
+      `${Number(params.value || 0).toLocaleString("en-IN")}`,
   },
   {
     field: "restaurantUpaad",
@@ -68,7 +76,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`
+      `${Number(params.value || 0).toLocaleString("en-IN")}`,
   },
   {
     field: "officeUpaad",
@@ -77,7 +85,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`
+      `${Number(params.value || 0).toLocaleString("en-IN")}`,
   },
   {
     field: "currentBalance",
@@ -87,46 +95,90 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`
+      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+  },
+  {
+    field: "salaryPaid",
+    headerName: "Salary Paid?",
+    width: 130,
+    headerAlign: "center",
+    align: "center",
+    renderCell: (params) => (
+      <Chip
+        label={params.value ? "Paid" : "Unpaid"}
+        color={params.value ? "success" : "default"}
+        size="small"
+        variant={params.value ? "filled" : "outlined"}
+      />
+    ),
   },
 ];
 
 const StaffSalaryDashboard = () => {
-  const [selectedMonth, setSelectedMonth] = useState(dayjs());
-  const [salarySheet, setSalarySheet] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const month = selectedMonth.month() + 1;
-  const year = selectedMonth.year();
+  const dispatch = useAppDispatch();
+  const { loading: staffUpaadLoading, staffTotalUpaad } = useAppSelector(
+    (state) => state.restEntry,
+  );
+  const { loading: officeUpaadLoading, officeBookCategoryUpaad } =
+    useAppSelector((state) => state.officeBook);
+  const { loading: salaryLoading, salarySheets } = useAppSelector(
+    (state) => state.staffSalary,
+  );
+  const [startMonth, setStartMonth] = useState(dayjs());
+  const [endMonth, setEndMonth] = useState(dayjs());
+  const [selectedName, setSelectedName] = useState(null);
 
   useEffect(() => {
-    handleLoad();
-  }, [month, year]);
+    const startDate = startMonth.startOf("month").format("DD-MM-YYYY");
+    const endDate = endMonth.endOf("month").format("DD-MM-YYYY");
+    dispatch(getStaffUpaadByMonthRange(startDate, endDate));
+    dispatch(getOfficeBookCategoryUpaadByMonthRange(startDate, endDate));
+    dispatch(getSalarySheetsByMonthRange(startDate, endDate));
+  }, [dispatch, startMonth, endMonth]);
 
-  const handleLoad = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`,
-      );
-      setSalarySheet(data.data);
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message ??
-        error?.message ??
-        "An unknown error occurred.",
-      );
-      setSalarySheet(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const allRows = (salarySheets || []).flatMap((sheet) => {
+    // Build the same "YYYY-MM" key both backends group by
+    const monthKey = `${sheet.year}-${String(sheet.month).padStart(2, "0")}`;
+    const staffMonthBucket = staffTotalUpaad?.[monthKey] || {};
+    const officeMonthBucket = officeBookCategoryUpaad?.[monthKey] || {};
 
-  const rows =
-    salarySheet?.rows?.map((row) => ({
-      ...row,
-      id: row._id,
-    })) || [];
+    return (sheet.rows || []).map((row) => {
+      const restaurantUpaad = staffMonthBucket[row.staffId?.toString()] || 0;
+      const officeUpaad = officeMonthBucket[row.staffId?.toString()] || 0;
+      const total = Number(row.perDayPay || 0) * Number(row.attendance || 0);
+
+      return {
+        ...row,
+        id: `${sheet._id}-${row._id}`,
+        month: `${dayjs()
+          .month(sheet.month - 1)
+          .format("MMMM")} ${sheet.year}`,
+        // numeric key purely for sorting months ascending; not for display
+        monthSortKey: sheet.year * 12 + sheet.month,
+        total,
+        restaurantUpaad,
+        officeUpaad,
+        currentBalance: total - restaurantUpaad - officeUpaad,
+        salaryPaid: Boolean(row.salaryPaid),
+      };
+    });
+  });
+
+  // Group rows by staff (fullname), then sort months ascending inside each group,
+  // and keep each staff's rows contiguous in the final list.
+  const sortedRows = [...allRows].sort((a, b) => {
+    const nameCompare = (a.fullname || "").localeCompare(b.fullname || "");
+    if (nameCompare !== 0) return nameCompare;
+    return a.monthSortKey - b.monthSortKey;
+  });
+
+  const nameOptions = [
+    ...new Set(sortedRows.map((row) => row.fullname)),
+  ].filter(Boolean);
+
+  const rows = selectedName
+    ? sortedRows.filter((row) => row.fullname === selectedName)
+    : sortedRows;
 
   const summary = rows.reduce(
     (acc, row) => {
@@ -169,27 +221,41 @@ const StaffSalaryDashboard = () => {
         flexWrap="wrap"
       >
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
-          Select Month:
+          Select Month Range:
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <DatePicker
             views={["year", "month"]}
-            value={selectedMonth}
+            value={startMonth}
             onChange={(newDate) => {
-              if (newDate) setSelectedMonth(newDate);
+              if (newDate) setStartMonth(newDate);
+            }}
+            format="MMMM YYYY"
+            slotProps={{ textField: { size: "small" } }}
+          />
+          <DatePicker
+            views={["year", "month"]}
+            value={endMonth}
+            onChange={(newDate) => {
+              if (newDate) setEndMonth(newDate);
             }}
             format="MMMM YYYY"
             slotProps={{ textField: { size: "small" } }}
           />
         </LocalizationProvider>
+
+        <Autocomplete
+          options={nameOptions}
+          value={selectedName}
+          onChange={(event, newValue) => setSelectedName(newValue)}
+          sx={{ minWidth: 220 }}
+          renderInput={(params) => (
+            <TextField {...params} label="Filter by Name" size="small" />
+          )}
+        />
       </Stack>
 
-      <Stack
-        direction="row"
-        spacing={2}
-        flexWrap="wrap"
-        sx={{ mb: 2 }}
-      >
+      <Stack direction="row" spacing={2} flexWrap="wrap" sx={{ mb: 2 }}>
         <Box
           sx={{
             p: 2,
@@ -198,9 +264,7 @@ const StaffSalaryDashboard = () => {
             borderRadius: 2,
           }}
         >
-          <Typography variant="body2">
-            Total Salary
-          </Typography>
+          <Typography variant="body2">Total Salary</Typography>
           <Typography variant="h6">
             {summary.totalSalary.toLocaleString("en-IN")}
           </Typography>
@@ -214,9 +278,7 @@ const StaffSalaryDashboard = () => {
             borderRadius: 2,
           }}
         >
-          <Typography variant="body2">
-            Restaurant Upaad
-          </Typography>
+          <Typography variant="body2">Restaurant Upaad</Typography>
           <Typography variant="h6">
             {summary.totalRestUpaad.toLocaleString("en-IN")}
           </Typography>
@@ -230,9 +292,7 @@ const StaffSalaryDashboard = () => {
             borderRadius: 2,
           }}
         >
-          <Typography variant="body2">
-            Office Upaad
-          </Typography>
+          <Typography variant="body2">Office Upaad</Typography>
           <Typography variant="h6">
             {summary.totalOfficeUpaad.toLocaleString("en-IN")}
           </Typography>
@@ -246,18 +306,16 @@ const StaffSalaryDashboard = () => {
             borderRadius: 2,
           }}
         >
-          <Typography variant="body2">
-            Net Balance
-          </Typography>
+          <Typography variant="body2">Net Balance</Typography>
           <Typography variant="h6">
             {summary.totalBalance.toLocaleString("en-IN")}
           </Typography>
         </Box>
       </Stack>
 
-      {salarySheet ? (
+      {rows.length > 0 ? (
         <DataGrid
-          loading={loading}
+          loading={staffUpaadLoading || officeUpaadLoading || salaryLoading}
           rows={rows}
           columns={columns}
           hideFooter
@@ -275,7 +333,8 @@ const StaffSalaryDashboard = () => {
         />
       ) : (
         <Typography variant="subtitle1" color="text.secondary" mt={2}>
-          No salary sheet found for {selectedMonth.format("MMMM YYYY")}
+          No salary sheet found for {startMonth.format("MMMM YYYY")} to{" "}
+          {endMonth.format("MMMM YYYY")}
         </Typography>
       )}
     </Box>
