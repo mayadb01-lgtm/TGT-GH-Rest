@@ -4,6 +4,8 @@ const initialState = {
   salarySheet: null,
   salarySheets: [],
   salarySheetNotFound: false,
+  previousSalarySheet: null,
+  previousSalarySheetNotFound: false,
   loading: false,
   error: null,
 };
@@ -26,6 +28,25 @@ const staffSalaryReducer = createReducer(initialState, (builder) => {
       state.salarySheetNotFound = true;
     })
     .addCase("GetSalarySheetFailure", (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    })
+    // Get Previous Month Salary Sheet
+    .addCase("GetPreviousSalarySheetRequest", (state) => {
+      state.loading = true;
+      state.previousSalarySheetNotFound = false;
+    })
+    .addCase("GetPreviousSalarySheetSuccess", (state, action) => {
+      state.loading = false;
+      state.previousSalarySheet = action.payload;
+      state.previousSalarySheetNotFound = false;
+    })
+    .addCase("GetPreviousSalarySheetNotFound", (state) => {
+      state.loading = false;
+      state.previousSalarySheet = null;
+      state.previousSalarySheetNotFound = true;
+    })
+    .addCase("GetPreviousSalarySheetFailure", (state, action) => {
       state.loading = false;
       state.error = action.payload;
     })

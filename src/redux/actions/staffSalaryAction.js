@@ -24,6 +24,28 @@ export const getSalarySheet = (month, year) => async (dispatch) => {
   }
 };
 
+// Get Previous Month Salary Sheet (used to look up previous month's salary paid amount)
+export const getPreviousMonthSalarySheet =
+  (month, year) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetPreviousSalarySheetRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`,
+      );
+      dispatch({ type: "GetPreviousSalarySheetSuccess", payload: data.data });
+    } catch (error) {
+      if (error?.response?.status === 404) {
+        dispatch({ type: "GetPreviousSalarySheetNotFound" });
+      } else {
+        dispatch({
+          type: "GetPreviousSalarySheetFailure",
+          payload: error?.response?.data?.message,
+        });
+        console.log("Error Catch", error?.response?.data?.message);
+      }
+    }
+  };
+
 // Get Salary Sheets by Month Range (Start Date, End Date - DD-MM-YYYY)
 export const getSalarySheetsByMonthRange =
   (startDate, endDate) => async (dispatch) => {

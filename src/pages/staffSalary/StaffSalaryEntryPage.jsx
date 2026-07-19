@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
@@ -28,6 +28,7 @@ import { getStaffUpaadByMonth } from "../../redux/actions/restEntryAction";
 import { getOfficeBookCategoryUpaadByMonthAndYear } from "../../redux/actions/officeBookAction";
 import {
   getSalarySheet,
+  getPreviousMonthSalarySheet,
   createSalarySheet,
   updateSalarySheet,
   deleteSalarySheet,
@@ -45,6 +46,7 @@ const tableColumns = [
   "Office Upaad",
   "Current Balance",
   "Salary Paid?",
+  "Prev Month Salary Paid",
 ];
 
 const buildDraftRows = (
@@ -85,6 +87,7 @@ const StaffSalaryEntryPage = () => {
     loading: salaryLoading,
     salarySheet,
     salarySheetNotFound,
+    previousSalarySheet,
   } = useAppSelector((state) => state.staffSalary);
 
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
@@ -95,12 +98,34 @@ const StaffSalaryEntryPage = () => {
   const month = selectedMonth.month() + 1;
   const year = selectedMonth.year();
 
+  const previousMonthDate = selectedMonth.subtract(1, "month");
+  const previousMonth = previousMonthDate.month() + 1;
+  const previousYear = previousMonthDate.year();
+
   useEffect(() => {
     dispatch(getRestStaff());
     dispatch(getStaffUpaadByMonth(month, year));
     dispatch(getOfficeBookCategoryUpaadByMonthAndYear(month, year));
     dispatch(getSalarySheet(month, year));
-  }, [dispatch, month, year]);
+    dispatch(getPreviousMonthSalarySheet(previousMonth, previousYear));
+  }, [dispatch, month, year, previousMonth, previousYear]);
+
+  // Map of staffId -> amount paid last month (only for staff whose "Salary Paid?"
+  // checkbox was checked in the previous month's sheet)
+  const previousMonthPaidAmountByStaffId = useMemo(() => {
+    const map = {};
+    (previousSalarySheet?.rows || []).forEach((row) => {
+      if (row.salaryPaid) {
+        map[row.staffId?.toString()] = row.salaryPaidAmount ?? 0;
+      }
+    });
+    return map;
+  }, [previousSalarySheet]);
+
+  const getPreviousMonthPaidAmount = (staffId) => {
+    const amount = previousMonthPaidAmountByStaffId[staffId?.toString()];
+    return amount === undefined ? "Not Paid" : amount;
+  };
 
   useEffect(() => {
     if (salarySheet && salarySheet.rows?.length > 0) {
@@ -179,12 +204,20 @@ const StaffSalaryEntryPage = () => {
     );
     if (!confirmSubmit) return;
     const editableRows = rows.map(
-      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+      ({
         staffId,
         fullname,
         perDayPay,
         attendance,
         salaryPaid,
+        currentBalance,
+      }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+        salaryPaidAmount: currentBalance || 0,
       }),
     );
     dispatch(
@@ -199,12 +232,20 @@ const StaffSalaryEntryPage = () => {
     );
     if (!confirmSubmit) return;
     const editableRows = rows.map(
-      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+      ({
         staffId,
         fullname,
         perDayPay,
         attendance,
         salaryPaid,
+        currentBalance,
+      }) => ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+        salaryPaidAmount: currentBalance || 0,
       }),
     );
     dispatch(
@@ -534,6 +575,26 @@ const StaffSalaryEntryPage = () => {
                           }
                           color="success"
                         />
+                      </TableCell>
+                      <TableCell sx={{ width: "15%" }}>
+                        {(() => {
+                          const previousAmount = getPreviousMonthPaidAmount(
+                            row.staffId,
+                          );
+                          return previousAmount === "Not Paid" ? (
+                            <Typography variant="body2" disabled>
+                              Not Paid
+                            </Typography>
+                          ) : (
+                            <Typography
+                              variant="body2"
+                              color="success"
+                              disabled
+                            >
+                              {previousAmount}
+                            </Typography>
+                          );
+                        })()}
                       </TableCell>
                     </TableRow>
                   ))}

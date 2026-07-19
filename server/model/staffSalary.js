@@ -11,6 +11,7 @@ const staffSalaryRowSchema = new Schema(
     perDayPay: { type: Number, required: true, min: 0 },
     attendance: { type: Number, default: 0, min: 0 },
     salaryPaid: { type: Boolean, default: false },
+    salaryPaidAmount: { type: Number, default: 0 },
     entryCreateDate: { type: Date },
     updatedDateTime: { type: Date, default: Date.now() },
     updatedDate: { type: String, default: "" },

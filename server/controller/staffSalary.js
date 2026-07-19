@@ -35,12 +35,20 @@ router.post("/create-salary-sheet", async (req, res) => {
 
     // Only persist editable fields; calculated fields are derived on the client
     const editableRows = rows.map(
-      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+      ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+        salaryPaidAmount,
+      }) => ({
         staffId,
         fullname,
         perDayPay,
         attendance,
         salaryPaid: Boolean(salaryPaid),
+        salaryPaidAmount: Number(salaryPaidAmount) || 0,
       }),
     );
 
@@ -141,12 +149,20 @@ router.put("/update-salary-sheet/:month/:year", async (req, res) => {
 
     // Only persist editable fields; calculated fields are derived on the client
     const editableRows = rows.map(
-      ({ staffId, fullname, perDayPay, attendance, salaryPaid }) => ({
+      ({
+        staffId,
+        fullname,
+        perDayPay,
+        attendance,
+        salaryPaid,
+        salaryPaidAmount,
+      }) => ({
         staffId,
         fullname,
         perDayPay,
         attendance,
         salaryPaid: Boolean(salaryPaid),
+        salaryPaidAmount: Number(salaryPaidAmount) || 0,
       }),
     );
 
