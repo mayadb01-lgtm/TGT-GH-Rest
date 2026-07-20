@@ -1,17 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import {
   Autocomplete,
   Box,
+  Button,
   Chip,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import SkipPreviousRoundedIcon from "@mui/icons-material/SkipPreviousRounded";
+import SkipNextRoundedIcon from "@mui/icons-material/SkipNextRounded";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useDateNavigation } from "../../hooks/useDateNavigation";
 import { getOfficeBookCategoryUpaadByMonthRange } from "../../redux/actions/officeBookAction";
 import { getSalarySheetsByMonthRange } from "../../redux/actions/staffSalaryAction";
 import { getStaffUpaadByMonthRange } from "../../redux/actions/restEntryAction";
@@ -124,17 +128,34 @@ const StaffSalaryDashboard = () => {
   const { loading: salaryLoading, salarySheets } = useAppSelector(
     (state) => state.staffSalary,
   );
-  const [startMonth, setStartMonth] = useState(dayjs());
-  const [endMonth, setEndMonth] = useState(dayjs());
+  const [startDate, setStartDate] = useState(dayjs().startOf("month"));
+  const [endDate, setEndDate] = useState(dayjs());
   const [selectedName, setSelectedName] = useState(null);
 
+  const handleStartDateChange = useCallback((newDate) => {
+    if (newDate) setStartDate(newDate);
+  }, []);
+
+  const handleEndDateChange = useCallback((newDate) => {
+    if (newDate) setEndDate(newDate);
+  }, []);
+
+  const { goToPreviousRange, goToNextRange } = useDateNavigation({
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+  });
+
   useEffect(() => {
-    const startDate = startMonth.startOf("month").format("DD-MM-YYYY");
-    const endDate = endMonth.endOf("month").format("DD-MM-YYYY");
-    dispatch(getStaffUpaadByMonthRange(startDate, endDate));
-    dispatch(getOfficeBookCategoryUpaadByMonthRange(startDate, endDate));
-    dispatch(getSalarySheetsByMonthRange(startDate, endDate));
-  }, [dispatch, startMonth, endMonth]);
+    const formattedStartDate = startDate.format("DD-MM-YYYY");
+    const formattedEndDate = endDate.format("DD-MM-YYYY");
+    dispatch(getStaffUpaadByMonthRange(formattedStartDate, formattedEndDate));
+    dispatch(
+      getOfficeBookCategoryUpaadByMonthRange(formattedStartDate, formattedEndDate),
+    );
+    dispatch(getSalarySheetsByMonthRange(formattedStartDate, formattedEndDate));
+  }, [dispatch, startDate, endDate]);
 
   const allRows = (salarySheets || []).flatMap((sheet) => {
     // Build the same "YYYY-MM" key both backends group by
@@ -221,28 +242,62 @@ const StaffSalaryDashboard = () => {
         flexWrap="wrap"
       >
         <Typography variant="subtitle2" fontWeight={500} color="text.secondary">
-          Select Month Range:
+          Select Date Range:
         </Typography>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
           <DatePicker
-            views={["year", "month"]}
-            value={startMonth}
-            onChange={(newDate) => {
-              if (newDate) setStartMonth(newDate);
-            }}
-            format="MMMM YYYY"
+            views={["year", "month", "day"]}
+            value={startDate}
+            onChange={handleStartDateChange}
+            format="DD-MM-YYYY"
             slotProps={{ textField: { size: "small" } }}
           />
+          <Typography>-</Typography>
           <DatePicker
-            views={["year", "month"]}
-            value={endMonth}
-            onChange={(newDate) => {
-              if (newDate) setEndMonth(newDate);
-            }}
-            format="MMMM YYYY"
+            views={["year", "month", "day"]}
+            value={endDate}
+            onChange={handleEndDateChange}
+            format="DD-MM-YYYY"
             slotProps={{ textField: { size: "small" } }}
           />
         </LocalizationProvider>
+
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={2}
+          justifyContent="center"
+          border={1}
+          borderColor="divider"
+          borderRadius={2}
+          p={1}
+        >
+          <Typography variant="subtitle2" color="text.secondary">
+            Month
+          </Typography>
+
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={goToPreviousRange}
+              sx={{ minWidth: "40px", padding: "4px" }}
+            >
+              <SkipPreviousRoundedIcon fontSize="small" />
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="secondary"
+              size="small"
+              onClick={goToNextRange}
+              sx={{ minWidth: "40px", padding: "4px" }}
+            >
+              <SkipNextRoundedIcon fontSize="small" />
+            </Button>
+          </Stack>
+        </Box>
 
         <Autocomplete
           options={nameOptions}
@@ -333,8 +388,8 @@ const StaffSalaryDashboard = () => {
         />
       ) : (
         <Typography variant="subtitle1" color="text.secondary" mt={2}>
-          No salary sheet found for {startMonth.format("MMMM YYYY")} to{" "}
-          {endMonth.format("MMMM YYYY")}
+          No salary sheet found for {startDate.format("DD-MM-YYYY")} to{" "}
+          {endDate.format("DD-MM-YYYY")}
         </Typography>
       )}
     </Box>
