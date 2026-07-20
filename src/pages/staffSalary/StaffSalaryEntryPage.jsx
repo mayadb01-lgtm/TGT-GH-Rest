@@ -37,16 +37,16 @@ import {
 dayjs.locale("en-gb");
 
 const tableColumns = [
-  "No",
-  "Staff Name",
-  "Per Day Pay",
-  "Attendance",
-  "Total",
-  "Rest Upaad",
-  "Office Upaad",
-  "Current Balance",
-  "Salary Paid?",
-  "Prev Month Salary Paid",
+  { label: "No", width: "4%", align: "center" },
+  { label: "Staff Name", width: "17%", align: "left" },
+  { label: "Per Day Pay", width: "10%", align: "center" },
+  { label: "Attendance", width: "9%", align: "center" },
+  { label: "Total", width: "10%", align: "center" },
+  { label: "Rest Upaad", width: "10%", align: "center" },
+  { label: "Office Upaad", width: "10%", align: "center" },
+  { label: "Current Balance", width: "11%", align: "center" },
+  { label: "Salary Paid?", width: "8%", align: "center" },
+  { label: "Prev Month Salary", width: "11%", align: "center" },
 ];
 
 const buildDraftRows = (
@@ -286,8 +286,7 @@ const StaffSalaryEntryPage = () => {
         spacing={1}
         justifyContent="space-between"
         alignItems="flex-start"
-        padding="8px 32px"
-        sx={{ width: "100%" }}
+        sx={{ width: "100%", padding: { xs: "8px 12px", md: "8px 24px" } }}
       >
         {/* Controls: Title + Month Picker + Buttons */}
         <Grid size={12}>
@@ -448,8 +447,8 @@ const StaffSalaryEntryPage = () => {
         </Grid>
 
         {/* Table */}
-        <Grid size={11}>
-          <Box>
+        <Grid size={12}>
+          <Box sx={{ width: "100%" }}>
             <Typography
               variant="subtitle1"
               sx={{
@@ -467,14 +466,46 @@ const StaffSalaryEntryPage = () => {
 
             <TableContainer
               component={Paper}
-              sx={{ maxHeight: "100%", boxShadow: 3 }}
+              variant="outlined"
+              sx={{
+                width: "100%",
+                boxShadow: 1,
+                borderRadius: "8px",
+                overflowX: "auto",
+              }}
             >
-              <Table stickyHeader size="small">
+              <Table
+                stickyHeader
+                size="small"
+                sx={{
+                  width: "100%",
+                  tableLayout: "fixed",
+                  "& .MuiTableCell-root": {
+                    borderRight: "1px solid",
+                    borderColor: "divider",
+                    px: 1,
+                  },
+                  "& .MuiTableCell-root:last-of-type": {
+                    borderRight: "none",
+                  },
+                }}
+              >
                 <TableHead>
                   <TableRow>
                     {tableColumns.map((col) => (
-                      <TableCell key={col} sx={{ fontWeight: "bold" }}>
-                        {col}
+                      <TableCell
+                        key={col.label}
+                        align={col.align}
+                        sx={{
+                          width: col.width,
+                          fontWeight: 700,
+                          fontSize: "13px",
+                          whiteSpace: "nowrap",
+                          backgroundColor: "#f5f3fc",
+                          color: "text.primary",
+                        }}
+                      >
+                        {col.label}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -488,10 +519,26 @@ const StaffSalaryEntryPage = () => {
                     </TableRow>
                   )}
                   {rows.map((row, index) => (
-                    <TableRow key={row._id ?? index}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{row.fullname}</TableCell>
-                      <TableCell>
+                    <TableRow
+                      key={row._id ?? index}
+                      sx={{
+                        "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
+                        "&:hover": { backgroundColor: "#f0edfa" },
+                      }}
+                    >
+                      <TableCell align="center">{index + 1}</TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        title={row.fullname}
+                      >
+                        {row.fullname}
+                      </TableCell>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -505,9 +552,10 @@ const StaffSalaryEntryPage = () => {
                             )
                           }
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
-                      <TableCell sx={{ width: "10%" }}>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -521,9 +569,10 @@ const StaffSalaryEntryPage = () => {
                             )
                           }
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -531,9 +580,10 @@ const StaffSalaryEntryPage = () => {
                           value={row.total || 0}
                           disabled
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
-                      <TableCell sx={{ width: "15%" }}>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -541,9 +591,10 @@ const StaffSalaryEntryPage = () => {
                           value={row.restaurantUpaad}
                           disabled
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
-                      <TableCell sx={{ width: "15%" }}>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -551,9 +602,10 @@ const StaffSalaryEntryPage = () => {
                           value={row.officeUpaad}
                           disabled
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
-                      <TableCell sx={{ width: "15%" }}>
+                      <TableCell align="center">
                         <TextField
                           variant="outlined"
                           type="number"
@@ -561,6 +613,7 @@ const StaffSalaryEntryPage = () => {
                           value={row.currentBalance || 0}
                           disabled
                           fullWidth
+                          inputProps={{ style: { textAlign: "center" } }}
                         />
                       </TableCell>
                       <TableCell align="center">
@@ -574,22 +627,26 @@ const StaffSalaryEntryPage = () => {
                             )
                           }
                           color="success"
+                          size="small"
                         />
                       </TableCell>
-                      <TableCell sx={{ width: "15%" }}>
+                      <TableCell align="center">
                         {(() => {
                           const previousAmount = getPreviousMonthPaidAmount(
                             row.staffId,
                           );
                           return previousAmount === "Not Paid" ? (
-                            <Typography variant="body2" disabled>
+                            <Typography
+                              variant="body2"
+                              color="text.disabled"
+                            >
                               Not Paid
                             </Typography>
                           ) : (
                             <Typography
                               variant="body2"
-                              color="success"
-                              disabled
+                              color="success.main"
+                              fontWeight={600}
                             >
                               {previousAmount}
                             </Typography>
