@@ -152,7 +152,10 @@ const StaffSalaryDashboard = () => {
     const formattedEndDate = endDate.format("DD-MM-YYYY");
     dispatch(getStaffUpaadByMonthRange(formattedStartDate, formattedEndDate));
     dispatch(
-      getOfficeBookCategoryUpaadByMonthRange(formattedStartDate, formattedEndDate),
+      getOfficeBookCategoryUpaadByMonthRange(
+        formattedStartDate,
+        formattedEndDate,
+      ),
     );
     dispatch(getSalarySheetsByMonthRange(formattedStartDate, formattedEndDate));
   }, [dispatch, startDate, endDate]);
@@ -216,6 +219,21 @@ const StaffSalaryDashboard = () => {
       totalBalance: 0,
     },
   );
+
+  const totalsRow = {
+    id: "totals",
+    month: "Total",
+    fullname: "Total",
+    perDayPay: "Total",
+    attendance: "Total",
+    total: summary.totalSalary,
+    restaurantUpaad: summary.totalRestUpaad,
+    officeUpaad: summary.totalOfficeUpaad,
+    currentBalance: summary.totalBalance,
+    salaryPaid: "Total",
+  };
+
+  const rowsWithTotals = [...rows, totalsRow];
 
   return (
     <Box
@@ -371,7 +389,7 @@ const StaffSalaryDashboard = () => {
       {rows.length > 0 ? (
         <DataGrid
           loading={staffUpaadLoading || officeUpaadLoading || salaryLoading}
-          rows={rows}
+          rows={rowsWithTotals}
           columns={columns}
           hideFooter
           WebkitFontSmoothing="auto"
@@ -383,6 +401,9 @@ const StaffSalaryDashboard = () => {
             "& .MuiDataGrid-cell:hover": { color: "primary.main" },
             "& .MuiDataGrid-columnHeader, .MuiDataGrid-cell": {
               border: "1px solid #f0f0f0",
+            },
+            "& .MuiDataGrid-row:last-child": {
+              fontWeight: "bold",
             },
           }}
         />
