@@ -8,6 +8,7 @@ import {
   Button,
   Checkbox,
   Chip,
+  MenuItem,
   Paper,
   Stack,
   Table,
@@ -92,6 +93,7 @@ const StaffSalaryEntryPage = () => {
 
   const [selectedMonth, setSelectedMonth] = useState(dayjs());
   const [rows, setRows] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("Active");
 
   const isNew = salarySheetNotFound;
 
@@ -126,6 +128,24 @@ const StaffSalaryEntryPage = () => {
     const amount = previousMonthPaidAmountByStaffId[staffId?.toString()];
     return amount === undefined ? "Not Paid" : amount;
   };
+
+  const staffStatusById = useMemo(() => {
+    const map = {};
+    (restStaff || []).forEach((s) => {
+      map[s._id?.toString()] = s.staffStatus || "Active";
+    });
+    return map;
+  }, [restStaff]);
+
+  const filteredRows = useMemo(() => {
+    const rowsWithIndex = rows.map((row, index) => ({ row, index }));
+    if (statusFilter === "All") return rowsWithIndex;
+    return rowsWithIndex.filter(
+      ({ row }) =>
+        (staffStatusById[row.staffId?.toString()] || "Active") ===
+        statusFilter,
+    );
+  }, [rows, statusFilter, staffStatusById]);
 
   useEffect(() => {
     if (salarySheet && salarySheet.rows?.length > 0) {
@@ -380,6 +400,20 @@ const StaffSalaryEntryPage = () => {
                     </Button>
                   </Stack>
                 </Box>
+                <Grid>
+                  <TextField
+                    select
+                    label="Staff Status"
+                    size="small"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    sx={{ minWidth: 150 }}
+                  >
+                    <MenuItem value="Active">Active</MenuItem>
+                    <MenuItem value="Inactive">Inactive</MenuItem>
+                    <MenuItem value="All">All</MenuItem>
+                  </TextField>
+                </Grid>
                 {isNew && (
                   <Grid>
                     <Chip
@@ -511,16 +545,16 @@ const StaffSalaryEntryPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.length === 0 && (
+                  {filteredRows.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={tableColumns.length} align="center">
                         No staff rows found.
                       </TableCell>
                     </TableRow>
                   )}
-                  {rows.map((row, index) => (
+                  {filteredRows.map(({ row, index: rowIndex }, index) => (
                     <TableRow
-                      key={row._id ?? index}
+                      key={row._id ?? rowIndex}
                       sx={{
                         "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
                         "&:hover": { backgroundColor: "#f0edfa" },
@@ -546,7 +580,7 @@ const StaffSalaryEntryPage = () => {
                           value={row.perDayPay}
                           onChange={(e) =>
                             handleRowChange(
-                              index,
+                              rowIndex,
                               "perDayPay",
                               Number(e.target.value),
                             )
@@ -561,13 +595,17 @@ const StaffSalaryEntryPage = () => {
                           type="number"
                           size="small"
                           value={row.attendance}
-                          onChange={(e) =>
-                            handleRowChange(
-                              index,
-                              "attendance",
-                              Number(e.target.value),
-                            )
+                          error={row.attendance > 31}
+                          helperText={
+                            row.attendance > 31 ? "Max 31 days allowed" : ""
                           }
+                          onChange={(e) => {
+                            const value = Number(e.target.value);
+                            if (value > 31) {
+                              e.target.value = 31;
+                            }
+                            handleRowChange(rowIndex, "attendance", value);
+                          }}
                           fullWidth
                           inputProps={{ style: { textAlign: "center" } }}
                         />
@@ -621,7 +659,7 @@ const StaffSalaryEntryPage = () => {
                           checked={Boolean(row.salaryPaid)}
                           onChange={(e) =>
                             handleRowChange(
-                              index,
+                              rowIndex,
                               "salaryPaid",
                               e.target.checked,
                             )
@@ -636,10 +674,7 @@ const StaffSalaryEntryPage = () => {
                             row.staffId,
                           );
                           return previousAmount === "Not Paid" ? (
-                            <Typography
-                              variant="body2"
-                              color="text.disabled"
-                            >
+                            <Typography variant="body2" color="text.disabled">
                               Not Paid
                             </Typography>
                           ) : (

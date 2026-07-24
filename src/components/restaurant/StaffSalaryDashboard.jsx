@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Chip,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -14,8 +15,11 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import SkipPreviousRoundedIcon from "@mui/icons-material/SkipPreviousRounded";
 import SkipNextRoundedIcon from "@mui/icons-material/SkipNextRounded";
+import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { useDateNavigation } from "../../hooks/useDateNavigation";
+import { getRestStaff } from "../../redux/actions/restStaffAction";
 import { getOfficeBookCategoryUpaadByMonthRange } from "../../redux/actions/officeBookAction";
 import { getSalarySheetsByMonthRange } from "../../redux/actions/staffSalaryAction";
 import { getStaffUpaadByMonthRange } from "../../redux/actions/restEntryAction";
@@ -120,6 +124,7 @@ const columns = [
 
 const StaffSalaryDashboard = () => {
   const dispatch = useAppDispatch();
+  const { restStaff } = useAppSelector((state) => state.restStaff);
   const { loading: staffUpaadLoading, staffTotalUpaad } = useAppSelector(
     (state) => state.restEntry,
   );
@@ -131,6 +136,8 @@ const StaffSalaryDashboard = () => {
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
   const [endDate, setEndDate] = useState(dayjs());
   const [selectedName, setSelectedName] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("Active");
+  const fileNameRef = useRef(null);
 
   const handleStartDateChange = useCallback((newDate) => {
     if (newDate) setStartDate(newDate);
@@ -148,6 +155,10 @@ const StaffSalaryDashboard = () => {
   });
 
   useEffect(() => {
+    dispatch(getRestStaff());
+  }, [dispatch]);
+
+  useEffect(() => {
     const formattedStartDate = startDate.format("DD-MM-YYYY");
     const formattedEndDate = endDate.format("DD-MM-YYYY");
     dispatch(getStaffUpaadByMonthRange(formattedStartDate, formattedEndDate));
@@ -159,6 +170,11 @@ const StaffSalaryDashboard = () => {
     );
     dispatch(getSalarySheetsByMonthRange(formattedStartDate, formattedEndDate));
   }, [dispatch, startDate, endDate]);
+
+  const staffStatusById = (restStaff || []).reduce((acc, staff) => {
+    acc[staff._id?.toString()] = staff.staffStatus || "Active";
+    return acc;
+  }, {});
 
   const allRows = (salarySheets || []).flatMap((sheet) => {
     // Build the same "YYYY-MM" key both backends group by
@@ -184,6 +200,7 @@ const StaffSalaryDashboard = () => {
         officeUpaad,
         currentBalance: total - restaurantUpaad - officeUpaad,
         salaryPaid: Boolean(row.salaryPaid),
+        staffStatus: staffStatusById[row.staffId?.toString()] || "Active",
       };
     });
   });
@@ -196,13 +213,18 @@ const StaffSalaryDashboard = () => {
     return a.monthSortKey - b.monthSortKey;
   });
 
+  const statusFilteredRows =
+    statusFilter === "All"
+      ? sortedRows
+      : sortedRows.filter((row) => row.staffStatus === statusFilter);
+
   const nameOptions = [
-    ...new Set(sortedRows.map((row) => row.fullname)),
+    ...new Set(statusFilteredRows.map((row) => row.fullname)),
   ].filter(Boolean);
 
   const rows = selectedName
-    ? sortedRows.filter((row) => row.fullname === selectedName)
-    : sortedRows;
+    ? statusFilteredRows.filter((row) => row.fullname === selectedName)
+    : statusFilteredRows;
 
   const summary = rows.reduce(
     (acc, row) => {
@@ -235,6 +257,50 @@ const StaffSalaryDashboard = () => {
 
   const rowsWithTotals = [...rows, totalsRow];
 
+  const headerMap = {
+    month: "Month",
+    fullname: "Staff Name",
+    perDayPay: "Per Day Pay",
+    attendance: "Attendance",
+    total: "Total",
+    restaurantUpaad: "Rest. Upaad",
+    officeUpaad: "Office Upaad",
+    currentBalance: "Balance",
+    salaryPaid: "Salary Paid?",
+  };
+
+  const handleExportToExcel = () => {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      toast.error("No data available to export for selected date range.");
+      return;
+    }
+
+    const fileName = `${
+      fileNameRef.current?.innerText || "Staff Salary Dashboard"
+    } - ${startDate.format("DD-MM-YYYY")} to ${endDate.format(
+      "DD-MM-YYYY",
+    )}.xlsx`;
+
+    const exportData = rowsWithTotals.map((item) => {
+      const transformed = {};
+      Object.keys(headerMap).forEach((key) => {
+        let value = item[key];
+        if (key === "salaryPaid") {
+          value =
+            typeof value === "boolean" ? (value ? "Paid" : "Unpaid") : value;
+        }
+        transformed[headerMap[key]] = value;
+      });
+      return transformed;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Staff Salary");
+
+    XLSX.writeFile(workbook, fileName);
+  };
+
   return (
     <Box
       sx={{
@@ -247,7 +313,12 @@ const StaffSalaryDashboard = () => {
       }}
     >
       <Box sx={{ alignItems: "center", py: 3 }}>
-        <Typography variant="h5" fontWeight={600} color="text.primary">
+        <Typography
+          ref={fileNameRef}
+          variant="h5"
+          fontWeight={600}
+          color="text.primary"
+        >
           Staff Salary Dashboard
         </Typography>
       </Box>
@@ -316,6 +387,31 @@ const StaffSalaryDashboard = () => {
             </Button>
           </Stack>
         </Box>
+      </Stack>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        mb={2}
+        flex
+        gap={1}
+        flexWrap={"wrap"}
+      >
+        <TextField
+          select
+          label="Staff Status"
+          size="small"
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setSelectedName(null);
+          }}
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="Active">Active</MenuItem>
+          <MenuItem value="Inactive">Inactive</MenuItem>
+          <MenuItem value="All">All</MenuItem>
+        </TextField>
 
         <Autocomplete
           options={nameOptions}
@@ -326,6 +422,14 @@ const StaffSalaryDashboard = () => {
             <TextField {...params} label="Filter by Name" size="small" />
           )}
         />
+
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleExportToExcel}
+        >
+          Export to Excel
+        </Button>
       </Stack>
 
       <Stack direction="row" spacing={2} flexWrap="wrap" sx={{ mb: 2 }}>
