@@ -53,7 +53,7 @@ const pendingUsersSchema = new Schema(
   {
     id: { type: String, required: true },
     fullname: { type: String, required: true },
-    mobileNumber: { type: Number, required: true },
+    mobileNumber: { type: Number },
     category: { type: String },
     amount: { type: Number },
     createDate: { type: String },

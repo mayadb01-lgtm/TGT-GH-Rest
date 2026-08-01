@@ -38,6 +38,7 @@ import OfficeBookDashboard from "../components/office/OfficeBookDashboard";
 import GHBankBooksDashboard from "../components/guest-house/GHBankBooksDashboard";
 import OfficeCategoryDashboard from "../components/office/OfficeCategoryDashboard";
 import OfficeMerged from "../components/office/OfficeMerged";
+import OfficeCreditDebit from "../components/office/OfficeCreditDebit";
 import GHUpaidEntriesDashboard from "../components/guest-house/GHUpaidEntriesDashboard";
 import OfficeHome from "../components/office/OfficeHome";
 import OfficeMergedGraph from "../components/office/OfficeMergedGraph";
@@ -215,6 +216,11 @@ const NAVIGATION = [
     icon: <BarChartIcon />,
   },
   {
+    segment: "merged-credit-debit",
+    title: "Merged Credit Debit",
+    icon: <BarChartIcon />,
+  },
+  {
     kind: "header",
     title: "Sales Goal",
   },
@@ -319,6 +325,7 @@ const DashboardPage = () => {
     { path: "staff-salary", element: <StaffSalaryDashboard /> },
     { path: "merged-graph", element: <OfficeMergedGraph /> },
     { path: "merged-reports", element: <OfficeMerged /> },
+    { path: "merged-credit-debit", element: <OfficeCreditDebit /> },
     { path: "sales-goal/gh-sales-goal", element: <GHSalesGoalDashboard /> },
     { path: "sales-goal/rest-sales-goal", element: <RestSalesGoalDashboard /> },
     {

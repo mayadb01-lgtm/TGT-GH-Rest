@@ -8,12 +8,13 @@ const restCategorySchema = new Schema(
       {
         expenseName: { type: String, required: true },
         expenseDescription: { type: String, required: true },
+        isVendor: { type: Boolean, default: false },
       },
     ],
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default model("RestCategory", restCategorySchema);

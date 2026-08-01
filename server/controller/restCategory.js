@@ -74,12 +74,12 @@ router.get("/get-category-name", async (req, res) => {
 router.get("/get-expenses", async (req, res) => {
   try {
     const categories = await RestCategory.find({}, { expense: 1 });
-
     const allExpenses = categories.flatMap((category) =>
       category.expense.map((exp) => ({
         _id: exp._id,
         expenseName: exp.expenseName,
-      }))
+        isVendor: exp.isVendor,
+      })),
     );
 
     res.status(200).json({

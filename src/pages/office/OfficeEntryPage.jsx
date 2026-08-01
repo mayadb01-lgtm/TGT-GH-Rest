@@ -16,8 +16,12 @@ import {
 } from "../../redux/actions/officeBookAction";
 import ModernLoader from "../../utils/util";
 import toast from "react-hot-toast";
-import { getRestCategory } from "../../redux/actions/restCategoryAction";
+import {
+  getRestCategory,
+  getRestExpenseName,
+} from "../../redux/actions/restCategoryAction";
 import { getRestStaff } from "../../redux/actions/restStaffAction";
+import { getPendingUser } from "../../redux/actions/restPendingAction";
 dayjs.locale("en-gb");
 const OfficeEntryPage = () => {
   const dispatch = useAppDispatch();
@@ -92,6 +96,7 @@ const OfficeEntryPage = () => {
     dispatch(getRestCategory());
     dispatch(getOfficeAllCategories());
     dispatch(getRestStaff());
+    dispatch(getPendingUser());
   }, [dispatch]);
 
   // Disable Edit when In and Out - Amount Total is 0
@@ -151,7 +156,8 @@ const OfficeEntryPage = () => {
       row.amount > 0 &&
       row.categoryName?.trim() &&
       row.expenseName?.trim() &&
-      row.modeOfPayment?.trim()
+      row.modeOfPayment?.trim() &&
+      row.fullname?.trim()
     );
   };
 

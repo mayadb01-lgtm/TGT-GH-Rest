@@ -21,7 +21,6 @@ const RestPendingUsersTable = ({
   restPendingData,
   setRestPendingData,
 }) => {
-
   let idCounter = restPendingData.length;
 
   const handleAddRow = () => {
@@ -116,7 +115,12 @@ const RestPendingUsersTable = ({
                   />
                 </TableCell>
                 <TableCell sx={{ width: "40%" }}>
-                  {renderAutocompleteCell(pendingVendorsOptions, row, index, "fullname")}
+                  {renderAutocompleteCell(
+                    pendingVendorsOptions,
+                    row,
+                    index,
+                    "fullname"
+                  )}
                 </TableCell>
                 <TableCell sx={{ width: "5%" }}>
                   <Button size="small" onClick={() => handleRemoveRow(row.id)}>

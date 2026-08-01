@@ -13,6 +13,7 @@ import {
   Typography,
   Tooltip,
   Stack,
+  Checkbox,
 } from "@mui/material";
 import { Add, Edit, Delete, ExpandMore } from "@mui/icons-material";
 import {
@@ -44,7 +45,16 @@ const CategoryAccordion = ({ category, onEdit, onDelete }) => (
       }}
     >
       <Typography variant="h6" sx={{ fontWeight: "bold", flexGrow: 1 }}>
-        {category.categoryName}
+        {category.categoryName}{" "}
+        {category.isVendor && (
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{ color: "primary.main", ml: 1 }}
+          >
+            (Vendor)
+          </Typography>
+        )}
       </Typography>
       <Box>
         <IconButton
@@ -98,7 +108,7 @@ const CategoryAccordion = ({ category, onEdit, onDelete }) => (
 const CategoriesExpensesDashboard = () => {
   const dispatch = useAppDispatch();
   const { loading, restCategory } = useAppSelector(
-    (state) => state.restCategory
+    (state) => state.restCategory,
   );
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -106,6 +116,7 @@ const CategoriesExpensesDashboard = () => {
   const [categoryData, setCategoryData] = useState({
     categoryName: "",
     categoryDescription: "",
+    isVendor: false,
     expense: [],
   });
   const [selectedId, setSelectedId] = useState(null);
@@ -124,6 +135,7 @@ const CategoriesExpensesDashboard = () => {
       setCategoryData({
         categoryName: "",
         categoryDescription: "",
+        isVendor: false,
         expense: [],
       });
       setSelectedId(null);
@@ -159,17 +171,17 @@ const CategoriesExpensesDashboard = () => {
                 .includes(search.toLowerCase()) ||
               expense.expenseDescription
                 .toLowerCase()
-                .includes(search.toLowerCase())
-          )
+                .includes(search.toLowerCase()),
+          ),
       ),
-    [restCategory, search]
+    [restCategory, search],
   );
 
   const leftCategories = filteredCategories.filter(
-    (_, index) => index % 2 === 0
+    (_, index) => index % 2 === 0,
   );
   const rightCategories = filteredCategories.filter(
-    (_, index) => index % 2 !== 0
+    (_, index) => index % 2 !== 0,
   );
 
   const handleAddExpense = () => {
@@ -191,7 +203,7 @@ const CategoriesExpensesDashboard = () => {
     setCategoryData({
       ...categoryData,
       expense: categoryData.expense.map((exp, i) =>
-        i === index ? { ...exp, [field]: value } : exp
+        i === index ? { ...exp, [field]: value } : exp,
       ),
     });
   };
@@ -203,6 +215,7 @@ const CategoriesExpensesDashboard = () => {
     return (
       categoryData.categoryName !== category.categoryName ||
       categoryData.categoryDescription !== category.categoryDescription ||
+      categoryData.isVendor !== category.isVendor ||
       JSON.stringify(categoryData.expense) !== JSON.stringify(category.expense)
     );
   }, [editMode, selectedId, categoryData, restCategory]);
@@ -355,7 +368,7 @@ const CategoriesExpensesDashboard = () => {
             >
               <TextField
                 size="small"
-                label="Expense Name"
+                label="Expense Name - Vendor Name"
                 value={exp.expenseName}
                 onChange={(e) =>
                   handleUpdateExpense(index, "expenseName", e.target.value)
@@ -370,11 +383,21 @@ const CategoriesExpensesDashboard = () => {
                   handleUpdateExpense(
                     index,
                     "expenseDescription",
-                    e.target.value
+                    e.target.value,
                   )
                 }
                 sx={{ flex: 1 }}
               />
+
+              {/* Checkbox - Is Vendor? */}
+              <Typography variant="subtitle2">Is Vendor?</Typography>
+              <Checkbox
+                checked={exp.isVendor}
+                onChange={(e) =>
+                  handleUpdateExpense(index, "isVendor", e.target.checked)
+                }
+              />
+
               <IconButton
                 size="small"
                 color="error"

@@ -199,7 +199,7 @@ router.get("/get-aapvana-entries/:startDate/:endDate", async (req, res) => {
       },
     });
 
-    const aapvanaEntries = entries.flatMap((entry) => entry.pending);
+    const aapvanaEntries = entries.flatMap((entry) => entry.pendingUsers);
 
     res.status(200).json({
       success: true,
@@ -225,7 +225,7 @@ router.get("/get-levana-entries/:startDate/:endDate", async (req, res) => {
       },
     });
 
-    const levanaEntries = entries.flatMap((entry) => entry.pendingUsers);
+    const levanaEntries = entries.flatMap((entry) => entry.pending);
 
     res.status(200).json({
       success: true,

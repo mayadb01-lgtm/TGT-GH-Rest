@@ -99,6 +99,9 @@ importers:
       globals:
         specifier: ^15.12.0
         version: 15.12.0
+      prettier:
+        specifier: 3.9.6
+        version: 3.9.6
       vite:
         specifier: ^6.0.1
         version: 6.4.2(yaml@2.9.0)
@@ -2018,6 +2021,11 @@ packages:
 
   prettier@3.3.3:
     resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
+    engines: {node: '>=14'}
+    hasBin: true
+
+  prettier@3.9.6:
+    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4481,6 +4489,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@3.3.3: {}
+
+  prettier@3.9.6: {}
 
   prop-types@15.8.1:
     dependencies:
