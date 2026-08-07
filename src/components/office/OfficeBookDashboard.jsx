@@ -106,7 +106,13 @@ const OfficeBookDashboard = () => {
     () => [
       { field: "inOrOut", headerName: "In/Out", width: 100 },
       { field: "amount", headerName: "Amount", width: 120 },
-      { field: "modeOfPayment", headerName: "Mode", width: 120 },
+      {
+        field: "modeOfPayment",
+        headerName: "Mode",
+        width: 120,
+        cellClassName: (params) =>
+          params.value === "UnPaid" ? "unpaid-cell" : "",
+      },
       { field: "fullname", headerName: "Full Name", width: 180 },
       { field: "categoryName", headerName: "Category", width: 140 },
       { field: "expenseName", headerName: "Expense", width: 140 },
@@ -467,6 +473,9 @@ const OfficeBookDashboard = () => {
                 border: "1px solid #f0f0f0",
               },
               "& .MuiDataGrid-row[data-id='Total'] .MuiDataGrid-cell": {
+                fontWeight: "bold",
+              },
+              "& .unpaid-cell": {
                 fontWeight: "bold",
               },
             }}
