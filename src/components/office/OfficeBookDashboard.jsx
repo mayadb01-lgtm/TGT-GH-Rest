@@ -184,10 +184,13 @@ const OfficeBookDashboard = () => {
     });
 
     // ✅ Compute total
-    const totalAmount = filteredData.reduce(
-      (sum, curr) => sum + (curr.amount || 0),
-      0
-    );
+
+    const totalAmount = filteredData.reduce((sum, curr) => {
+      if (curr.modeOfPayment === "UnPaid") {
+        return sum;
+      }
+      return sum + (curr.amount || 0);
+    }, 0);
 
     const totalRow = {
       id: "Total",

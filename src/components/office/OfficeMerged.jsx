@@ -839,6 +839,8 @@ const OfficeMerged = () => {
       "DD-MM-YYYY"
     )} to ${endDate.format("DD-MM-YYYY")}.xlsx`;
 
+    const rowsToExport = [...preparedRows, totalsRow];
+
     const exportData = rowsToExport.map((row) => {
       const transformed = {};
       visibleColumns.forEach(({ field, headerName }) => {
