@@ -476,6 +476,11 @@ const OfficeBookDashboard = () => {
             No entries for the selected date.
           </Typography>
         )}
+
+        <Typography variant="caption" color="text.secondary" mt={2}>
+          Note: Entries with "UnPaid" mode of payment are excluded from the total
+          amount calculation.
+        </Typography>
       </Box>
     );
   }
