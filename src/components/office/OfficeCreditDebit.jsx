@@ -131,7 +131,7 @@ const OfficeCreditDebit = () => {
           entryCreateDate: null,
           fullname: "",
           expenseName: null,
-          modeOfPayment: "",
+          modeOfPayment: "Total",
           credit: creditAmountTotal,
           debit: debitAmountTotal,
           balance: totalBalance,
@@ -192,6 +192,7 @@ const OfficeCreditDebit = () => {
       width: 100,
       align: "center",
       headerAlign: "center",
+      cellClassName: "credit-cell",
       valueFormatter: (value) => (value ? value.toLocaleString("en-IN") : ""),
     },
     {
@@ -200,6 +201,7 @@ const OfficeCreditDebit = () => {
       width: 100,
       align: "center",
       headerAlign: "center",
+      cellClassName: "debit-cell",
       valueFormatter: (value) => (value ? value.toLocaleString("en-IN") : ""),
     },
     {
@@ -225,17 +227,16 @@ const OfficeCreditDebit = () => {
   };
 
   const handleExportToExcel = () => {
-    const exportRows = displayRows.filter((row) => row.id !== "Total");
-    if (exportRows.length === 0) {
+    if (displayRows.length === 0) {
       toast.error("No data available to export for selected date range.");
       return;
     }
 
-    const fileName = `Vendor Aapvana Levana Balance - ${startDate.format(
+    const fileName = `Merged Vendor Report - ${startDate.format(
       DATE_FORMAT
     )} to ${endDate.format(DATE_FORMAT)}.xlsx`;
 
-    const exportData = exportRows.map((item) => {
+    const exportData = displayRows.map((item) => {
       const transformed = {};
       Object.keys(headerMap).forEach((key) => {
         transformed[headerMap[key]] = item[key];
@@ -350,10 +351,9 @@ const OfficeCreditDebit = () => {
           variant="outlined"
           color="primary"
           onClick={handleExportToExcel}
-          startIcon={<DownloadForOffline fontSize="small" />}
           size="small"
         >
-          Excel
+          Export to Excel
         </Button>
       </Stack>
 
@@ -424,6 +424,14 @@ const OfficeCreditDebit = () => {
             "& .total-row": {
               fontWeight: 700,
               backgroundColor: "action.hover",
+            },
+            "& .credit-cell": {
+              color: "success.main",
+              fontWeight: 600,
+            },
+            "& .debit-cell": {
+              color: "error.main",
+              fontWeight: 600,
             },
           }}
         />
