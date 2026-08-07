@@ -33,6 +33,9 @@ const RestPendingUsersTable = ({
         fullname: "",
         mobileNumber: 0,
         category: "",
+        expenseName: "",
+        isVendor: false,
+        categoryName: "",
         amount: 0,
         createDate: selectedDate,
       },
@@ -58,12 +61,20 @@ const RestPendingUsersTable = ({
       value={
         options.find((option) => option.fullname === row[fieldKey]) || null
       }
-      groupBy={(option) => option.category || ""}
+      groupBy={(option) => option?.categoryName || ""}
       onChange={(_, value) => {
         handleUpdateRow(index, fieldKey, value ? value?.fullname : "");
         handleUpdateRow(index, "mobileNumber", value ? value?.mobileNumber : 0);
         handleUpdateRow(index, "category", value ? value?.category : "");
         handleUpdateRow(index, "_id", value?._id ? value._id : "");
+        handleUpdateRow(index, "expenseName", value ? value?.expenseName : "");
+        handleUpdateRow(index, "isVendor", value ? value?.isVendor : false);
+        handleUpdateRow(
+          index,
+          "categoryName",
+          value ? value?.categoryName : ""
+        );
+        handleUpdateRow(index, "categoryDescription", value ? value?.categoryDescription : "");
       }}
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" fullWidth />

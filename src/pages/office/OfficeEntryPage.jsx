@@ -16,10 +16,7 @@ import {
 } from "../../redux/actions/officeBookAction";
 import ModernLoader from "../../utils/util";
 import toast from "react-hot-toast";
-import {
-  getRestCategory,
-  getRestExpenseName,
-} from "../../redux/actions/restCategoryAction";
+import { getRestCategory } from "../../redux/actions/restCategoryAction";
 import { getRestStaff } from "../../redux/actions/restStaffAction";
 import { getPendingUser } from "../../redux/actions/restPendingAction";
 dayjs.locale("en-gb");

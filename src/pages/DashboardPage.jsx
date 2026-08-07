@@ -216,8 +216,8 @@ const NAVIGATION = [
     icon: <BarChartIcon />,
   },
   {
-    segment: "merged-credit-debit",
-    title: "Merged Credit Debit",
+    segment: "merged-vendor-report",
+    title: "Vendor Merged Report",
     icon: <BarChartIcon />,
   },
   {
@@ -325,7 +325,7 @@ const DashboardPage = () => {
     { path: "staff-salary", element: <StaffSalaryDashboard /> },
     { path: "merged-graph", element: <OfficeMergedGraph /> },
     { path: "merged-reports", element: <OfficeMerged /> },
-    { path: "merged-credit-debit", element: <OfficeCreditDebit /> },
+    { path: "merged-vendor-report", element: <OfficeCreditDebit /> },
     { path: "sales-goal/gh-sales-goal", element: <GHSalesGoalDashboard /> },
     { path: "sales-goal/rest-sales-goal", element: <RestSalesGoalDashboard /> },
     {

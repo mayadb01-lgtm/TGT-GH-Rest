@@ -122,6 +122,7 @@ const ExpensesTable = ({
       _id: exp._id,
       expenseName: exp.expenseName,
       categoryName: category.categoryName,
+      isVendor: exp?.isVendor || false,
     }))
   );
 
@@ -154,6 +155,7 @@ const ExpensesTable = ({
             "categoryName",
             value ? value.categoryName : ""
           );
+          handleUpdateRow(index, "isVendor", value ? value.isVendor : false);
         }}
         renderInput={(params) => (
           <TextField {...params} variant="outlined" size="small" fullWidth />

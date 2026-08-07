@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
+import { DownloadForOffline } from "@mui/icons-material";
 
 dayjs.locale("en-gb");
 
@@ -28,7 +29,7 @@ const DATE_FORMAT = "DD-MM-YYYY";
 const OfficeCreditDebit = () => {
   const [startDate, setStartDate] = useState(dayjs().startOf("month"));
   const [endDate, setEndDate] = useState(dayjs());
-  const [selectedProduct, setSelectedProduct] = useState(null); // expenseName string
+  const [selectedExpenseName, setSelectedExpenseName] = useState(null);
 
   const fileNameRef = useRef(null);
 
@@ -46,17 +47,17 @@ const OfficeCreditDebit = () => {
     setEndDate,
   });
 
-  const [rows, setRows] = useState([]);
+  // Raw data straight from the server for the current date range.
+  // This is never mutated by filtering - filtering/derived values are
+  // computed with useMemo below so the original data is always available.
+  const [rawRows, setRawRows] = useState([]);
   const [expenseNameOptions, setExpenseNameOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [totals, setTotals] = useState({
-    creditAmountTotal: 0,
-    debitAmountTotal: 0,
-    totalBalance: 0,
-  });
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -64,47 +65,94 @@ const OfficeCreditDebit = () => {
         const start = startDate.format(DATE_FORMAT);
         const end = endDate.format(DATE_FORMAT);
         const { data } = await axios.get(
-          `${import.meta.env.VITE_REACT_APP_SERVER_URL}/merge-aggregator/get-credit-debit-entries/${start}/${end}`,
-
-          { params: selectedProduct ? { expenseName: selectedProduct } : {} }
+          `${import.meta.env.VITE_REACT_APP_SERVER_URL}/vendor/get-vendor-entries/${start}/${end}`
         );
+        if (cancelled) return;
+
         if (data?.success) {
-          setRows(data.data.finalRows || []);
+          setRawRows(
+            (data.data.finalRows || []).filter((row) => row.id !== "Total")
+          );
           setExpenseNameOptions(data.data.expenseNameOptions || []);
-          setTotals({
-            creditAmountTotal: data.data.creditAmountTotal || 0,
-            debitAmountTotal: data.data.debitAmountTotal || 0,
-            totalBalance: data.data.totalBalance || 0,
-          });
         } else {
           setError(data?.message || "Could not load entries.");
-          setRows([]);
+          setRawRows([]);
+          setExpenseNameOptions([]);
         }
       } catch (err) {
+        if (cancelled) return;
         const message =
           err?.response?.data?.message || "Could not load entries.";
         setError(message);
         toast.error(message);
-        setRows([]);
+        setRawRows([]);
+        setExpenseNameOptions([]);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
+
     fetchData();
-  }, [startDate, endDate, selectedProduct]);
+    return () => {
+      cancelled = true;
+    };
+  }, [startDate, endDate]);
+
+  // Apply the expenseName filter and recompute the running balance +
+  // totals for just the filtered subset. Derived purely from rawRows,
+  // so switching/clearing the filter always starts from the full data.
+  const { displayRows, totals } = useMemo(() => {
+    const filteredRows = selectedExpenseName
+      ? rawRows.filter((row) => row.expenseName === selectedExpenseName)
+      : rawRows;
+
+    let runningBalance = 0;
+    const rowsWithBalance = filteredRows.map((row) => {
+      runningBalance += row.credit - row.debit;
+      return { ...row, balance: runningBalance };
+    });
+
+    const creditAmountTotal = rowsWithBalance.reduce(
+      (sum, row) => sum + row.credit,
+      0
+    );
+    const debitAmountTotal = rowsWithBalance.reduce(
+      (sum, row) => sum + row.debit,
+      0
+    );
+    const totalBalance = creditAmountTotal - debitAmountTotal;
+
+    return {
+      displayRows: [
+        ...rowsWithBalance,
+        {
+          id: "Total",
+          createDate: "",
+          entryCreateDate: null,
+          fullname: "",
+          expenseName: null,
+          modeOfPayment: "",
+          credit: creditAmountTotal,
+          debit: debitAmountTotal,
+          balance: totalBalance,
+        },
+      ],
+      totals: { creditAmountTotal, debitAmountTotal, totalBalance },
+    };
+  }, [rawRows, selectedExpenseName]);
 
   const columns = [
     {
       field: "createDate",
       headerName: "Date",
-      width: 130,
+      width: 100,
       align: "center",
       headerAlign: "center",
     },
     {
       field: "fullname",
       headerName: "Name",
-      width: 180,
+      width: 150,
       align: "center",
       headerAlign: "center",
     },
@@ -118,12 +166,12 @@ const OfficeCreditDebit = () => {
     {
       field: "source",
       headerName: "Source",
-      width: 130,
+      width: 180,
       align: "center",
       headerAlign: "center",
       valueFormatter: (value) =>
         ({
-          restAapvana: "Restaurant Credit",
+          restAapvana: "Restaurant Aapvana",
           restExpense: "Restaurant Expense",
           officeIn: "Office In",
           officeOut: "Office Out",
@@ -140,16 +188,16 @@ const OfficeCreditDebit = () => {
     },
     {
       field: "credit",
-      headerName: "Amount In",
-      width: 130,
+      headerName: "Credit",
+      width: 100,
       align: "center",
       headerAlign: "center",
       valueFormatter: (value) => (value ? value.toLocaleString("en-IN") : ""),
     },
     {
       field: "debit",
-      headerName: "Amount Out",
-      width: 130,
+      headerName: "Debit",
+      width: 100,
       align: "center",
       headerAlign: "center",
       valueFormatter: (value) => (value ? value.toLocaleString("en-IN") : ""),
@@ -167,8 +215,8 @@ const OfficeCreditDebit = () => {
 
   const headerMap = {
     createDate: "Date",
-    fullname: "Name",
-    expenseName: "Product / Category",
+    fullname: "Full Name",
+    expenseName: "Expense Name",
     source: "Source",
     modeOfPayment: "Mode of Payment",
     credit: "Amount In",
@@ -177,18 +225,13 @@ const OfficeCreditDebit = () => {
   };
 
   const handleExportToExcel = () => {
-    const exportRows = rows.filter((row) => row.id !== "Total");
+    const exportRows = displayRows.filter((row) => row.id !== "Total");
     if (exportRows.length === 0) {
       toast.error("No data available to export for selected date range.");
       return;
     }
-    const headingText = fileNameRef.current?.innerText || "";
-    let prefix = "Export";
-    if (headingText.includes("Guest House")) prefix = "GH";
-    else if (headingText.includes("Restaurant")) prefix = "R";
-    else if (headingText.includes("Office")) prefix = "OB";
 
-    const fileName = `${prefix} Aapvana Levana Balance - ${startDate.format(
+    const fileName = `Vendor Aapvana Levana Balance - ${startDate.format(
       DATE_FORMAT
     )} to ${endDate.format(DATE_FORMAT)}.xlsx`;
 
@@ -223,7 +266,7 @@ const OfficeCreditDebit = () => {
           fontWeight={600}
           color="text.primary"
         >
-          Office Credit Debit
+          Merged Vendor Report
         </Typography>
       </Box>
 
@@ -294,12 +337,12 @@ const OfficeCreditDebit = () => {
           disablePortal
           id="expenseName"
           options={expenseNameOptions}
-          value={selectedProduct}
+          value={selectedExpenseName}
           style={{ width: 260 }}
           renderInput={(params) => (
-            <TextField {...params} label="Product / Category" />
+            <TextField {...params} label="Expense Name" />
           )}
-          onChange={(event, newValue) => setSelectedProduct(newValue)}
+          onChange={(event, newValue) => setSelectedExpenseName(newValue)}
           size="small"
         />
 
@@ -307,8 +350,10 @@ const OfficeCreditDebit = () => {
           variant="outlined"
           color="primary"
           onClick={handleExportToExcel}
+          startIcon={<DownloadForOffline fontSize="small" />}
+          size="small"
         >
-          Export to Excel
+          Excel
         </Button>
       </Stack>
 
@@ -355,23 +400,27 @@ const OfficeCreditDebit = () => {
         </Card>
       </Stack>
 
-      <Box sx={{ width: "100%", maxWidth: 1100, mt: 3 }}>
+      <Box sx={{ width: "100%", maxWidth: 1100, mt: 3, height: 400 }}>
         <DataGrid
-          rows={rows}
+          rows={displayRows}
           columns={columns}
           loading={loading}
           getRowId={(row) => row.id}
           showCellVerticalBorder
           showColumnVerticalBorder
+          disableRowSelectionOnClick
           getRowClassName={(params) =>
             params.row.id === "Total" ? "total-row" : ""
           }
-          disableRowSelectionOnClick
           initialState={{
             pagination: { paginationModel: { pageSize: 25 } },
           }}
           pageSizeOptions={[25, 50, 100]}
           sx={{
+            WebkitFontSmoothing: "auto",
+            "&.MuiDataGrid-root .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+            },
             "& .total-row": {
               fontWeight: 700,
               backgroundColor: "action.hover",
