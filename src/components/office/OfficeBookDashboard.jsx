@@ -478,7 +478,7 @@ const OfficeBookDashboard = () => {
         )}
 
         <Typography variant="caption" color="text.secondary" mt={2}>
-          Note: Entries with "UnPaid" mode of payment are excluded from the total
+          Note: Entries with <strong> "UnPaid" </strong> mode of payment are excluded from the total
           amount calculation.
         </Typography>
       </Box>
