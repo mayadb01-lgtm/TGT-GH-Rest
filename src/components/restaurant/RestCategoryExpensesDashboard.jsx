@@ -46,7 +46,7 @@ const CategoryAccordion = ({ category, onEdit, onDelete }) => (
     >
       <Typography variant="h6" sx={{ fontWeight: "bold", flexGrow: 1 }}>
         {category.categoryName}{" "}
-        {category.isVendor && (
+        {category?.isVendor && (
           <Typography
             component="span"
             variant="body2"
@@ -215,7 +215,7 @@ const CategoriesExpensesDashboard = () => {
     return (
       categoryData.categoryName !== category.categoryName ||
       categoryData.categoryDescription !== category.categoryDescription ||
-      categoryData.isVendor !== category.isVendor ||
+      categoryData?.isVendor !== category?.isVendor ||
       JSON.stringify(categoryData.expense) !== JSON.stringify(category.expense)
     );
   }, [editMode, selectedId, categoryData, restCategory]);
@@ -392,7 +392,7 @@ const CategoriesExpensesDashboard = () => {
               {/* Checkbox - Is Vendor? */}
               <Typography variant="subtitle2">Is Vendor?</Typography>
               <Checkbox
-                checked={exp.isVendor}
+                checked={exp?.isVendor}
                 onChange={(e) =>
                   handleUpdateExpense(index, "isVendor", e.target.checked)
                 }

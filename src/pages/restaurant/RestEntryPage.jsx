@@ -66,11 +66,11 @@ const RestEntryPage = () => {
 
   const pendingVendorsOptions = restCategory
     ?.filter((category) =>
-      category.expense.some((exp) => exp?.isVendor === true)
+      category.expense.some((exp) => exp?.isVendor)
     )
     .flatMap((category) =>
       category.expense
-        .filter((exp) => exp?.isVendor === true)
+        .filter((exp) => exp?.isVendor)
         .map((exp) => ({
           _id: exp?._id,
           fullname: exp.fullname || exp.expenseName,
@@ -78,7 +78,7 @@ const RestEntryPage = () => {
           category: exp?.category || "",
           expenseName: exp?.expenseName,
           expenseDescription: exp?.expenseDescription,
-          isVendor: exp?.isVendor,
+          isVendor: exp?.isVendor || false,
           categoryName: category?.categoryName,
           categoryDescription: category?.categoryDescription,
         }))
@@ -114,7 +114,7 @@ const RestEntryPage = () => {
     amount: 0,
     categoryName: "",
     expenseName: "",
-    isVendor: "",
+    isVendor: false,
     createDate: selectedDate,
   }));
   const [restExpensesData, setRestExpensesData] = useState(
@@ -252,7 +252,7 @@ const RestEntryPage = () => {
 
   const processRestPendingUsersData = (data) => {
     return data.filter((row) => {
-      return row.amount > 0 && row.isVendor;
+      return row.amount > 0 && row?.isVendor;
     });
   };
 

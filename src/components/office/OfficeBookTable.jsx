@@ -45,7 +45,7 @@ const EditableRow = ({
       _id: exp?._id,
       expenseName: exp?.expenseName,
       categoryName: category?.categoryName,
-      isVendor: exp?.isVendor,
+      isVendor: exp?.isVendor || false,
     }))
   );
 
@@ -66,7 +66,7 @@ const EditableRow = ({
         handleInputChange(rowKey, value?.expenseName);
         handleInputChange("_id", value ? value._id : "");
         handleInputChange("categoryName", value ? value?.categoryName : "");
-        handleInputChange("isVendor", value ? value?.isVendor : "");
+        handleInputChange("isVendor", value ? value?.isVendor || false : false);
       }}
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" />
@@ -229,12 +229,12 @@ const OfficeBookTable = ({
   const { restPending } = useAppSelector((state) => state.restPending);
 
   const pendingVendorsOptions = restCategory
-    ?.filter((category) => category.expense.some((exp) => exp.isVendor))
+    ?.filter((category) => category.expense.some((exp) => exp?.isVendor))
     .map((category) => ({
       _id: category._id,
       categoryName: category.categoryName,
       categoryDescription: category.categoryDescription,
-      expense: category.expense.filter((exp) => exp.isVendor),
+      expense: category.expense.filter((exp) => exp?.isVendor),
     }));
 
   const pendingUsersOptions = restPending.map((pending) => ({

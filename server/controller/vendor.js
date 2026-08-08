@@ -53,7 +53,7 @@ router.get("/get-vendor-entries/:startDate/:endDate", async (req, res) => {
     const restExpensesEntries = restEntries.flatMap((e) => {
       const expense = e.expenses || [];
       return expense.map((exp) => {
-        if (exp?.isVendor === true) {
+        if (exp?.isVendor) {
           return exp;
         }
         return [];
@@ -62,7 +62,7 @@ router.get("/get-vendor-entries/:startDate/:endDate", async (req, res) => {
     const officeInEntries = officeBooks.flatMap((e) => {
       const officeIn = e.officeIn || [];
       return officeIn.map((officeIn) => {
-        if (officeIn?.isVendor === true) {
+        if (officeIn?.isVendor) {
           return officeIn;
         }
         return [];
@@ -71,7 +71,7 @@ router.get("/get-vendor-entries/:startDate/:endDate", async (req, res) => {
     const officeOutEntries = officeBooks.flatMap((e) => {
       const officeOut = e.officeOut || [];
       return officeOut.map((officeOut) => {
-        if (officeOut?.isVendor === true) {
+        if (officeOut?.isVendor) {
           return officeOut;
         }
         return [];
