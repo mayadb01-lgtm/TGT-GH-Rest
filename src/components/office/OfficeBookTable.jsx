@@ -226,6 +226,7 @@ const OfficeBookTable = ({
 }) => {
   const { restCategory } = useAppSelector((state) => state.restCategory);
   const { officeCategory } = useAppSelector((state) => state.officeBook);
+  const { restPending } = useAppSelector((state) => state.restPending);
 
   const pendingVendorsOptions = restCategory
     ?.filter((category) => category.expense.some((exp) => exp.isVendor))
@@ -236,12 +237,30 @@ const OfficeBookTable = ({
       expense: category.expense.filter((exp) => exp.isVendor),
     }));
 
+  const pendingUsersOptions = restPending.map((pending) => ({
+    _id: pending._id,
+    fullname: pending.fullname,
+    mobileNumber: pending.mobileNumber,
+    expenseName: pending.fullname,
+    isVendor: false,
+    categoryName: "Pending",
+    expense: [
+      {
+        _id: pending._id,
+        expenseName: pending.fullname,
+        isVendor: false,
+        categoryName: "Pending",
+      },
+    ],
+  }));
+
   const officeInOptions = isOfficeIn
     ? [
         ...officeCategory.filter(
           (category) => category.categoryName !== "Pending"
         ),
         ...pendingVendorsOptions,
+        ...pendingUsersOptions,
       ]
     : officeCategory;
 
