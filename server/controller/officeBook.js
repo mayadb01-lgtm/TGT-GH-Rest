@@ -18,7 +18,7 @@ router.post("/create-entry", async (req, res) => {
           item._id &&
           item.categoryName &&
           item.expenseName &&
-          item.modeOfPayment,
+          item.modeOfPayment
       );
 
     if (officeIn && !validateEntries(officeIn)) {
@@ -99,7 +99,7 @@ router.put("/update-entry/:date", async (req, res) => {
           item.categoryName &&
           item.expenseName &&
           item.modeOfPayment &&
-          item.createDate,
+          item.createDate
       );
 
     if (officeIn && !validateEntries(officeIn)) {
@@ -137,7 +137,7 @@ router.put("/update-entry/:date", async (req, res) => {
         entryCreateDate: reqBody.entryCreateDate || "",
         updatedDate: reqBody.updatedDate || "",
       },
-      { new: true },
+      { new: true }
     );
 
     res.status(200).json({
@@ -261,7 +261,7 @@ router.get("/get-expenses", async (req, res) => {
       category.expense.map((exp) => ({
         _id: exp._id,
         expenseName: exp.expenseName,
-      })),
+      }))
     );
 
     res.status(200).json({
@@ -353,15 +353,15 @@ router.get(
         },
         {
           officeOut: 1,
-        },
+        }
       );
 
       const officeBookCategoryUpaadEntries = entries.flatMap((entry) =>
         entry.officeOut.filter(
           (item) =>
             item.categoryName &&
-            item.categoryName.match(/upad|upaad|Upad|Upaad|staff|Staff/i),
-        ),
+            item.categoryName.match(/upad|upaad|Upad|Upaad/i)
+        )
       );
 
       const officeBookCategoryUpaad = officeBookCategoryUpaadEntries.reduce(
@@ -376,7 +376,7 @@ router.get(
 
           return acc;
         },
-        {},
+        {}
       );
 
       res.status(200).json({
@@ -391,7 +391,7 @@ router.get(
         message: error.message,
       });
     }
-  },
+  }
 );
 
 // Get Office Book Category Upaad by Month Range (Start Month, End Month) - grouped by Month
@@ -422,7 +422,7 @@ router.get(
         {
           officeOut: 1,
           entryCreateDate: 1,
-        },
+        }
       );
 
       // Group by "YYYY-MM" first, keeping staffName totals inside each month
@@ -432,7 +432,7 @@ router.get(
         const matchingItems = (entry.officeOut || []).filter(
           (item) =>
             item.categoryName &&
-            item.categoryName.match(/upad|upaad|Upad|Upaad|staff|Staff/i),
+            item.categoryName.match(/upad|upaad|Upad|Upaad|staff|Staff/i)
         );
 
         if (matchingItems.length === 0) {
@@ -456,7 +456,7 @@ router.get(
 
       console.log(
         "Office Book Category Upaad by Month Range:",
-        officeBookCategoryUpaadByMonth,
+        officeBookCategoryUpaadByMonth
       );
 
       res.status(200).json({
@@ -466,14 +466,14 @@ router.get(
     } catch (error) {
       console.error(
         "Get Office Book Category Upaad by Month Range Error:",
-        error,
+        error
       );
       res.status(500).json({
         success: false,
         message: error.message,
       });
     }
-  },
+  }
 );
 
 export default router;
