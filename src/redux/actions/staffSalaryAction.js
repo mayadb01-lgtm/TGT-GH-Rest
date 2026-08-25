@@ -6,7 +6,7 @@ export const getSalarySheet = (month, year) => async (dispatch) => {
   try {
     dispatch({ type: "GetSalarySheetRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`
     );
     console.log("Salary Sheet fetched successfully", data);
     dispatch({ type: "GetSalarySheetSuccess", payload: data.data });
@@ -30,7 +30,7 @@ export const getPreviousMonthSalarySheet =
     try {
       dispatch({ type: "GetPreviousSalarySheetRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheet/${month}/${year}`
       );
       dispatch({ type: "GetPreviousSalarySheetSuccess", payload: data.data });
     } catch (error) {
@@ -52,7 +52,7 @@ export const getSalarySheetsByMonthRange =
     try {
       dispatch({ type: "GetSalarySheetsByMonthRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheets-by-month-range/${startDate}/${endDate}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-sheets-by-month-range/${startDate}/${endDate}`
       );
       console.log("Salary Sheets fetched successfully", data);
       dispatch({
@@ -80,7 +80,7 @@ export const createSalarySheet = (salaryData) => async (dispatch) => {
         headers: {
           "Content-Type": "application/json",
         },
-      },
+      }
     );
     console.log("Salary Sheet created successfully", data);
     dispatch({ type: "CreateSalarySheetSuccess", payload: data.data });
@@ -93,7 +93,7 @@ export const createSalarySheet = (salaryData) => async (dispatch) => {
     toast.error(
       error?.response?.data?.message ??
         error?.message ??
-        "An unknown error occurred.",
+        "An unknown error occurred."
     );
     console.log("Error Catch", error);
   }
@@ -111,7 +111,7 @@ export const updateSalarySheet =
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
       console.log("Salary Sheet updated successfully", data);
       dispatch({ type: "UpdateSalarySheetSuccess", payload: data.data });
@@ -124,7 +124,7 @@ export const updateSalarySheet =
       toast.error(
         error?.response?.data?.message ??
           error?.message ??
-          "An unknown error occurred.",
+          "An unknown error occurred."
       );
       console.log("Error Catch", error);
     }
@@ -135,7 +135,7 @@ export const deleteSalarySheet = (month, year) => async (dispatch) => {
   try {
     dispatch({ type: "DeleteSalarySheetRequest" });
     const { data } = await axios.delete(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/delete-salary-sheet/${month}/${year}`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/delete-salary-sheet/${month}/${year}`
     );
     console.log("Salary Sheet deleted successfully", data);
     dispatch({ type: "DeleteSalarySheetSuccess", payload: data.data });
@@ -148,8 +148,31 @@ export const deleteSalarySheet = (month, year) => async (dispatch) => {
     toast.error(
       error?.response?.data?.message ??
         error?.message ??
-        "An unknown error occurred.",
+        "An unknown error occurred."
     );
     console.log("Error Catch", error?.response?.data?.message);
   }
 };
+
+// Get Salary and Overtime by Month Range (Start Date, End Date - DD-MM-YYYY)
+export const getSalaryAndOvertimeByMonthRange =
+  (startDate, endDate) => async (dispatch) => {
+    try {
+      dispatch({ type: "GetSalaryAndOvertimeByMonthRangeRequest" });
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/staffSalary/get-salary-and-overtime-by-month-range/${startDate}/${endDate}`
+      );
+      console.log("Salary and Overtime fetched successfully", data);
+      dispatch({
+        type: "GetSalaryAndOvertimeByMonthRangeSuccess",
+        payload: data.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: "GetSalaryAndOvertimeByMonthRangeFailure",
+        payload: error?.response?.data?.message,
+      });
+      toast.error(error?.response?.data?.message);
+      console.log("Error Catch", error?.response?.data?.message);
+    }
+  };

@@ -115,6 +115,8 @@ const RestEntryPage = () => {
     categoryName: "",
     expenseName: "",
     isVendor: false,
+    fullname: "",
+    fullname_id: "",
     createDate: selectedDate,
   }));
   const [restExpensesData, setRestExpensesData] = useState(
