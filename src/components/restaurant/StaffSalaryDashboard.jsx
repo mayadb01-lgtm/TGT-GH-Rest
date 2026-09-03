@@ -29,6 +29,9 @@ import { getStaffUpaadByMonthRange } from "../../redux/actions/restEntryAction";
 
 dayjs.locale("en-gb");
 
+/** Round to nearest whole number (e.g. 12.25 → 12, 12.99 → 13). */
+const roundWhole = (value) => Math.round(Number(value) || 0);
+
 const columns = [
   {
     field: "index",
@@ -83,7 +86,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+      `${roundWhole(params.value).toLocaleString("en-IN")}`,
   },
   {
     field: "restaurantUpaad",
@@ -93,7 +96,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+      `${roundWhole(params.value).toLocaleString("en-IN")}`,
   },
   {
     field: "officeUpaad",
@@ -103,7 +106,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+      `${roundWhole(params.value).toLocaleString("en-IN")}`,
   },
   {
     field: "currentBalance",
@@ -113,7 +116,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+      `${roundWhole(params.value).toLocaleString("en-IN")}`,
   },
   {
     field: "salaryPaid",
@@ -140,7 +143,7 @@ const columns = [
     headerAlign: "center",
     align: "center",
     renderCell: (params) =>
-      `${Number(params.value || 0).toLocaleString("en-IN")}`,
+      `${roundWhole(params.value).toLocaleString("en-IN")}`,
   },
 ];
 
@@ -148,7 +151,7 @@ const StaffSalaryDashboard = () => {
   const dispatch = useAppDispatch();
   const { restStaff } = useAppSelector((state) => state.restStaff);
   const { loading: staffUpaadLoading, staffTotalUpaad } = useAppSelector(
-    (state) => state.restEntry,
+    (state) => state.restEntry
   );
   const { loading: officeUpaadLoading, officeBookCategoryUpaad } =
     useAppSelector((state) => state.officeBook);
@@ -190,12 +193,12 @@ const StaffSalaryDashboard = () => {
     dispatch(
       getOfficeBookCategoryUpaadByMonthRange(
         formattedStartDate,
-        formattedEndDate,
-      ),
+        formattedEndDate
+      )
     );
     dispatch(getSalarySheetsByMonthRange(formattedStartDate, formattedEndDate));
     dispatch(
-      getSalaryAndOvertimeByMonthRange(formattedStartDate, formattedEndDate),
+      getSalaryAndOvertimeByMonthRange(formattedStartDate, formattedEndDate)
     );
   }, [dispatch, startDate, endDate]);
 
@@ -212,9 +215,15 @@ const StaffSalaryDashboard = () => {
     const salaryAndOvertimeMonthBucket = salaryAndOvertime?.[monthKey] || {};
 
     return (sheet.rows || []).map((row) => {
-      const restaurantUpaad = staffMonthBucket[row.staffId?.toString()] || 0;
-      const officeUpaad = officeMonthBucket[row.staffId?.toString()] || 0;
-      const total = Number(row.perDayPay || 0) * Number(row.attendance || 0);
+      const restaurantUpaad = roundWhole(
+        staffMonthBucket[row.staffId?.toString()] || 0
+      );
+      const officeUpaad = roundWhole(
+        officeMonthBucket[row.staffId?.toString()] || 0
+      );
+      const total = roundWhole(
+        Number(row.perDayPay || 0) * Number(row.attendance || 0)
+      );
 
       return {
         ...row,
@@ -227,11 +236,12 @@ const StaffSalaryDashboard = () => {
         total,
         restaurantUpaad,
         officeUpaad,
-        currentBalance: total - restaurantUpaad - officeUpaad,
+        currentBalance: roundWhole(total - restaurantUpaad - officeUpaad),
         salaryPaid: Boolean(row.salaryPaid),
         // Informational only - not persisted, not used in any total/balance calculation.
-        salaryAndOvertime:
-          Number(salaryAndOvertimeMonthBucket[row.staffId?.toString()]) || 0,
+        salaryAndOvertime: roundWhole(
+          salaryAndOvertimeMonthBucket[row.staffId?.toString()] || 0
+        ),
         staffStatus: staffStatusById[row.staffId?.toString()] || "Active",
       };
     });
@@ -273,7 +283,7 @@ const StaffSalaryDashboard = () => {
       totalOfficeUpaad: 0,
       totalBalance: 0,
       totalSalaryAndOvertime: 0,
-    },
+    }
   );
 
   const totalsRow = {
@@ -314,8 +324,16 @@ const StaffSalaryDashboard = () => {
     const fileName = `${
       fileNameRef.current?.innerText || "Staff Salary Dashboard"
     } - ${startDate.format("DD-MM-YYYY")} to ${endDate.format(
-      "DD-MM-YYYY",
+      "DD-MM-YYYY"
     )}.xlsx`;
+
+    const numericExportKeys = new Set([
+      "total",
+      "restaurantUpaad",
+      "officeUpaad",
+      "currentBalance",
+      "salaryAndOvertime",
+    ]);
 
     const exportData = rowsWithTotals.map((item) => {
       const transformed = {};
@@ -324,6 +342,8 @@ const StaffSalaryDashboard = () => {
         if (key === "salaryPaid") {
           value =
             typeof value === "boolean" ? (value ? "Paid" : "Unpaid") : value;
+        } else if (numericExportKeys.has(key) && typeof value === "number") {
+          value = roundWhole(value);
         }
         transformed[headerMap[key]] = value;
       });
@@ -480,7 +500,7 @@ const StaffSalaryDashboard = () => {
         >
           <Typography variant="body2">Total Salary</Typography>
           <Typography variant="h6">
-            {summary.totalSalary.toLocaleString("en-IN")}
+            {roundWhole(summary.totalSalary).toLocaleString("en-IN")}
           </Typography>
         </Box>
 
@@ -494,7 +514,7 @@ const StaffSalaryDashboard = () => {
         >
           <Typography variant="body2">Restaurant Upaad</Typography>
           <Typography variant="h6">
-            {summary.totalRestUpaad.toLocaleString("en-IN")}
+            {roundWhole(summary.totalRestUpaad).toLocaleString("en-IN")}
           </Typography>
         </Box>
 
@@ -508,7 +528,7 @@ const StaffSalaryDashboard = () => {
         >
           <Typography variant="body2">Office Upaad</Typography>
           <Typography variant="h6">
-            {summary.totalOfficeUpaad.toLocaleString("en-IN")}
+            {roundWhole(summary.totalOfficeUpaad).toLocaleString("en-IN")}
           </Typography>
         </Box>
 
@@ -522,7 +542,7 @@ const StaffSalaryDashboard = () => {
         >
           <Typography variant="body2">Net Balance</Typography>
           <Typography variant="h6">
-            {summary.totalBalance.toLocaleString("en-IN")}
+            {roundWhole(summary.totalBalance).toLocaleString("en-IN")}
           </Typography>
         </Box>
       </Stack>
