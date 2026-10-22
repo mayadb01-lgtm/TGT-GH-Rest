@@ -14,7 +14,7 @@ const restCategorySchema = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 export default model("RestCategory", restCategorySchema);

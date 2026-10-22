@@ -12,7 +12,7 @@ export const createOfficeBook = (officeBookData) => async (dispatch) => {
         headers: {
           "Content-Type": "application/json",
         },
-      },
+      }
     );
     console.log("Office Book created successfully", data);
     dispatch({ type: "CreateOfficeEntrySuccess", payload: data.data });
@@ -32,7 +32,7 @@ export const getOfficeBookByDate = (date) => async (dispatch) => {
   try {
     dispatch({ type: "GetOfficeBookByDateRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-entry/${date}`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-entry/${date}`
     );
     console.log("Office Book fetched successfully", data);
     dispatch({ type: "GetOfficeBookByDateSuccess", payload: data.data });
@@ -58,7 +58,7 @@ export const updateOfficeBookByDate =
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
       console.log("Office Book updated successfully", data);
       dispatch({ type: "UpdateOfficeEntrySuccess", payload: data.data });
@@ -78,7 +78,7 @@ export const deleteOfficeBookByDate = (date) => async (dispatch) => {
   try {
     dispatch({ type: "DeleteOfficeEntryRequest" });
     const { data } = await axios.delete(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/delete-entry/${date}`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/delete-entry/${date}`
     );
     console.log("Office Book deleted successfully", data);
     dispatch({ type: "DeleteOfficeEntrySuccess", payload: data.data });
@@ -99,7 +99,7 @@ export const getOfficeBookByDateRange =
     try {
       dispatch({ type: "GetOfficeBookByDateRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-entries/${startDate}/${endDate}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-entries/${startDate}/${endDate}`
       );
       console.log("Office Book fetched successfully", data);
       dispatch({ type: "GetOfficeBookByDateRangeSuccess", payload: data.data });
@@ -127,7 +127,7 @@ export const createOfficeCategory =
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
       console.log("Office Category created successfully", data);
       dispatch({ type: "CreateOfficeCategorySuccess", payload: data.data });
@@ -147,7 +147,7 @@ export const getOfficeAllCategories = () => async (dispatch) => {
   try {
     dispatch({ type: "GetOfficeAllCategoriesRequest" });
     const { data } = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-categories`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-categories`
     );
     console.log("Office All Categories fetched successfully", data);
     dispatch({ type: "GetOfficeAllCategoriesSuccess", payload: data.data });
@@ -173,7 +173,7 @@ export const updateOfficeCategory =
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
       console.log("Office Category updated successfully", data);
       dispatch({ type: "UpdateOfficeCategorySuccess", payload: data.data });
@@ -193,7 +193,7 @@ export const deleteOfficeCategory = (id) => async (dispatch) => {
   try {
     dispatch({ type: "DeleteOfficeCategoryRequest" });
     const { data } = await axios.delete(
-      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/delete-category/${id}`,
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/delete-category/${id}`
     );
     console.log("Office Category deleted successfully", data);
     dispatch({ type: "DeleteOfficeCategorySuccess", payload: data.data });
@@ -214,7 +214,7 @@ export const getOfficeBookCategoryUpaadByMonthAndYear =
     try {
       dispatch({ type: "GetOfficeBookCategoryUpaadByMonthAndYearRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-category-upaad-by-month-and-year/${month}/${year}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-category-upaad-by-month-and-year/${month}/${year}`
       );
       console.log("Office Book Category Upaad fetched successfully", data);
       dispatch({
@@ -237,7 +237,7 @@ export const getOfficeBookCategoryUpaadByMonthRange =
     try {
       dispatch({ type: "GetOfficeBookCategoryUpaadByMonthRangeRequest" });
       const { data } = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-category-upaad-by-month-range/${startMonth}/${endMonth}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/officeBook/get-category-upaad-by-month-range/${startMonth}/${endMonth}`
       );
       console.log("Office Book Category Upaad fetched successfully", data);
       dispatch({

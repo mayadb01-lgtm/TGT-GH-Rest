@@ -41,7 +41,7 @@ const restEntryReducer = createReducer(initialState, (builder) => {
     .addCase("DeleteRestEntrySuccess", (state, action) => {
       state.loading = false;
       state.restEntries = state.restEntries.filter(
-        (entry) => entry._id !== action.payload,
+        (entry) => entry._id !== action.payload
       );
     })
     .addCase("DeleteRestEntryFailure", (state, action) => {

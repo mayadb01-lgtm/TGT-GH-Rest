@@ -342,7 +342,10 @@ const StaffSalaryDashboard = () => {
         if (key === "salaryPaid") {
           value =
             typeof value === "boolean" ? (value ? "Paid" : "Unpaid") : value;
-        } else if (numericExportKeys.has(key) && typeof value === "number") {
+        } else if (
+          numericExportKeys.has(key) &&
+          typeof value === "number"
+        ) {
           value = roundWhole(value);
         }
         transformed[headerMap[key]] = value;

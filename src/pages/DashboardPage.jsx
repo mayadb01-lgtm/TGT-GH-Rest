@@ -1,9 +1,13 @@
+import { useEffect } from "react";
 import { useRoutes, useNavigate, Navigate } from "react-router-dom";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
-import { Button, createTheme, Stack, Typography } from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import CategoryIcon from "@mui/icons-material/Category";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { dashboardTheme } from "../theme";
+import TabbedPage from "../components/TabbedPage";
+import TodayHome from "../components/owner/TodayHome";
+import TodayIcon from "@mui/icons-material/Today";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import BadgeIcon from "@mui/icons-material/Badge";
 // import RestaurantIcon from "@mui/icons-material/Restaurant";
 // import HotelIcon from "@mui/icons-material/Hotel";
@@ -14,8 +18,9 @@ import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import { BookOutlined } from "@mui/icons-material";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
-import HomeIcon from "@mui/icons-material/Home";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import CategoryIcon from "@mui/icons-material/Category";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 
 // Components
@@ -39,6 +44,35 @@ import GHBankBooksDashboard from "../components/guest-house/GHBankBooksDashboard
 import OfficeCategoryDashboard from "../components/office/OfficeCategoryDashboard";
 import OfficeMerged from "../components/office/OfficeMerged";
 import OfficeCreditDebit from "../components/office/OfficeCreditDebit";
+import VendorGraphDashboard from "../components/office/VendorGraphDashboard";
+import CashflowDashboard from "../components/insights/CashflowDashboard";
+import ModeBalanceDashboard from "../components/insights/ModeBalanceDashboard";
+import OfficeTypesDashboard from "../components/insights/OfficeTypesDashboard";
+import RestReceivableBalance from "../components/insights/RestReceivableBalance";
+import BanquetSetupDashboard from "../components/insights/BanquetSetupDashboard";
+import BanquetReportDashboard from "../components/insights/BanquetReportDashboard";
+import PurchaseAnalyticsDashboard from "../components/insights/PurchaseAnalyticsDashboard";
+import GhGrowthDashboard from "../components/insights/GhGrowthDashboard";
+import ForecastDashboard from "../components/insights/ForecastDashboard";
+import PerformanceDashboard from "../components/insights/PerformanceDashboard";
+import GHGraph2 from "../components/biz/GHGraph2";
+import RestGraph2 from "../components/biz/RestGraph2";
+import MergedGraph2 from "../components/biz/MergedGraph2";
+import SalesGoals2 from "../components/biz/SalesGoals2";
+import KharchControlDashboard from "../components/insights/KharchControlDashboard";
+import DataAlerts from "../components/insights/DataAlerts";
+import ProfitLossDashboard from "../components/insights/ProfitLossDashboard";
+import RoomRatesDashboard from "../components/owner/RoomRatesDashboard";
+import GuestRegisterDashboard from "../components/owner/GuestRegisterDashboard";
+import RoomActivityDashboard from "../components/owner/RoomActivityDashboard";
+import InvoicesDashboard from "../components/owner/InvoicesDashboard";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import BedIcon from "@mui/icons-material/Bed";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 import GHUpaidEntriesDashboard from "../components/guest-house/GHUpaidEntriesDashboard";
 import OfficeHome from "../components/office/OfficeHome";
 import OfficeMergedGraph from "../components/office/OfficeMergedGraph";
@@ -50,85 +84,82 @@ import OfficeBakeryBaadaSalesGoalDashboard from "../components/office/OfficeBake
 import OfficeMotiBaadaSalesGoalDashboard from "../components/office/OfficeMotiBaadaSalesGoalDashboard";
 // Staff Salary
 import StaffSalaryDashboard from "../components/restaurant/StaffSalaryDashboard";
+import AttendanceImportDashboard from "../components/restaurant/AttendanceImportDashboard";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import DataImportDashboard from "../components/import/DataImportDashboard";
+import OwnerMonthlyDashboard from "../components/owner/OwnerMonthlyDashboard";
+import GuestDuesReminders from "../components/owner/GuestDuesReminders";
+import StaffAccessDashboard from "../components/owner/StaffAccessDashboard";
+import MyPasswordPage from "../components/owner/MyPasswordPage";
+import KeyIcon from "@mui/icons-material/LockOutlined";
+import LoginLogDashboard from "../components/owner/LoginLogDashboard";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import InsightsIcon from "@mui/icons-material/Insights";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
-const DashboardHeader = ({ onNavigate }) => {
+const DashboardHeader = () => {
+  useEffect(() => {
+    document.title = import.meta.env.VITE_REACT_APP_BUSINESS_NAME || "Ashirvad";
+  }, []);
   const navigate = useNavigate();
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      justifyContent="space-between"
-      width="100%"
-    >
-      {/* Heading */}
-      <Typography variant="h6" fontWeight="bold">
-        {import.meta.env.VITE_REACT_APP_BUSINESS_NAME} Admin Dashboard
-      </Typography>
-
-      {/* Buttons */}
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Button
-          variant="contained"
-          onClick={() => onNavigate("home")}
-          startIcon={<DashboardIcon />}
-        >
-          Dashboard Home
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => navigate("/")}
-          endIcon={<HomeIcon />}
-        >
-          Entry Home
+    <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" width="100%">
+      <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
+        <Box sx={{ width: 32, height: 32, borderRadius: 2, bgcolor: "#0F172A", color: "#fff", display: "grid", placeItems: "center", fontWeight: 800, flexShrink: 0 }}>
+          {(import.meta.env.VITE_REACT_APP_BUSINESS_NAME || "A").charAt(0)}
+        </Box>
+        <Box sx={{ minWidth: 0, display: { xs: "none", sm: "block" } }}>
+          <Typography fontWeight={800} lineHeight={1.1} noWrap>
+            {import.meta.env.VITE_REACT_APP_BUSINESS_NAME || "Ashirvad"}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap component="div">
+            Owner dashboard
+          </Typography>
+        </Box>
+      </Stack>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Button variant="contained" size="small" startIcon={<EditNoteIcon />} onClick={() => navigate("/entry")}>
+          New entry
         </Button>
       </Stack>
     </Stack>
   );
 };
 
+// Saare purane menu items waise hi + naye items (Aaj ka hisaab, Guest Dues, Staff Access).
+// Naye tab-wale pages (Reports, Setup...) bhi "Naye combined pages" mein rakhe hain.
 const NAVIGATION = [
-  {
-    segment: "home",
-    title: "Home",
-    icon: <DashboardIcon />,
-  },
+  { segment: "home", title: "Today's summary", icon: <TodayIcon /> },
+  { segment: "owner-report", title: "Owner Monthly Report", icon: <InsightsIcon /> },
+  { segment: "forecast", title: "Forecast & key dates", icon: <TrendingUpIcon /> },
+  { segment: "performance", title: "Performance: year vs year", icon: <AssessmentIcon /> },
+  { segment: "guest-dues", title: "Guest Dues & Reminders", icon: <WhatsAppIcon /> },
+  { kind: "header", title: "Business Growth" },
+  { segment: "profit-loss", title: "Profit & Loss", icon: <AssessmentIcon /> },
+  { segment: "cashflow", title: "Cashflow (monthly)", icon: <AccountBalanceWalletIcon /> },
+  { segment: "mode-balance", title: "Monthly balance (Cash / PP / PPS / PPC)", icon: <AccountBalanceWalletIcon /> },
+  { segment: "purchase-analytics", title: "Purchase analytics", icon: <ReceiptLongIcon /> },
+  { segment: "office-types", title: "Office category types", icon: <AccountBalanceWalletIcon /> },
+  { segment: "rest-receivables", title: "Restaurant receivables (who owes)", icon: <CurrencyRupeeIcon /> },
+  { kind: "header", title: "Banquet" },
+  { segment: "banquet-report", title: "Banquet report & kitchen planning", icon: <ReceiptLongIcon /> },
+  { segment: "banquet-setup", title: "Banquet setup (menu, packages)", icon: <ReceiptLongIcon /> },
+  { segment: "gh-growth", title: "GH Growth", icon: <TrendingUpIcon /> },
+  { segment: "kharch-control", title: "Expense control", icon: <ReceiptLongIcon /> },
+  { segment: "data-check", title: "Data check (error alerts)", icon: <FactCheckIcon /> },
   { kind: "header", title: "Guest House" },
-  {
-    segment: "guest-house",
-    title: "GH - Graph",
-    icon: <PieChartIcon />,
-  },
-  {
-    segment: "gh-dashboard",
-    title: "GH - One Day View",
-    icon: <LooksOneIcon />,
-  },
-  {
-    segment: "gh-dashboard-range",
-    title: "GH - Date Range",
-    icon: <DateRangeIcon />,
-  },
+  { segment: "guest-house", title: "GH - Graph", icon: <PieChartIcon /> },
+  { segment: "gh-dashboard", title: "GH - One Day View", icon: <LooksOneIcon /> },
+  { segment: "gh-dashboard-range", title: "GH - Date Range", icon: <DateRangeIcon /> },
   {
     segment: "gh-reports",
     title: "GH - Reports",
     icon: <BarChartIcon />,
     children: [
-      {
-        segment: "sales-report",
-        title: "GH - Sales Report",
-        icon: <CurrencyRupeeIcon />,
-      },
-      {
-        segment: "bank-books",
-        title: "GH - Bank Books",
-        icon: <BookOutlined />,
-      },
-      {
-        segment: "upaid-report",
-        title: "GH - Upaid",
-        icon: <PaymentsIcon />,
-      },
+      { segment: "sales-report", title: "GH - Sales Report", icon: <CurrencyRupeeIcon /> },
+      { segment: "bank-books", title: "GH - Bank Books", icon: <BookOutlined /> },
+      { segment: "upaid-report", title: "GH - Unpaid", icon: <PaymentsIcon /> },
     ],
   },
   { kind: "header", title: "Restaurant" },
@@ -138,134 +169,64 @@ const NAVIGATION = [
     title: "Rest - Reports",
     icon: <BarChartIcon />,
     children: [
-      {
-        segment: "sales-report",
-        title: "Rest - Sales",
-        icon: <CurrencyRupeeIcon />,
-      },
-      {
-        segment: "upaad-report",
-        title: "Rest - Upaad",
-        icon: <PaymentsIcon />,
-      },
-      {
-        segment: "expenses-report",
-        title: "Rest - Expenses",
-        icon: <CreditScoreIcon />,
-      },
-      {
-        segment: "bank-books",
-        title: "Rest - Bank Books",
-        icon: <BookOutlined />,
-      },
-      {
-        segment: "levana-report",
-        title: "Rest - Levana",
-        icon: <CurrencyRupeeIcon />,
-      },
-      {
-        segment: "aapvana-report",
-        title: "Rest - Aapvana",
-        icon: <CurrencyRupeeIcon />,
-      },
-      {
-        segment: "aapvana-levana-balance",
-        title: "Pending Balance",
-        icon: <CurrencyRupeeIcon />,
-      },
+      { segment: "sales-report", title: "Rest - Sales", icon: <CurrencyRupeeIcon /> },
+      { segment: "upaad-report", title: "Rest - Staff advance", icon: <PaymentsIcon /> },
+      { segment: "expenses-report", title: "Rest - Expenses", icon: <CreditScoreIcon /> },
+      { segment: "bank-books", title: "Rest - Bank Books", icon: <BookOutlined /> },
+      { segment: "levana-report", title: "Rest - Receivables", icon: <CurrencyRupeeIcon /> },
+      { segment: "aapvana-report", title: "Rest - Payables", icon: <CurrencyRupeeIcon /> },
+      { segment: "aapvana-levana-balance", title: "Pending Balance", icon: <CurrencyRupeeIcon /> },
     ],
   },
-  {
-    segment: "manage-staff",
-    title: "Rest - Manage Staff",
-    icon: <BadgeIcon />,
-  },
-  {
-    segment: "categories-expenses",
-    title: "Categories & Expenses",
-    icon: <CategoryIcon />,
-  },
-  {
-    segment: "pending-users",
-    title: "Rest - Pending Users",
-    icon: <BadgeIcon />,
-  },
+  { segment: "manage-staff", title: "Rest - Manage Staff", icon: <BadgeIcon /> },
+  { segment: "categories-expenses", title: "Categories & Expenses", icon: <CategoryIcon /> },
+  { segment: "pending-users", title: "Rest - Pending Users", icon: <BadgeIcon /> },
   { kind: "header", title: "Office Book" },
   { segment: "office", title: "Office Graph", icon: <PieChartIcon /> },
   { segment: "office-book", title: "Office Book", icon: <LooksOneIcon /> },
-  {
-    segment: "office-category",
-    title: "Office Category",
-    icon: <CategoryIcon />,
-  },
+  { segment: "office-category", title: "Office Category", icon: <CategoryIcon /> },
   { kind: "header", title: "Staff Salary" },
-  {
-    segment: "staff-salary",
-    title: "Staff Salary",
-    icon: <BadgeIcon />,
-  },
+  { segment: "staff-salary", title: "Staff Salary", icon: <BadgeIcon /> },
+  { segment: "attendance-import", title: "Attendance machine import", icon: <FingerprintIcon /> },
   { kind: "header", title: "Merged Reports" },
-  {
-    segment: "merged-graph",
-    title: "Merged Graph",
-    icon: <PieChartIcon />,
-  },
-  {
-    segment: "merged-reports",
-    title: "Merged Report",
-    icon: <BarChartIcon />,
-  },
-  {
-    segment: "merged-vendor-report",
-    title: "Merged Vendor Report",
-    icon: <BarChartIcon />,
-  },
-  {
-    kind: "header",
-    title: "Sales Goal",
-  },
+  { segment: "merged-graph", title: "Merged Graph", icon: <PieChartIcon /> },
+  { segment: "merged-reports", title: "Merged Report", icon: <BarChartIcon /> },
+  { segment: "merged-vendor-report", title: "Merged Vendor Report", icon: <BarChartIcon /> },
+  { segment: "merged-vendor-graph", title: "Vendor Graph (all vendors)", icon: <InsightsIcon /> },
+  { kind: "header", title: "Sales Goal" },
   {
     segment: "sales-goal",
     title: "Sales Goal",
     icon: <StackedLineChartIcon />,
     children: [
-      {
-        segment: "gh-sales-goal",
-        title: "GH - Sales Goal",
-        icon: <StackedLineChartIcon />,
-      },
-      {
-        segment: "rest-sales-goal",
-        title: "Rest - Sales Goal",
-        icon: <StackedLineChartIcon />,
-      },
-      {
-        segment: "office-banquet-sales-goal",
-        title: "Banquet Sales Goal",
-        icon: <StackedLineChartIcon />,
-      },
-      {
-        segment: "office-bakery-baada",
-        title: "Bakery Baada",
-        icon: <StackedLineChartIcon />,
-      },
-      {
-        segment: "office-moti-baada",
-        title: "Moti  Baada",
-        icon: <StackedLineChartIcon />,
-      },
+      { segment: "all", title: "All goals (new)", icon: <StackedLineChartIcon /> },
+      { segment: "gh-sales-goal", title: "GH - Sales Goal", icon: <StackedLineChartIcon /> },
+      { segment: "rest-sales-goal", title: "Rest - Sales Goal", icon: <StackedLineChartIcon /> },
+      { segment: "office-banquet-sales-goal", title: "Banquet Sales Goal", icon: <StackedLineChartIcon /> },
+      { segment: "office-bakery-baada", title: "Bakery Baada", icon: <StackedLineChartIcon /> },
+      { segment: "office-moti-baada", title: "Moti Baada", icon: <StackedLineChartIcon /> },
     ],
   },
+  { kind: "header", title: "Combined pages (tabs)" },
+  { segment: "gh-all-reports", title: "GH - All Reports", icon: <CurrencyRupeeIcon /> },
+  { segment: "rest-all-reports", title: "Rest - All Reports", icon: <PaymentsIcon /> },
+  { segment: "rest-setup", title: "Rest - Staff & Setup", icon: <BadgeIcon /> },
+  { segment: "office-all", title: "Office Book + Category", icon: <BookOutlined /> },
+  { segment: "merged-all", title: "Merged - All", icon: <StackedLineChartIcon /> },
+  { segment: "sales-goals", title: "Sales Goals - All", icon: <BarChartIcon /> },
+  { kind: "header", title: "Billing" },
+  { segment: "invoices", title: "Invoices (GST / Non-GST)", icon: <ReceiptLongIcon /> },
+  { kind: "header", title: "Settings" },
+  { segment: "staff-access", title: "Staff Access", icon: <AdminPanelSettingsIcon /> },
+  { segment: "my-password", title: "My password", icon: <KeyIcon /> },
+  { segment: "login-log", title: "Login log", icon: <FingerprintIcon /> },
+  { segment: "room-rates", title: "Room Rates", icon: <BedIcon /> },
+  { segment: "guest-register", title: "Guest Register (Govt)", icon: <AssignmentIndIcon /> },
+  { segment: "room-activity", title: "Room Activity (footprint)", icon: <FingerprintIcon /> },
+  { segment: "data-import", title: "Import Excel / CSV", icon: <UploadFileIcon /> },
+  { kind: "header", title: "Old" },
+  { segment: "home-classic", title: "Home (old)", icon: <DashboardIcon /> },
 ];
-
-// Theme setup
-const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: "data-toolpad-color-scheme",
-  },
-  colorSchemes: { light: true },
-  breakpoints: { values: { xs: 0, sm: 600, md: 960, lg: 1200, xl: 1536 } },
-});
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -284,19 +245,108 @@ const DashboardPage = () => {
   const routes = useRoutes([
     // Redirect /dashboard to /dashboard/home
     { path: "", element: <Navigate to="home" replace /> },
+    { path: "home", element: <TodayHome onNavigate={router.navigate} /> },
+    // Purana links-wala home bhi rakha hai
+    { path: "home-classic", element: <HomeDashboard navigation={NAVIGATION} onNavigate={router.navigate} /> },
     {
-      path: "home",
+      path: "gh-all-reports",
       element: (
-        <HomeDashboard navigation={NAVIGATION} onNavigate={router.navigate} />
+        <TabbedPage
+          title="Guest House reports"
+          accent="#0F766E"
+          tabs={[
+            { key: "range", label: "Date range", element: <GHSalesDashboardRange /> },
+            { key: "sales", label: "Sales", element: <GHSalesDashboard /> },
+            { key: "bank", label: "Bank books", element: <GHBankBooksDashboard /> },
+            { key: "unpaid", label: "Unpaid", element: <GHUpaidEntriesDashboard /> },
+          ]}
+        />
+      ),
+    },
+    {
+      path: "rest-all-reports",
+      element: (
+        <TabbedPage
+          title="Restaurant reports"
+          accent="#B45309"
+          tabs={[
+            { key: "sales", label: "Sales", element: <RestSalesDashboard /> },
+            { key: "upaad", label: "Staff advance", element: <RestUpaadEntriesDashboard /> },
+            { key: "expenses", label: "Expenses", element: <RestExpensesDashboard /> },
+            { key: "bank", label: "Bank books", element: <BankBooksDashboard /> },
+            { key: "levana", label: "Receivables", element: <RestLevanaDashboard /> },
+            { key: "aapvana", label: "Payables", element: <RestAapvanaDashboard /> },
+            { key: "balance", label: "Pending balance", element: <AapvanaLevanaBalance /> },
+          ]}
+        />
+      ),
+    },
+    {
+      path: "rest-setup",
+      element: (
+        <TabbedPage
+          title="Restaurant staff & setup"
+          accent="#B45309"
+          tabs={[
+            { key: "staff", label: "Staff", element: <RestStaffDashboard /> },
+            { key: "categories", label: "Categories & expenses", element: <RestCategoryExpensesDashboard /> },
+            { key: "pending", label: "Receivable/Payable people", element: <RestPendingUsersDashboard /> },
+          ]}
+        />
+      ),
+    },
+    {
+      path: "office-all",
+      element: (
+        <TabbedPage
+          title="Office Book"
+          accent="#4338CA"
+          tabs={[
+            { key: "book", label: "Office Book", element: <OfficeBookDashboard /> },
+            { key: "category", label: "Categories", element: <OfficeCategoryDashboard /> },
+          ]}
+        />
+      ),
+    },
+    {
+      path: "merged-all",
+      element: (
+        <TabbedPage
+          title="Merged reports"
+          subtitle="Guest House + Restaurant + Office together"
+          tabs={[
+            { key: "graph", label: "Graph", element: <MergedGraph2 /> },
+            { key: "graph-classic", label: "Graph (classic)", element: <OfficeMergedGraph /> },
+            { key: "report", label: "Report", element: <OfficeMerged /> },
+            { key: "vendor", label: "Vendor report", element: <OfficeCreditDebit /> },
+            { key: "vendor-graph", label: "Vendor graph", element: <VendorGraphDashboard /> },
+          ]}
+        />
+      ),
+    },
+    {
+      path: "sales-goals",
+      element: (
+        <TabbedPage
+          title="Sales goals"
+          tabs={[
+            { key: "all", label: "All goals (new)", element: <SalesGoals2 /> },
+            { key: "gh", label: "Guest House", element: <GHSalesGoalDashboard /> },
+            { key: "rest", label: "Restaurant", element: <RestSalesGoalDashboard /> },
+            { key: "banquet", label: "Banquet", element: <OfficeBanquetSalesGoalDashboard /> },
+            { key: "bakery", label: "Bakery Baada", element: <OfficeBakeryBaadaSalesGoalDashboard /> },
+            { key: "moti", label: "Moti Baada", element: <OfficeMotiBaadaSalesGoalDashboard /> },
+          ]}
+        />
       ),
     },
     { path: "gh-dashboard", element: <GHDashboard /> },
     { path: "gh-dashboard-range", element: <GHSalesDashboardRange /> },
-    { path: "guest-house", element: <GHHome /> },
+    { path: "guest-house", element: <TabbedPage title="Guest house graph" accent="#2563EB" tabs={[{ key: "new", label: "New graph", element: <GHGraph2 /> }, { key: "classic", label: "Classic", element: <GHHome /> }]} /> },
     { path: "gh-reports/sales-report", element: <GHSalesDashboard /> },
     { path: "gh-reports/bank-books", element: <GHBankBooksDashboard /> },
     { path: "gh-reports/upaid-report", element: <GHUpaidEntriesDashboard /> },
-    { path: "restaurant", element: <RestHome /> },
+    { path: "restaurant", element: <TabbedPage title="Restaurant graph" accent="#EA580C" tabs={[{ key: "new", label: "New graph", element: <RestGraph2 /> }, { key: "classic", label: "Classic", element: <RestHome /> }]} /> },
     { path: "res-reports/sales-report", element: <RestSalesDashboard /> },
     {
       path: "res-reports/upaad-report",
@@ -323,9 +373,29 @@ const DashboardPage = () => {
     { path: "office-book", element: <OfficeBookDashboard /> },
     { path: "office-category", element: <OfficeCategoryDashboard /> },
     { path: "staff-salary", element: <StaffSalaryDashboard /> },
-    { path: "merged-graph", element: <OfficeMergedGraph /> },
+    { path: "attendance-import", element: <AttendanceImportDashboard /> },
+    { path: "merged-graph", element: <TabbedPage title="Merged graph" accent="#0F172A" tabs={[{ key: "new", label: "New graph", element: <MergedGraph2 /> }, { key: "classic", label: "Classic", element: <OfficeMergedGraph /> }]} /> },
     { path: "merged-reports", element: <OfficeMerged /> },
     { path: "merged-vendor-report", element: <OfficeCreditDebit /> },
+    { path: "merged-vendor-graph", element: <VendorGraphDashboard /> },
+    { path: "cashflow", element: <CashflowDashboard /> },
+    { path: "mode-balance", element: <ModeBalanceDashboard /> },
+    { path: "purchase-analytics", element: <PurchaseAnalyticsDashboard /> },
+    { path: "office-types", element: <OfficeTypesDashboard /> },
+    { path: "rest-receivables", element: <RestReceivableBalance /> },
+    { path: "banquet-report", element: <BanquetReportDashboard /> },
+    { path: "banquet-setup", element: <BanquetSetupDashboard /> },
+    { path: "profit-loss", element: <ProfitLossDashboard /> },
+    { path: "room-rates", element: <RoomRatesDashboard /> },
+    { path: "guest-register", element: <GuestRegisterDashboard /> },
+    { path: "room-activity", element: <RoomActivityDashboard /> },
+    { path: "invoices", element: <InvoicesDashboard /> },
+    { path: "gh-growth", element: <GhGrowthDashboard /> },
+    { path: "forecast", element: <ForecastDashboard /> },
+    { path: "performance", element: <PerformanceDashboard /> },
+    { path: "kharch-control", element: <KharchControlDashboard /> },
+    { path: "data-check", element: <DataAlerts onNavigate={router.navigate} /> },
+    { path: "sales-goal/all", element: <SalesGoals2 /> },
     { path: "sales-goal/gh-sales-goal", element: <GHSalesGoalDashboard /> },
     { path: "sales-goal/rest-sales-goal", element: <RestSalesGoalDashboard /> },
     {
@@ -340,11 +410,17 @@ const DashboardPage = () => {
       path: "sales-goal/office-moti-baada",
       element: <OfficeMotiBaadaSalesGoalDashboard />,
     },
+    { path: "data-import", element: <DataImportDashboard /> },
+    { path: "owner-report", element: <OwnerMonthlyDashboard /> },
+    { path: "guest-dues", element: <GuestDuesReminders /> },
+    { path: "staff-access", element: <StaffAccessDashboard /> },
+    { path: "my-password", element: <MyPasswordPage /> },
+    { path: "login-log", element: <LoginLogDashboard /> },
     { path: "*", element: <Typography>404: Page Not Found</Typography> },
   ]);
 
   return (
-    <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
+    <AppProvider navigation={NAVIGATION} router={router} theme={dashboardTheme}>
       <DashboardLayout
         slots={{
           appTitle: () => <DashboardHeader onNavigate={router.navigate} />,

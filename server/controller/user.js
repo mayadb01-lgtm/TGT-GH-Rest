@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+import { logLogin } from "../utils/loginLog.js";
 import { Router } from "express";
 const router = Router();
 import sendToken from "../utils/jwtToken.js";
@@ -8,7 +10,16 @@ import process from "process";
 // Sign Up User
 router.post("/create-user", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, signupCode } = req.body;
+
+    // 🔒 Koi bhi bahar wala khud account na bana sake.
+    // Owner .env mein USER_SIGNUP_CODE set kare aur sirf staff ko bataye.
+    if (!process.env.USER_SIGNUP_CODE || signupCode !== process.env.USER_SIGNUP_CODE) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid signup code. Please ask the owner for the code.",
+      });
+    }
 
     // Check if the user already exists
     const userEmail = await User.findOne({ email: email });
@@ -50,8 +61,12 @@ router.post("/login-user", async (req, res) => {
     }
 
     // Find the user
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({
+      // email ke aage-peeche space ya Capital letter (phone keyboard) se login fail na ho
+      email: new RegExp("^" + String(email).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i"),
+    }).select("+password");
     if (!user) {
+      logLogin(req, { kind: "staff", event: "failed", email, note: "No account with this email" });
       return res.status(404).json({
         success: false,
         message: "Invalid email or password",
@@ -62,12 +77,14 @@ router.post("/login-user", async (req, res) => {
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
+      logLogin(req, { kind: "staff", event: "failed", user, note: "Wrong password" });
       return res.status(404).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
+    logLogin(req, { kind: "staff", event: user.isActive === false ? "disabled" : "login", user, note: user.isActive === false ? "Account is off" : "" });
     // Send success response with token
     sendToken(user, 200, res);
   } catch (error) {
@@ -105,6 +122,14 @@ router.get("/getuser", isAuthenticated, async (req, res) => {
 // Logout User
 router.get("/logout-user", async (req, res) => {
   try {
+    // Kaun logout hua (cookie se) — log ke liye
+    try {
+      const { id } = jwt.verify(req.cookies?.token || "", process.env.JWT_SECRET_KEY);
+      const u = await User.findById(id, { name: 1, email: 1 }).lean();
+      if (u) logLogin(req, { kind: "staff", event: "logout", user: u });
+    } catch {
+      /* cookie nahi / purani — koi baat nahi */
+    }
     res.cookie("token", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
@@ -125,6 +150,11 @@ router.get("/logout-user", async (req, res) => {
 
 // Reset Password - Using one Referral Code Directly - POST
 router.post("/reset-password", async (req, res) => {
+  // 🔒 Band: referral code se kisi ka bhi password badal sakte the. Ab staff ka password Super Admin (Staff access) se.
+  if (process.env.ALLOW_CODE_RESET !== "yes") {
+    logLogin(req, { kind: "staff", event: "blocked", email: req.body?.email, note: "Tried old password reset (referral code)" });
+    return res.status(403).json({ success: false, message: "Ask the owner to reset your password." });
+  }
   try {
     const { email, password, referralCode } = req.body;
 

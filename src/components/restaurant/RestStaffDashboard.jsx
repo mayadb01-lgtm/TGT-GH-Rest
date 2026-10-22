@@ -86,7 +86,7 @@ const RestStaffDashboard = () => {
   const filteredStaff = restStaff.filter(
     (staff) =>
       staff.fullname.toLowerCase().includes(search.toLowerCase()) ||
-      String(staff.mobileNumber).includes(search),
+      String(staff.mobileNumber).includes(search)
   );
 
   const columns = [

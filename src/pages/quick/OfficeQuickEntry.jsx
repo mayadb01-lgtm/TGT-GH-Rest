@@ -1,0 +1,486 @@
+// Office Book: Aavak (In) / Javak (Out), PC + mobile
+// Category list purane page jaisi:
+//   In  = Office categories (Pending ke alawa) + restaurant vendors + Pending log
+//   Out = Restaurant categories
+// Data purane format mein: /officeBook/create-entry, /officeBook/update-entry
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import axios from "axios";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
+import { Alert, Box, Button, ButtonBase, Skeleton, Stack, TextField, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import AddIcon from "@mui/icons-material/Add";
+import PurchaseBillsSection from "./PurchaseBillsSection";
+import OfficeRoomBillsSection from "./OfficeRoomBillsSection";
+import OfficeCounterSection, { useOfficeCounter } from "./OfficeCounterSection";
+import OfficeImportDialog from "./OfficeImportDialog";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import {
+  API,
+  ChipChoice,
+  ConfirmDialog,
+  EditorDialog,
+  MoneyField,
+  PickField,
+  Q,
+  SaveBar,
+  Section,
+  StatusPill,
+  apiError,
+  inr,
+  num,
+  useDraft,
+} from "./shared";
+
+const LOCK_MSG = "Already submitted. Only the owner can change it.";
+const MODES = ["Cash", "Card", "PP", "PPS", "PPC", "UnPaid"];
+const EMPTY = { officeIn: [], officeOut: [] };
+const isStaffCat = (c) => /upad|upaad|staff/i.test(c || "");
+const rowValid = (r) => num(r.amount) > 0 && r.categoryName && r.expenseName && r.modeOfPayment && String(r.fullname || "").trim() && r._id;
+const sum = (rows) => rows.reduce((s, r) => s + num(r.amount), 0);
+
+const OfficeQuickEntry = ({ date, isAdmin, canEdit = true }) => {
+  const [lists, setLists] = useState(null);
+  const [server, setServer] = useState({ loaded: false, doc: null });
+  const [status, setStatus] = useState(null);
+  const [draft, setDraft, clearDraft] = useDraft(`qe-office-${date}`, EMPTY);
+  const [editor, setEditor] = useState(null); // { side, index, row }
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const seededFor = useRef("");
+
+  const load = useCallback(async () => {
+    setError("");
+    setServer({ loaded: false, doc: null });
+    try {
+      const [oc, rc, pend, staff, e, s] = await Promise.all([
+        axios.get(`${API}/officeBook/get-categories`),
+        axios.get(`${API}/restCategory/get-categories`),
+        axios.get(`${API}/restPending/get-all-pending-users`),
+        axios.get(`${API}/restStaff/get-staff-id-name-mobile`),
+        axios.get(`${API}/officeBook/get-entry/${date}`),
+        axios.get(`${API}/quick/day-status/${date}`).catch(() => ({ data: {} })),
+      ]);
+      const office = oc.data.data || [];
+      const rest = rc.data.data || [];
+      const flat = (cats, vendorOnly = false) =>
+        cats.flatMap((c) =>
+          (c.expense || [])
+            .filter((x) => (vendorOnly ? x?.isVendor : true))
+            .map((x) => ({ _id: x._id, expenseName: x.expenseName, categoryName: c.categoryName, isVendor: !!x?.isVendor }))
+        );
+      const pendingAsExpense = (pend.data.data || []).map((p) => ({ _id: p._id, expenseName: p.fullname, categoryName: "Pending", isVendor: false }));
+      setLists({
+        in: [...flat(office.filter((c) => c.categoryName !== "Pending")), ...flat(rest, true), ...pendingAsExpense],
+        out: flat(rest),
+        staff: (staff.data.data || []).map((x) => ({ _id: x._id, fullname: x.fullname })),
+      });
+      const doc = e.data.data && !Array.isArray(e.data.data) && e.data.data._id ? e.data.data : null;
+      setServer({ loaded: true, doc });
+      setStatus(s.data?.data?.office || null);
+    } catch (err) {
+      setError(apiError(err));
+      setServer({ loaded: true, doc: null });
+    }
+  }, [date]);
+
+  useEffect(() => {
+    seededFor.current = "";
+    load();
+  }, [load]);
+
+  const submitted = !!server.doc;
+  const editLocked = submitted && !canEdit;
+
+  useEffect(() => {
+    if (!server.loaded || !server.doc || seededFor.current === date) return;
+    seededFor.current = date;
+    setDraft({ officeIn: server.doc.officeIn || [], officeOut: server.doc.officeOut || [] });
+  }, [server, date, setDraft]);
+
+  const t = useMemo(() => ({ in: sum(draft.officeIn), out: sum(draft.officeOut) }), [draft]);
+  // 🤝 GH / Restaurant dues + counter ka cash (alag collections, Money in mein nahi)
+  const counter = useOfficeCounter(date);
+
+  /* ----- 🧾 Purchase bills: paid (Cash / PP / PPS / PPC) → Money out mein line; Payable → vendor ledger ----- */
+  const [bills, setBills] = useState([]);
+  const [importOpen, setImportOpen] = useState(false);
+  const addImported = (list) =>
+    setDraft((d) => ({
+      ...d,
+      officeIn: [...d.officeIn, ...list.filter((x) => x.side === "officeIn").map((x) => x.row)],
+      officeOut: [...d.officeOut, ...list.filter((x) => x.side === "officeOut").map((x) => x.row)],
+    }));
+  const loadBills = useCallback(
+    () =>
+      axios
+        .get(`${API}/purchase/day/${date}?book=office`)
+        .then(({ data }) => setBills(data.data || []))
+        .catch(() => setBills([])),
+    [date]
+  );
+  useEffect(() => {
+    loadBills();
+  }, [loadBills]);
+  const billRow = (bill) => {
+    const v = bill.vendor || {};
+    return {
+      amount: num(bill.amount),
+      purchaseKey: bill.rowKey,
+      _id: v._id,
+      expenseName: v.expenseName || v.name,
+      categoryName: v.categoryName,
+      isVendor: !!v.isVendor,
+      modeOfPayment: bill.mode,
+      fullname: v.name || v.expenseName,
+      remark: `Purchase bill${bill.billNo ? ` #${bill.billNo}` : ""}`,
+    };
+  };
+  const findBillRow = (rows, bill, used = new Set()) => {
+    let i = rows.findIndex((r, j) => !used.has(j) && r.purchaseKey && r.purchaseKey === bill.rowKey);
+    if (i < 0) i = rows.findIndex((r, j) => !used.has(j) && !r.purchaseKey && num(r.amount) === num(bill.amount) && r.expenseName === (bill.vendor?.expenseName || bill.vendor?.name) && /purchase bill/i.test(r.remark || ""));
+    return i;
+  };
+  // Har paid bill ki line Money out mein ho (reload / doosre phone se bill aaya ho to bhi)
+  useEffect(() => {
+    if (!server.loaded || !bills.length) return;
+    if (server.doc && seededFor.current !== date) return;
+    setDraft((d) => {
+      const rows = [...d.officeOut];
+      const used = new Set();
+      let changed = false;
+      bills
+        .filter((b) => b.mode !== "Payable")
+        .forEach((bill) => {
+          const i = findBillRow(rows, bill, used);
+          if (i >= 0) used.add(i);
+          else {
+            rows.push(billRow(bill));
+            used.add(rows.length - 1);
+            changed = true;
+          }
+        });
+      return changed ? { ...d, officeOut: rows } : d;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bills, server, date, setDraft]);
+  const billSaved = (bill) => {
+    if (bill.mode !== "Payable") setDraft((d) => ({ ...d, officeOut: [...d.officeOut, billRow(bill)] }));
+    loadBills();
+    toast.success(
+      bill.mode === "Payable"
+        ? "Bill saved → shown in the vendor ledger as payable."
+        : `Bill saved → added to Money out. Press ${submitted ? "Update" : "Submit"} to save the day.`,
+      { duration: 5000 }
+    );
+  };
+  const billDeleted = (bill) => {
+    if (bill.mode !== "Payable")
+      setDraft((d) => {
+        const rows = [...d.officeOut];
+        const i = findBillRow(rows, bill);
+        if (i >= 0) rows.splice(i, 1);
+        return { ...d, officeOut: rows };
+      });
+    loadBills();
+    toast.success(bill.mode === "Payable" ? "Bill removed." : `Bill removed. Press ${submitted ? "Update" : "Submit"} to save the day.`);
+  };
+
+  // Submit ke baad badalna: sirf owner ya jise Super Admin ne "Edit" diya
+  const openNew = (side) => (editLocked ? toast.error(LOCK_MSG) : setEditor({ side, index: -1, row: { amount: 0, modeOfPayment: "", fullname: "", remark: "" } }));
+  const openEdit = (side, index) => (editLocked ? toast.error(LOCK_MSG) : setEditor({ side, index, row: { ...draft[side][index] } }));
+  const saveRow = () => {
+    const { side, index, row } = editor;
+    setDraft((d) => {
+      const rows = [...d[side]];
+      if (index === -1) rows.push(row);
+      else rows[index] = row;
+      return { ...d, [side]: rows };
+    });
+    setEditor(null);
+  };
+  const removeRow = () => {
+    const { side, index } = editor;
+    setDraft((d) => ({ ...d, [side]: d[side].filter((_, i) => i !== index) }));
+    setEditor(null);
+  };
+
+  const invalidCount = [...draft.officeIn, ...draft.officeOut].filter((r) => num(r.amount) > 0 && !rowValid(r)).length;
+
+  const submit = async () => {
+    setConfirm(false);
+    setBusy(true);
+    try {
+      const prep = (rows) =>
+        // eslint-disable-next-line no-unused-vars
+        rows.filter(rowValid).map(({ purchaseKey, ...r }, i) => ({ ...r, id: String(i + 1), amount: num(r.amount), fullname: String(r.fullname).trim(), createDate: r.createDate || date }));
+      const body = {
+        officeIn: JSON.stringify(prep(draft.officeIn)),
+        officeOut: JSON.stringify(prep(draft.officeOut)),
+        createDate: date,
+        entryCreateDate: server.doc?.entryCreateDate || dayjs(date, "DD-MM-YYYY").startOf("day").toDate(),
+        updatedDate: dayjs().format("DD-MM-YYYY"),
+      };
+      if (submitted) await axios.put(`${API}/officeBook/update-entry/${date}`, body);
+      else await axios.post(`${API}/officeBook/create-entry`, body);
+      toast.success(submitted ? "Office entry updated" : "Office entry submitted");
+      clearDraft();
+      setDraft(EMPTY);
+      seededFor.current = "";
+      await load();
+    } catch (err) {
+      toast.error(apiError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (error && !lists) return <Alert severity="error">{error}</Alert>;
+  if (!lists || !server.loaded)
+    return (
+      <Stack spacing={1.5}>
+        {[1, 2].map((i) => (
+          <Skeleton key={i} variant="rounded" height={140} />
+        ))}
+      </Stack>
+    );
+
+  const side = (key, title, subtitle, color) => (
+    <Section
+      title={title}
+      subtitle={subtitle}
+      total={sum(draft[key])}
+      color={color}
+      action={
+        <Button size="small" startIcon={<AddIcon />} onClick={() => openNew(key)} sx={{ fontWeight: 800, color }}>
+          Add
+        </Button>
+      }
+    >
+      {draft[key].length === 0 && (
+        <Typography variant="body2" color={Q.muted} sx={{ py: 1 }}>
+          None
+        </Typography>
+      )}
+      {draft[key].map((r, i) => {
+        const bad = num(r.amount) > 0 && !rowValid(r);
+        return (
+          <ButtonBase key={i} onClick={() => openEdit(key, i)} sx={{ display: "flex", width: "100%", textAlign: "left", py: 1, px: 0.5, borderTop: i ? `1px solid ${Q.line}` : "none" }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography fontWeight={700} noWrap>
+                {r.expenseName || "—"}
+                {r.fullname ? ` · ${r.fullname}` : ""}
+              </Typography>
+              <Typography variant="caption" color={bad ? Q.bad : Q.muted} fontWeight={bad ? 700 : 400}>
+                {bad ? "Incomplete, tap to complete" : `${r.categoryName} · ${r.modeOfPayment}${r.remark ? ` · ${r.remark}` : ""}`}
+              </Typography>
+            </Box>
+            <Typography fontWeight={800}>{inr(r.amount)}</Typography>
+          </ButtonBase>
+        );
+      })}
+    </Section>
+  );
+
+  const ed = editor;
+  // "Pending" se GH / Restaurant ka baaki ab 🤝 Counters dabbe se hi lena hai (warna do baar ginega) —
+  // isliye jinka Restaurant mein baaki hai aur GH/Restaurant ke aam naam Money in list mein nahi dikhte (sirf screen; purani entries waisi hi)
+  const restDueNames = new Set((counter.rest.due || []).map((d) => String(d.name || "").trim().toLowerCase()));
+  const viaCounters = (o) =>
+    o.categoryName === "Pending" && (restDueNames.has(String(o.expenseName || "").trim().toLowerCase()) || /gh\s*pending|restaurant\s*(pending|bill)|room\s*bill|canteen/i.test(o.expenseName || ""));
+  // Banquet ka paisa ab 🎉 Banquet tab (booking ke saath) mein — Money in mein nahi, warna do baar ginega
+  const viaBanquet = (o) => /banquet|banquate/i.test(`${o.categoryName || ""}`);
+  const opts = ed ? (ed.side === "officeIn" ? lists.in.filter((o) => !viaCounters(o) && !viaBanquet(o)) : lists.out) : [];
+  const edValue = ed?.row._id ? opts.find((o) => o._id === ed.row._id && o.expenseName === ed.row.expenseName) || null : null;
+  const staffName = ed && isStaffCat(ed.row.categoryName);
+  const setRow = (patch) => setEditor((e) => ({ ...e, row: { ...e.row, ...patch } }));
+  const edColor = ed?.side === "officeIn" ? Q.office : "#7C3AED";
+
+  return (
+    <Box sx={{ pb: { xs: 18, md: 0 } }}>
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 1.5 }}>
+        {submitted ? (
+          <StatusPill tone="good">
+            ✓ Submitted{status?.by ? ` · ${status.by}` : ""}
+            {status?.at ? ` · ${dayjs(status.at).format("hh:mm A")}` : ""}
+          </StatusPill>
+        ) : t.in + t.out > 0 ? (
+          <StatusPill tone="info">Draft saved on this device · not submitted yet</StatusPill>
+        ) : (
+          <StatusPill tone="warn">Today's office entry is not done yet</StatusPill>
+        )}
+        {status?.updatedBy && <StatusPill tone="lock">Edit: {status.updatedBy}</StatusPill>}
+        {editLocked && <StatusPill tone="lock">🔒 Submitted — only the owner can change it</StatusPill>}
+      </Stack>
+
+      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 1 }}>
+        <Button size="small" variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setImportOpen(true)} sx={{ fontWeight: 700, color: Q.office, borderColor: Q.office }}>
+          Import Excel / CSV
+        </Button>
+      </Stack>
+      <OfficeImportDialog open={importOpen} onClose={() => setImportOpen(false)} date={date} lists={lists} isAdmin={isAdmin} onAddToday={addImported} />
+      <Box sx={{ mb: 2 }}>
+        <PurchaseBillsSection
+          date={date}
+          book="office"
+          modes={["Cash", "PP", "PPS", "PPC", "Payable"]}
+          color={Q.office}
+          subtitle="Scan or type a supplier bill · Cash / PP / PPS / PPC → Money out, Payable → vendor ledger"
+          vendors={lists.out.filter((x) => x.isVendor)}
+          expenses={lists.out}
+          bills={bills}
+          onSaved={billSaved}
+          onDeleted={billDeleted}
+          deleteNote={(b) => (b.mode === "Payable" ? "It is removed from the vendor ledger too." : "Its line in Money out is removed too.")}
+        />
+      </Box>
+      <OfficeCounterSection date={date} counter={counter} />
+      <OfficeRoomBillsSection date={date} onChanged={counter.reload} />
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>{side("officeIn", "Money in", "Money received", Q.office)}</Grid>
+        <Grid size={{ xs: 12, md: 6 }}>{side("officeOut", "Money out", "Money paid out", "#7C3AED")}</Grid>
+      </Grid>
+
+      {/* 💵 Office: har mode ka total — Money in + collections − Money out (+ counters se mila cash) */}
+      {(() => {
+        const MODES = ["Cash", "PP", "PPS", "PPC"];
+        const by = (rows) => rows.reduce((o, r) => ({ ...o, [r.modeOfPayment]: (o[r.modeOfPayment] || 0) + num(r.amount) }), {});
+        const mi = by(draft.officeIn);
+        const mo = by(draft.officeOut);
+        const rows = MODES.map((m) => {
+          const coll = num(counter.byMode[m]) + (m === "Cash" ? counter.handIn : 0);
+          return [m, num(mi[m]), coll, num(mo[m])];
+        });
+        const tot = rows.reduce((a, r) => [0, a[1] + r[1], a[2] + r[2], a[3] + r[3]], [0, 0, 0, 0]);
+        if (tot[1] + tot[2] + tot[3] <= 0) return null;
+        const cell = { textAlign: "right", fontVariantNumeric: "tabular-nums", minWidth: 84, pl: 1 };
+        return (
+          <Box sx={{ border: "1.5px solid #C7D2FE", borderRadius: 3, p: 2, mt: 2, bgcolor: "#EEF2FF" }}>
+            <Typography fontWeight={800}>💵 Total by payment mode</Typography>
+            <Typography variant="caption" color={Q.muted} sx={{ display: "block", mb: 1 }}>
+              Collections = GH / Restaurant dues and room food bills received in the Office{counter.handIn ? ` + cash from counters ${inr(counter.handIn)} (transfer)` : ""}
+            </Typography>
+            <Stack direction="row" sx={{ py: 0.4, borderBottom: "1px solid #C7D2FE" }}>
+              {["MODE", "MONEY IN", "COLLECTIONS", "MONEY OUT", "BALANCE"].map((h, i) => (
+                <Typography key={h} variant="caption" fontWeight={800} color={Q.muted} sx={i ? cell : { flex: 1 }}>
+                  {h}
+                </Typography>
+              ))}
+            </Stack>
+            {[...rows, ["Total", tot[1], tot[2], tot[3]]].map(([m, a, c, o]) => (
+              <Stack key={m} direction="row" sx={{ py: 0.4, ...(m === "Total" ? { borderTop: "1px solid #C7D2FE", mt: 0.5 } : {}) }}>
+                <Typography fontWeight={m === "Total" || m === "Cash" ? 800 : 600} sx={{ flex: 1 }}>
+                  {m === "Cash" ? "Total cash" : m}
+                  {["PP", "PPS", "PPC"].includes(m) && (
+                    <Typography component="span" variant="caption" color={Q.muted} sx={{ display: "block", fontWeight: 400 }}>
+                      {{ PP: "restaurant a/c", PPS: "GH saving a/c", PPC: "GH current a/c" }[m]}
+                    </Typography>
+                  )}
+                </Typography>
+                <Typography sx={cell}>{inr(a)}</Typography>
+                <Typography sx={cell}>{inr(c)}</Typography>
+                <Typography sx={cell}>{inr(o)}</Typography>
+                <Typography fontWeight={800} sx={{ ...cell, color: a + c - o < 0 ? Q.bad : "#3730A3" }}>
+                  {inr(a + c - o)}
+                </Typography>
+              </Stack>
+            ))}
+          </Box>
+        );
+      })()}
+
+      <SaveBar
+        label={`In ${inr(t.in)} · Out ${inr(t.out)}`}
+        amount={t.in - t.out}
+        sub={editLocked ? { text: LOCK_MSG, color: Q.bad } : invalidCount ? { text: `${invalidCount} incomplete ${invalidCount === 1 ? "entry" : "entries"}`, color: Q.bad } : { text: "Remaining (In − Out)" }}
+        buttonText={submitted ? "Update" : "Submit"}
+        color={Q.office}
+        busy={busy}
+        disabled={invalidCount > 0 || t.in + t.out === 0 || editLocked}
+        onClick={() => setConfirm(true)}
+      />
+
+      <EditorDialog
+        open={!!ed}
+        onClose={() => setEditor(null)}
+        subtitle={`Office · ${date}`}
+        title={ed ? `${ed.index === -1 ? "Add" : "Edit"} ${ed.side === "officeIn" ? "money in" : "money out"}` : ""}
+        actions={
+          <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
+            {ed && ed.index !== -1 && (
+              <Button color="error" onClick={removeRow} sx={{ fontWeight: 700 }}>
+                Remove
+              </Button>
+            )}
+            <Button
+              fullWidth
+              variant="contained"
+              disabled={!ed || !rowValid({ ...ed.row, _id: ed.row._id })}
+              onClick={saveRow}
+              sx={{ bgcolor: edColor, py: 1.4, fontWeight: 800, fontSize: 16, "&:hover": { bgcolor: edColor } }}
+            >
+              Save
+            </Button>
+          </Stack>
+        }
+      >
+        {ed && (
+          <Stack spacing={2}>
+            <MoneyField label="Amount" value={ed.row.amount} onChange={(v) => setRow({ amount: v })} big autoFocus />
+            <ChipChoice label="Payment" options={MODES} value={ed.row.modeOfPayment} onChange={(v) => setRow({ modeOfPayment: v })} color={edColor} danger={["UnPaid"]} />
+            <PickField
+              label={ed.side === "officeIn" ? "Income item" : "Expense item"}
+              options={opts}
+              value={edValue}
+              onChange={(o) =>
+                setRow(
+                  o
+                    ? {
+                        _id: o._id,
+                        expenseName: o.expenseName,
+                        categoryName: o.categoryName,
+                        isVendor: o.isVendor,
+                        fullname: o.isVendor || o.categoryName === "Pending" ? ed.row.fullname || o.expenseName : isStaffCat(o.categoryName) ? "" : ed.row.fullname,
+                        fullname_id: "",
+                      }
+                    : { _id: "", expenseName: "", categoryName: "", isVendor: false }
+                )
+              }
+              getLabel={(o) => o?.expenseName || ""}
+              groupBy={(o) => (o.isVendor ? "Vendor" : o.categoryName || "")}
+            />
+            {staffName ? (
+              <PickField
+                label="Staff member"
+                options={lists.staff}
+                value={lists.staff.find((s) => s._id === ed.row.fullname_id) || (ed.row.fullname ? { _id: ed.row.fullname_id, fullname: ed.row.fullname } : null)}
+                onChange={(s) => setRow({ fullname: s?.fullname || "", fullname_id: s?._id || "" })}
+                getLabel={(o) => o?.fullname || ""}
+              />
+            ) : (
+              <TextField label="Name (received from / paid to)" value={ed.row.fullname || ""} onChange={(e) => setRow({ fullname: e.target.value })} fullWidth />
+            )}
+            <TextField label="Remark (optional)" value={ed.row.remark || ""} onChange={(e) => setRow({ remark: e.target.value })} fullWidth />
+          </Stack>
+        )}
+      </EditorDialog>
+
+      <ConfirmDialog
+        open={confirm}
+        color={Q.office}
+        title={submitted ? `Update office entry for ${date}?` : `Submit office entry for ${date}?`}
+        confirmText={submitted ? "Yes, update" : "Yes, submit"}
+        lines={[
+          { label: "Money in", value: `${draft.officeIn.filter(rowValid).length} · ${inr(t.in)}` },
+          { label: "Money out", value: `${draft.officeOut.filter(rowValid).length} · ${inr(t.out)}` },
+          { label: "Remaining", value: inr(t.in - t.out), color: Q.ink },
+        ]}
+        onCancel={() => setConfirm(false)}
+        onConfirm={submit}
+      />
+    </Box>
+  );
+};
+
+export default OfficeQuickEntry;

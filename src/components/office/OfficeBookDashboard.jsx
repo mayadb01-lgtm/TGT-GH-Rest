@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   Box,
@@ -405,9 +406,9 @@ const OfficeBookDashboard = () => {
             value={
               ["in", "out"].includes(officeInOut)
                 ? {
-                  label: `Office ${officeInOut === "in" ? "In" : "Out"}`,
-                  value: officeInOut,
-                }
+                    label: `Office ${officeInOut === "in" ? "In" : "Out"}`,
+                    value: officeInOut,
+                  }
                 : null
             }
             onChange={(e, newValue) => setOfficeInOut(newValue?.value || "")}
@@ -487,8 +488,8 @@ const OfficeBookDashboard = () => {
         )}
 
         <Typography variant="caption" color="text.secondary" mt={2}>
-          Note: Entries with <strong> "UnPaid" </strong> mode of payment are excluded from the total
-          amount calculation.
+          Note: Entries with <strong> "UnPaid" </strong> mode of payment are
+          excluded from the total amount calculation.
         </Typography>
       </Box>
     );

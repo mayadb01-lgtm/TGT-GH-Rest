@@ -18,7 +18,7 @@ const staffSalaryRowSchema = new Schema(
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const staffSalarySchema = new Schema(
@@ -34,7 +34,7 @@ const staffSalarySchema = new Schema(
     createdAt: { type: Date, default: Date.now() },
     updatedAt: { type: Date, default: Date.now() },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 staffSalarySchema.index({ month: 1, year: 1 }, { unique: true });

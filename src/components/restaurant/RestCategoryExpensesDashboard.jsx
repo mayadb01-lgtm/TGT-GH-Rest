@@ -108,7 +108,7 @@ const CategoryAccordion = ({ category, onEdit, onDelete }) => (
 const CategoriesExpensesDashboard = () => {
   const dispatch = useAppDispatch();
   const { loading, restCategory } = useAppSelector(
-    (state) => state.restCategory,
+    (state) => state.restCategory
   );
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -171,17 +171,17 @@ const CategoriesExpensesDashboard = () => {
                 .includes(search.toLowerCase()) ||
               expense.expenseDescription
                 .toLowerCase()
-                .includes(search.toLowerCase()),
-          ),
+                .includes(search.toLowerCase())
+          )
       ),
-    [restCategory, search],
+    [restCategory, search]
   );
 
   const leftCategories = filteredCategories.filter(
-    (_, index) => index % 2 === 0,
+    (_, index) => index % 2 === 0
   );
   const rightCategories = filteredCategories.filter(
-    (_, index) => index % 2 !== 0,
+    (_, index) => index % 2 !== 0
   );
 
   const handleAddExpense = () => {
@@ -203,7 +203,7 @@ const CategoriesExpensesDashboard = () => {
     setCategoryData({
       ...categoryData,
       expense: categoryData.expense.map((exp, i) =>
-        i === index ? { ...exp, [field]: value } : exp,
+        i === index ? { ...exp, [field]: value } : exp
       ),
     });
   };
@@ -383,7 +383,7 @@ const CategoriesExpensesDashboard = () => {
                   handleUpdateExpense(
                     index,
                     "expenseDescription",
-                    e.target.value,
+                    e.target.value
                   )
                 }
                 sx={{ flex: 1 }}

@@ -272,14 +272,8 @@ const ExpensesTable = ({
                   )}
                 </TableCell>
                 <TableCell sx={{ width: "10%" }}>
-                  <Button
-                    size="small"
-                    onClick={() => handleRemoveRow(row.id)}
-                  >
-                    <RemoveCircleOutlineIcon
-                      variant="outlined"
-                      color="error"
-                    />
+                  <Button size="small" onClick={() => handleRemoveRow(row.id)}>
+                    <RemoveCircleOutlineIcon variant="outlined" color="error" />
                   </Button>
                 </TableCell>
               </TableRow>

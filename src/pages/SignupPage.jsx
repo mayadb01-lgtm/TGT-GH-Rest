@@ -11,9 +11,10 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { createUser } from "../redux/actions/userAction";
 import toast from "react-hot-toast";
+import PasswordField from "../components/PasswordField";
 
 const SignupPage = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", signupCode: "" });
   const { loading, isAuthenticated } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -31,13 +32,13 @@ const SignupPage = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      if (!form.name || !form.email || !form.password) {
+      if (!form.name || !form.email || !form.password || !form.signupCode) {
         return toast.error("Please fill in all fields");
       }
       dispatch(createUser(form));
 
       navigate("/");
-      setForm({ name: "", email: "", password: "" });
+      setForm({ name: "", email: "", password: "", signupCode: "" });
     } catch (err) {
       toast.error(err.response.data.message);
     }
@@ -124,13 +125,24 @@ const SignupPage = () => {
             required
           />
 
-          <TextField
+          <PasswordField
             name="password"
             label="Password"
             type="password"
             variant="outlined"
             fullWidth
             value={form.password}
+            onChange={handleChange}
+            required
+          />
+
+          <PasswordField
+            name="signupCode"
+            label="Signup code"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={form.signupCode}
             onChange={handleChange}
             required
           />

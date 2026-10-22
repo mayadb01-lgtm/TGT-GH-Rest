@@ -1,23 +1,21 @@
+import { logLogin } from "../utils/loginLog.js";
 import { Router } from "express";
 const router = Router();
 import { isAuthenticated } from "../middleware/auth.js";
 import sendAdminToken from "../utils/adminToken.js";
 import process from "process";
-import runBackup from "../utils/runBackup.js";
-import sendMailWithAttachment from "../utils/sendMail.js";
-
-// Models
-import User from "../model/user.js";
+import { runAutoBackup } from "../utils/autoBackup.js";
 import Admin from "../model/admin.js";
-import Room from "../model/room.js";
-import Entry from "../model/entry.js";
-import RestEntry from "../model/restEntry.js";
-import RestStaff from "../model/restStaff.js";
-import RestPending from "../model/restPending.js";
-import OfficeBook, { OfficeCategory } from "../model/officeBook.js";
+import { otpOn, mailReady, sendOtp, checkOtp, maskEmail } from "../utils/adminOtp.js";
+import { clearDashCookie } from "./dashLock.js";
 
 // Sign Up Admin
 router.post("/create-admin", async (req, res) => {
+  // 🔒 Band: referral code se koi bhi naya admin bana sakta tha. Super Admin sirf ek (owner) — naya chahiye to server se.
+  if (process.env.ALLOW_ADMIN_SIGNUP !== "yes") {
+    logLogin(req, { kind: "admin", event: "blocked", email: req.body?.email, note: "Tried to create a new admin" });
+    return res.status(403).json({ success: false, message: "New admin accounts are closed. Ask the owner." });
+  }
   try {
     const { name, email, password, referralCode } = req.body;
 
@@ -75,9 +73,13 @@ router.post("/login-admin", async (req, res) => {
     }
 
     // Find the admin
-    const admin = await Admin.findOne({ email }).select("+password");
+    const admin = await Admin.findOne({
+      // email ke aage-peeche space ya Capital letter (phone keyboard) se login fail na ho
+      email: new RegExp("^" + String(email).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i"),
+    }).select("+password");
 
     if (!admin) {
+      logLogin(req, { kind: "admin", event: "failed", email, note: "No admin with this email" });
       return res.status(404).json({
         success: false,
         message: "Invalid email or password",
@@ -88,19 +90,49 @@ router.post("/login-admin", async (req, res) => {
     const isPasswordMatch = await admin.comparePassword(password);
 
     if (!isPasswordMatch) {
+      logLogin(req, { kind: "admin", event: "failed", user: admin, note: "Wrong password" });
       return res.status(404).json({
         success: false,
         message: "Invalid email or password",
       });
     }
 
-    // Send success response with token
+    // 🔐 Password sahi → email par OTP (email set ho tabhi)
+    if (otpOn()) {
+      try {
+        const otpId = await sendOtp(admin, "login");
+        logLogin(req, { kind: "admin", event: "otp_sent", user: admin, note: "Password OK, code emailed" });
+        return res.status(200).json({ success: true, otpRequired: true, otpId, sentTo: maskEmail(admin.email) });
+      } catch (e) {
+        console.log("OTP mail failed:", e.message);
+        return res.status(500).json({ success: false, message: "Could not send the login code by email. Please try again." });
+      }
+    }
+    logLogin(req, { kind: "admin", event: "login", user: admin, note: "Password only (email code not set up)" });
     sendAdminToken(admin, 200, res);
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
     });
+  }
+});
+
+// POST /admin/verify-otp { email, otpId, code } → login poora
+router.post("/verify-otp", async (req, res) => {
+  try {
+    const { email, otpId, code } = req.body || {};
+    const admin = await Admin.findOne({ email: new RegExp("^" + String(email || "").trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i") });
+    if (!admin) return res.status(400).json({ success: false, message: "Code expired. Please start again." });
+    const ok = await checkOtp(otpId, admin._id, "login", code);
+    if (ok !== true) {
+      logLogin(req, { kind: "admin", event: "otp_failed", user: admin, note: ok });
+      return res.status(400).json({ success: false, message: ok });
+    }
+    logLogin(req, { kind: "admin", event: "login", user: admin, note: "Password + email code" });
+    sendAdminToken(admin, 200, res);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -130,6 +162,8 @@ router.get("/getadmin", isAuthenticated, async (req, res) => {
 // Logout Admin
 router.get("/logout-admin", isAuthenticated, async (req, res) => {
   try {
+    if (req.user?.constructor?.modelName === "Admin") logLogin(req, { kind: "admin", event: "logout", user: req.user });
+    clearDashCookie(res);
     res.cookie("admin_token", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
@@ -148,72 +182,76 @@ router.get("/logout-admin", isAuthenticated, async (req, res) => {
   }
 });
 
-// Reset Password
+// 🔑 Login ke andar se apna password badalna: { current, password } — purana password sahi hona zaroori
+const pwFails = new Map(); // adminId -> { n, until }
+router.post("/change-password", isAuthenticated, async (req, res) => {
+  try {
+    if (req.user?.constructor?.modelName !== "Admin") return res.status(403).json({ success: false, message: "Only Super Admin" });
+    const id = String(req.user._id);
+    const f = pwFails.get(id);
+    if (f && f.until > Date.now()) return res.status(429).json({ success: false, message: `Too many wrong tries. Try again after ${Math.ceil((f.until - Date.now()) / 60000)} minute(s).` });
+    const { current, password } = req.body || {};
+    if (!password || String(password).length < 8) return res.status(400).json({ success: false, message: "New password must be at least 8 characters" });
+    if (String(password) === String(current || "")) return res.status(400).json({ success: false, message: "New password must be different from the old one" });
+    const admin = await Admin.findById(req.user._id).select("+password");
+    if (!admin || !(await admin.comparePassword(String(current || "")))) {
+      const x = pwFails.get(id) || { n: 0, until: 0 };
+      x.n += 1;
+      if (x.n >= 5) { x.until = Date.now() + 15 * 60 * 1000; x.n = 0; }
+      pwFails.set(id, x);
+      logLogin(req, { kind: "admin", event: "failed", user: admin || req.user, note: "Change password: wrong current password" });
+      return res.status(401).json({ success: false, message: "Current password is wrong" });
+    }
+    pwFails.delete(id);
+    admin.password = String(password);
+    await admin.save();
+    logLogin(req, { kind: "admin", event: "reset", user: admin, note: "Password changed from inside the app" });
+    res.json({ success: true, message: "Password changed. Use the new password next time you log in." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// 🔐 Password reset: referral code wala tarika band (koi bhi admin ka password badal sakta tha).
+// Ab: 1) /reset-password/request { email } → email par OTP   2) /reset-password { email, otpId, code, password }
+const findAdmin = (email) => Admin.findOne({ email: new RegExp("^" + String(email || "").trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i") });
+router.post("/reset-password/request", async (req, res) => {
+  try {
+    // Login wala OTP (ADMIN_OTP=off) band ho tab bhi "password bhool gaye" email se chalega — bas email set ho
+    if (!mailReady()) return res.status(400).json({ success: false, message: "Password reset by email is not set up yet. Ask the owner." });
+    const admin = await findAdmin(req.body?.email);
+    // Email galat ho tab bhi wahi jawab (koi email dhoondh na sake)
+    const otpId = admin ? await sendOtp(admin, "reset") : "000000000000000000000000";
+    res.json({ success: true, otpId, message: "If this email is an admin, a code has been sent to it." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Could not send the code. Please try again." });
+  }
+});
 router.post("/reset-password", async (req, res) => {
   try {
-    const { email, password, referralCode } = req.body;
-
-    // Check if the admin exists
-    const admin = await Admin.findOne({ email });
-
-    if (!admin) {
-      return res.status(404).json({
-        success: false,
-        message: "Admin not found",
-      });
+    const { email, otpId, code, password } = req.body || {};
+    if (!password || String(password).length < 8) return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+    const admin = await findAdmin(email);
+    if (!admin) return res.status(400).json({ success: false, message: "Code expired. Please start again." });
+    const ok = await checkOtp(otpId, admin._id, "reset", code);
+    if (ok !== true) {
+      logLogin(req, { kind: "admin", event: "otp_failed", user: admin, note: `Password reset: ${ok}` });
+      return res.status(400).json({ success: false, message: ok });
     }
-
-    // Check if the referral code is correct
-    if (referralCode !== process.env.REFERRAL_CODE) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid referral code",
-      });
-    }
-
-    // Update the password
     admin.password = password;
     await admin.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Password updated successfully",
-    });
+    logLogin(req, { kind: "admin", event: "reset", user: admin, note: "Password changed with email code" });
+    res.json({ success: true, message: "Password updated successfully" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.get("/send-backup", isAuthenticated, async (req, res) => {
-  try {
-    const backupModels = [
-      User,
-      Admin,
-      Room,
-      Entry,
-      RestEntry,
-      RestStaff,
-      RestPending,
-      OfficeBook,
-      OfficeCategory,
-    ];
-    await runBackup(backupModels);
-    await sendMailWithAttachment();
-    res.status(200).json({
-      success: true,
-      message: "Backup created and stored as backup.zip",
-    });
-  } catch (error) {
-    console.error("❌ Backup failed:", error);
-    res.status(500).json({
-      success: false,
-      message: "Backup failed",
-      error: error.message,
-    });
-  }
+  // Ab ye bhi naya full backup use karta hai (saare collections, restore-ready)
+  const log = await runAutoBackup("manual");
+  if (log.ok) return res.status(200).json({ success: true, message: "Backup sent successfully" });
+  return res.status(500).json({ success: false, message: log.error || "Backup failed" });
 });
 
 export default router;

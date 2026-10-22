@@ -231,7 +231,8 @@ const StaffSalaryEntryPage = () => {
         };
 
         updatedRow.total = roundWhole(
-          Number(updatedRow.perDayPay || 0) * Number(updatedRow.attendance || 0)
+          Number(updatedRow.perDayPay || 0) *
+            Number(updatedRow.attendance || 0)
         );
 
         updatedRow.currentBalance = roundWhole(

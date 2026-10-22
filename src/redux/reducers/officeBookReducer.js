@@ -131,7 +131,7 @@ export const officeBookReducer = createReducer(initialState, (builder) => {
       (state, action) => {
         state.loading = false;
         state.officeBookCategoryUpaad = action.payload;
-      },
+      }
     )
     .addCase(
       "GetOfficeBookCategoryUpaadByMonthAndYearFailure",
@@ -139,7 +139,7 @@ export const officeBookReducer = createReducer(initialState, (builder) => {
         state.loading = false;
         state.error = action.payload;
         state.officeBookCategoryUpaad = {};
-      },
+      }
     )
     // Get Office Book Category Upaad by Month Range
     .addCase("GetOfficeBookCategoryUpaadByMonthRangeRequest", (state) => {
@@ -150,7 +150,7 @@ export const officeBookReducer = createReducer(initialState, (builder) => {
       (state, action) => {
         state.loading = false;
         state.officeBookCategoryUpaad = action.payload;
-      },
+      }
     )
     .addCase(
       "GetOfficeBookCategoryUpaadByMonthRangeFailure",
@@ -158,7 +158,7 @@ export const officeBookReducer = createReducer(initialState, (builder) => {
         state.loading = false;
         state.error = action.payload;
         state.officeBookCategoryUpaad = {};
-      },
+      }
     );
 });
 

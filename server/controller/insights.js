@@ -1,0 +1,672 @@
+// Business Growth reports (Cashflow, GH growth, Kharch control, Data check)
+// ⚠️ READ-ONLY: sirf find/lean. Koi save/update/delete nahi.
+// Sirf Admin / Super User (staff ke liye server pe band).
+import { Router } from "express";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import { isAuthenticated } from "../middleware/auth.js";
+import Entry from "../model/entry.js";
+import Room from "../model/room.js";
+import RestEntry from "../model/restEntry.js";
+import OfficeBook from "../model/officeBook.js";
+import StaffSalary from "../model/staffSalary.js";
+import RoomCharge from "../model/roomCharge.js";
+import AppSetting from "../model/appSetting.js";
+import { computeRestReceivables } from "../utils/restReceivables.js";
+import RestDueReceipt from "../model/restDueReceipt.js";
+import GhDueReceipt from "../model/ghDueReceipt.js";
+import { bookingAdvanceMoves } from "../utils/bookingAdvance.js";
+import { BanquetBooking, banquetTotals } from "../model/banquet.js";
+
+// 🎉 Banquet: paisa jis din mila (mode ke saath) + bill (event ke din, GST ke bina)
+const banquetMoney = async (from, to) => {
+  const list = await BanquetBooking.find({}, { payments: 1, status: 1, eventDate: 1, menus: 1, addons: 1, hallRent: 1, discount: 1, gstPercent: 1 }).lean();
+  const a = from.format("YYYY-MM");
+  const b = to.format("YYYY-MM");
+  const ymOfD = (d) => dayjs(d, "DD-MM-YYYY", true).format("YYYY-MM");
+  const pays = list.flatMap((x) => (x.payments || []).filter((p) => !p.cancelled).map((p) => ({ ym: ymOfD(p.date), amount: Number(p.amount) || 0, mode: p.mode }))).filter((p) => p.ym >= a && p.ym <= b);
+  const sales = list.filter((x) => x.status === "billed").map((x) => ({ ym: ymOfD(x.eventDate), amount: banquetTotals(x).taxable })).filter((x) => x.ym >= a && x.ym <= b);
+  return { pays, sales };
+};
+import { loadOfficeClassifier, lineName, nk } from "../utils/officeTypes.js";
+
+// "Discount on total bill" (naya niyam) kis din se P&L mein ghatega: server pehli baar chalte hi aaj ki tareekh (IST) save karta hai.
+// Isse pehle ke din bilkul waise hi rehte hain (purane records mein Discount ka matlab alag tha).
+let discountFromCache = null;
+const discountFrom = async () => {
+  if (discountFromCache) return discountFromCache;
+  const ist = new Date(Date.now() + 330 * 60 * 1000).toISOString().slice(0, 10);
+  const doc = await AppSetting.findOneAndUpdate({ _id: "billDiscountFrom" }, { $setOnInsert: { value: ist } }, { upsert: true, new: true }).lean();
+  discountFromCache = new Date(`${doc.value}T00:00:00+05:30`);
+  return discountFromCache;
+};
+discountFrom().catch((e) => console.error("billDiscountFrom:", e.message));
+
+dayjs.extend(customParseFormat);
+const router = Router();
+const F = "DD-MM-YYYY";
+const SOLD = ["day", "night", "extraDay", "extraNight"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const IST_MS = 330 * 60 * 1000;
+
+const n = (v) => Number(v) || 0;
+const sum = (arr, f) => arr.reduce((s, x) => s + n(f(x)), 0);
+const round = (v, d = 0) => Math.round(v * 10 ** d) / 10 ** d;
+const inc = (o, k, v) => (o[k] = (o[k] || 0) + n(v));
+const norm = (s) => String(s || "").replace(/\s+/g, " ").trim();
+const ymOf = (d) => dayjs(d).format("YYYY-MM");
+const todayIst = () => dayjs(new Date(Date.now() + IST_MS).toISOString().slice(0, 10));
+const range = (start, end) => ({ entryCreateDate: { $gte: start.startOf("day").toDate(), $lte: end.endOf("day").toDate() } });
+const fail = (res, e) => res.status(500).json({ success: false, message: e.message });
+
+router.use(isAuthenticated, (req, res, next) => {
+  if (req.user?.role === "Admin" || req.user?.isSuperUser) return next();
+  // Super Admin ne is user ko yeh report di hai (staffGuard ne check + din ki seema laga di)
+  if (req.reportOk) return next();
+  return res.status(403).json({ success: false, message: "Owner/Admin only" });
+});
+
+const monthList = (from, to) => {
+  const out = [];
+  let m = from.startOf("month");
+  while (!m.isAfter(to, "month") && out.length < 60) {
+    out.push(m.format("YYYY-MM"));
+    m = m.add(1, "month");
+  }
+  return out;
+};
+
+// ───────────────────────── 1) CASHFLOW (mahina-wise, cash basis) ─────────────────────────
+// Aaya  = GH (naqad/online sales + purane baaki ki jama) + Rest (grandTotal − udhaar) + Office In
+// Gaya  = Rest galle se kharch + Rest upad + Office Out (category-wise)
+// "Personal" aur "Loans" alag dikhaye, taaki business ka asli bachat dikhe.
+router.get("/cashflow/:from/:to", async (req, res) => {
+  try {
+    const from = dayjs(req.params.from, "YYYY-MM", true);
+    const to = dayjs(req.params.to, "YYYY-MM", true);
+    if (!from.isValid() || !to.isValid() || to.isBefore(from)) {
+      return res.status(400).json({ success: false, message: "Month must be in YYYY-MM format (from <= to)" });
+    }
+    const q = range(from.startOf("month"), to.endOf("month"));
+    const [gh, rest, office, classify] = await Promise.all([
+      Entry.find(q, { entry: 1, entryCreateDate: 1 }).lean(),
+      RestEntry.find(q, { entryCreateDate: 1, grandTotal: 1, totalPending: 1, totalExpenses: 1, totalUpad: 1 }).lean(),
+      OfficeBook.find(q, { entryCreateDate: 1, officeIn: 1, officeOut: 1 }).lean(),
+      loadOfficeClassifier(),
+    ]);
+    const dueReceipts = await RestDueReceipt.find({ ...q, cancelled: { $ne: true }, source: { $ne: "gh" } }, { entryCreateDate: 1, amount: 1 }).lean();
+    const roomPaid = await paidRoomCharges(from, to);
+    const ghOffice = await GhDueReceipt.find({ ...q, cancelled: { $ne: true } }, { entryCreateDate: 1, amount: 1 }).lean();
+    const advMoves = await bookingAdvanceMoves();
+    const bq = await banquetMoney(from, to);
+
+    const months = monthList(from, to).map((m) => ({
+      month: m,
+      label: dayjs(m + "-01").format("MMM YY"),
+      ghCash: 0, ghJama: 0, ghUdhaar: 0, banquetIn: 0,
+      restCash: 0, restUdhaar: 0,
+      officeIn: 0, recoveryIn: 0, loansIn: 0, personalIn: 0, transferIn: 0,
+      restKharch: 0, restUpad: 0,
+      officeOut: 0, personalOut: 0, loanOut: 0, transferOut: 0, refundOut: 0,
+      inByCat: {}, outByCat: {},
+    }));
+    const byM = Object.fromEntries(months.map((m) => [m.month, m]));
+
+    gh.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (!m) return;
+      (d.entry || []).forEach((e) => {
+        if (e.period === "UnPaid") m.ghJama += n(e.rate); // purane baaki ka paisa aaya
+        else if (e.modeOfPayment === "UnPaid") m.ghUdhaar += n(e.rate);
+        else m.ghCash += n(e.rate);
+      });
+    });
+    rest.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (!m) return;
+      m.restCash += n(d.grandTotal) - n(d.totalPending);
+      m.restUdhaar += n(d.totalPending);
+      m.restKharch += n(d.totalExpenses);
+      m.restUpad += n(d.totalUpad);
+    });
+    office.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (!m) return;
+      (d.officeIn || []).forEach((x) => {
+        const c = x.categoryName || "Other";
+        inc(m.inByCat, c, x.amount);
+        const t = classify("in", c, lineName(x));
+        if (t === "loan") m.loansIn += n(x.amount);
+        else if (t === "personal") m.personalIn += n(x.amount);
+        else if (t === "transfer") m.transferIn += n(x.amount);
+        else if (t === "recovery") m.recoveryIn += n(x.amount);
+        else m.officeIn += n(x.amount);
+      });
+      (d.officeOut || []).forEach((x) => {
+        const c = x.categoryName || "Other";
+        const t = classify("out", c, lineName(x));
+        inc(m.outByCat, t === "emi" ? "Loan EMI" : t === "transfer" ? "Transfer (own accounts)" : c, x.amount);
+        if (t === "personal") m.personalOut += n(x.amount);
+        else if (t === "emi") m.loanOut += n(x.amount);
+        else if (t === "transfer") m.transferOut += n(x.amount);
+        else if (t === "refund") m.refundOut += n(x.amount);
+        else m.officeOut += n(x.amount);
+      });
+    });
+
+    // Restaurant screen par purana udhaar wasool (sale nahi, "old dues received")
+    dueReceipts.forEach((x) => {
+      const m = byM[ymOf(x.entryCreateDate)];
+      if (m) m.recoveryIn += n(x.amount);
+    });
+    // GH ka purana baaki Office mein wasool → GH jama (purane baaki ki wasooli)
+    ghOffice.forEach((x) => {
+      const m = byM[ymOf(x.entryCreateDate)];
+      if (m) m.ghJama += n(x.amount);
+    });
+    // Banquet ka paisa (jis din mila)
+    bq.pays.forEach((x) => {
+      const m = byM[x.ym];
+      if (m) m.banquetIn += x.amount;
+    });
+    // Booking advance: jis mahine mila wahan +, check-in wale room ki wasooli se −
+    advMoves.forEach((x) => {
+      const m = byM[x.ym];
+      if (m) m.ghCash += x.amount;
+    });
+    // GH counter par wasooli: food bill = restaurant ka udhaar wapas (recovery), extra charge = GH kamai
+    roomPaid.forEach((c) => {
+      const m = byM[c.ym];
+      if (!m) return;
+      if (c.kind === "food") m.recoveryIn += n(c.amount);
+      else m.ghCash += n(c.amount);
+    });
+    months.forEach((m) => {
+      m.aaya = m.ghCash + m.ghJama + m.restCash + m.officeIn + m.recoveryIn + m.banquetIn; // business ka paisa aaya (personal / loan / transfer alag)
+      m.gaya = m.restKharch + m.restUpad + m.officeOut + m.refundOut; // business kharch + guest ko wapas (personal / EMI / transfer alag)
+      m.businessNet = m.aaya - m.gaya;
+      m.net = m.aaya + m.loansIn + m.personalIn - m.gaya - m.personalOut - m.loanOut; // transfer dono taraf barabar, isliye nahi gina
+      Object.keys(m).forEach((k) => typeof m[k] === "number" && (m[k] = round(m[k])));
+    });
+
+    const keys = ["ghCash", "ghJama", "ghUdhaar", "banquetIn", "restCash", "restUdhaar", "officeIn", "recoveryIn", "loansIn", "personalIn", "transferIn", "restKharch", "restUpad", "officeOut", "personalOut", "loanOut", "transferOut", "refundOut", "aaya", "gaya", "businessNet", "net"];
+    const totals = Object.fromEntries(keys.map((k) => [k, round(sum(months, (m) => m[k]))]));
+    const outByCat = {};
+    const inByCat = {};
+    months.forEach((m) => {
+      Object.entries(m.outByCat).forEach(([k, v]) => inc(outByCat, k, v));
+      Object.entries(m.inByCat).forEach(([k, v]) => inc(inByCat, k, v));
+    });
+    res.json({ success: true, data: { months, totals, outByCat, inByCat } });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── 2) GUEST HOUSE GROWTH ─────────────────────────
+router.get("/gh-growth/:start/:end", async (req, res) => {
+  try {
+    const start = dayjs(req.params.start, F, true);
+    const end = dayjs(req.params.end, F, true);
+    if (!start.isValid() || !end.isValid() || end.isBefore(start)) {
+      return res.status(400).json({ success: false, message: "Date must be in DD-MM-YYYY format" });
+    }
+    const [docs, rooms, allForGuests] = await Promise.all([
+      Entry.find(range(start, end), { entry: 1, date: 1, entryCreateDate: 1 }).lean(),
+      Room.find({}).lean(),
+      // purane guest pehchanne ke liye poora itihaas (sirf zaroori fields)
+      Entry.find({}, { "entry.mobileNumber": 1, "entry.fullname": 1, "entry.rate": 1, "entry.period": 1, "entry.type": 1, entryCreateDate: 1 }).lean(),
+    ]);
+    const nRooms = rooms.length || 1;
+    const days = end.diff(start, "day") + 1;
+
+    const rows = docs.flatMap((d) =>
+      (d.entry || []).filter((e) => SOLD.includes(e.period)).map((e) => ({ ...e, _date: d.entryCreateDate, _key: d.date }))
+    );
+    const roomDays = new Set(rows.map((e) => `${e._key}|${e.roomNo}`));
+    const revenue = sum(rows, (e) => e.rate);
+    const discount = sum(rows, (e) => Math.max(n(e.cost) - n(e.rate), 0));
+
+    const byType = {}, byRoomType = {}, byMode = {};
+    rows.forEach((e) => {
+      inc(byType, e.type || "Other", e.rate);
+      inc(byRoomType, e.roomType || "Other", e.rate);
+      inc(byMode, e.modeOfPayment || "Other", e.rate);
+    });
+
+    // Room-wise
+    const roomMap = {};
+    rooms.forEach((r) => (roomMap[r.roomNumber] = { roomNo: r.roomNumber, roomType: r.roomType, listRate: r.roomCost, revenue: 0, days: new Set(), stays: 0 }));
+    rows.forEach((e) => {
+      const r = (roomMap[e.roomNo] ||= { roomNo: e.roomNo, roomType: e.roomType, listRate: 0, revenue: 0, days: new Set(), stays: 0 });
+      r.revenue += n(e.rate);
+      r.days.add(e._key);
+      r.stays += 1;
+    });
+    const roomWise = Object.values(roomMap)
+      .map((r) => ({ roomNo: r.roomNo, roomType: r.roomType, listRate: r.listRate, revenue: round(r.revenue), stays: r.stays, occupancy: round((100 * r.days.size) / days), avgRate: r.stays ? round(r.revenue / r.stays) : 0 }))
+      .sort((a, b) => a.roomNo - b.roomNo);
+
+    // Weekday occupancy
+    const wdDays = {}, wdUsed = {};
+    for (let d = start; !d.isAfter(end, "day"); d = d.add(1, "day")) inc(wdDays, WEEKDAYS[d.day()], 1);
+    roomDays.forEach((k) => inc(wdUsed, WEEKDAYS[dayjs(k.split("|")[0], F).day()], 1));
+    const weekday = WEEKDAYS.map((w) => ({ day: w, occupancy: wdDays[w] ? round((100 * (wdUsed[w] || 0)) / (wdDays[w] * nRooms)) : 0 }));
+
+    // Monthly trend
+    const mt = {};
+    rows.forEach((e) => {
+      const m = (mt[ymOf(e._date)] ||= { revenue: 0, stays: 0, roomDays: new Set() });
+      m.revenue += n(e.rate);
+      m.stays += 1;
+      m.roomDays.add(`${e._key}|${e.roomNo}`);
+    });
+    const monthly = Object.keys(mt).sort().map((k) => {
+      const dim = dayjs(k + "-01").daysInMonth();
+      const m = mt[k];
+      return { month: k, label: dayjs(k + "-01").format("MMM YY"), revenue: round(m.revenue), occupancy: round((100 * m.roomDays.size) / (nRooms * dim)), adr: m.stays ? round(m.revenue / m.stays) : 0 };
+    });
+
+    // Purane guests (poore itihaas se), is period mein aaye guests
+    const hist = {};
+    allForGuests.forEach((d) =>
+      (d.entry || []).forEach((e) => {
+        if (!SOLD.includes(e.period)) return;
+        const mob = String(e.mobileNumber || "").replace(/\D/g, "").slice(-10);
+        if (mob.length !== 10 || /^(\d)\1{9}$/.test(mob)) return;
+        const g = (hist[mob] ||= { mobile: mob, name: "", type: "", stays: 0, spent: 0, last: null, first: null });
+        g.stays += 1;
+        g.spent += n(e.rate);
+        if (e.fullname) g.name = norm(e.fullname);
+        if (e.type) g.type = e.type;
+        const dt = d.entryCreateDate;
+        if (!g.last || dt > g.last) g.last = dt;
+        if (!g.first || dt < g.first) g.first = dt;
+      })
+    );
+    const periodMobiles = new Set(rows.map((e) => String(e.mobileNumber || "").replace(/\D/g, "").slice(-10)));
+    const periodGuests = Object.values(hist).filter((g) => periodMobiles.has(g.mobile));
+    const repeatGuests = periodGuests.filter((g) => g.stays > 1);
+    const topGuests = Object.values(hist)
+      .filter((g) => g.stays > 1)
+      .sort((a, b) => b.stays - a.stays || b.spent - a.spent)
+      .slice(0, 100)
+      .map((g) => ({ ...g, spent: round(g.spent), last: dayjs(g.last).format(F), first: dayjs(g.first).format(F), daysSinceLast: todayIst().diff(dayjs(g.last), "day") }));
+
+    res.json({
+      success: true,
+      data: {
+        rooms: nRooms,
+        days,
+        kpi: {
+          revenue: round(revenue),
+          stays: rows.length,
+          occupancy: round((100 * roomDays.size) / (nRooms * days), 1),
+          adr: rows.length ? round(revenue / rows.length) : 0,
+          revPar: round(revenue / (nRooms * days)),
+          discount: round(discount),
+          guests: periodGuests.length,
+          repeatGuests: repeatGuests.length,
+          repeatShare: periodGuests.length ? round((100 * repeatGuests.length) / periodGuests.length) : 0,
+          emptyRoomNights: Math.max(nRooms * days - roomDays.size, 0),
+        },
+        byType, byRoomType, byMode, roomWise, weekday, monthly, topGuests,
+      },
+    });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── 3) KHARCH CONTROL ─────────────────────────
+// Kharch = Restaurant galle se kharch + Office Out (Personal/Loans/Upad chhod ke)
+router.get("/kharch/:months", async (req, res) => {
+  try {
+    const count = Math.min(Math.max(parseInt(req.params.months, 10) || 6, 2), 24);
+    const end = todayIst().endOf("month");
+    const start = end.subtract(count - 1, "month").startOf("month");
+    const q = range(start, end);
+    const [rest, office] = await Promise.all([
+      RestEntry.find(q, { entryCreateDate: 1, grandTotal: 1, expenses: 1 }).lean(),
+      OfficeBook.find(q, { entryCreateDate: 1, officeOut: 1 }).lean(),
+    ]);
+    const classify = await loadOfficeClassifier();
+    const months = monthList(start, end);
+    const sales = Object.fromEntries(months.map((m) => [m, 0]));
+    const food = Object.fromEntries(months.map((m) => [m, 0]));
+    const total = Object.fromEntries(months.map((m) => [m, 0]));
+    const items = {}; // name -> {category, months:{}}
+    const cats = {}; // cat -> {months:{}}
+    const add = (m, cat, name, amt, src) => {
+      if (!(m in total)) return;
+      if (/^(personal|loans?|upad)/i.test(cat || "")) return;
+      const key = norm(name).toLowerCase() || "(no name)";
+      const it = (items[key] ||= { name: norm(name) || "(no name)", category: cat || "Other", source: src, months: {} });
+      inc(it.months, m, amt);
+      inc((cats[cat || "Other"] ||= { category: cat || "Other", months: {} }).months, m, amt);
+      total[m] += n(amt);
+      if (/food/i.test(cat || "")) food[m] += n(amt);
+    };
+    rest.forEach((d) => {
+      const m = ymOf(d.entryCreateDate);
+      if (m in sales) sales[m] += n(d.grandTotal);
+      (d.expenses || []).forEach((x) => add(m, x.categoryName, x.expenseName, x.amount, "Rest"));
+    });
+    office.forEach((d) => {
+      const m = ymOf(d.entryCreateDate);
+      (d.officeOut || []).forEach((x) => classify("out", x.categoryName, lineName(x)) === "business" && add(m, x.categoryName, x.expenseName || x.fullname, x.amount, "Office"));
+    });
+
+    const monthRows = months.map((m) => ({
+      month: m,
+      label: dayjs(m + "-01").format("MMM YY"),
+      restSales: round(sales[m]),
+      food: round(food[m]),
+      total: round(total[m]),
+      foodPct: sales[m] ? round((100 * food[m]) / sales[m], 1) : 0,
+    }));
+
+    const itemList = Object.values(items).map((it) => {
+      const vals = months.map((m) => round(it.months[m] || 0));
+      return { ...it, months: undefined, values: vals, total: round(vals.reduce((a, b) => a + b, 0)) };
+    });
+    itemList.sort((a, b) => b.total - a.total);
+
+    // Alert: pichla poora mahina vs usse pehle ke 3 mahino ka average (30%+ aur ₹2000+ zyada)
+    const cur = todayIst();
+    const lastFullIdx = months.indexOf(cur.subtract(1, "month").format("YYYY-MM"));
+    const alerts = [];
+    if (lastFullIdx >= 3) {
+      itemList.forEach((it) => {
+        const now = it.values[lastFullIdx];
+        const prev = it.values.slice(lastFullIdx - 3, lastFullIdx);
+        const avg = prev.reduce((a, b) => a + b, 0) / 3;
+        if (now - avg >= 2000 && (avg === 0 ? now >= 5000 : now >= avg * 1.3)) {
+          alerts.push({ name: it.name, category: it.category, month: monthRows[lastFullIdx].label, now: round(now), avg: round(avg), changePct: avg ? round((100 * (now - avg)) / avg) : null });
+        }
+      });
+      alerts.sort((a, b) => b.now - b.avg - (a.now - a.avg));
+    }
+
+    const catList = Object.values(cats)
+      .map((c) => ({ category: c.category, values: months.map((m) => round(c.months[m] || 0)) }))
+      .map((c) => ({ ...c, total: c.values.reduce((a, b) => a + b, 0) }))
+      .sort((a, b) => b.total - a.total);
+
+    res.json({ success: true, data: { months: monthRows, items: itemList.slice(0, 40), categories: catList, alerts: alerts.slice(0, 15) } });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── 4) DATA CHECK (galti alert) ─────────────────────────
+router.get("/data-alerts", async (req, res) => {
+  try {
+    const today = todayIst();
+    const from = today.subtract(30, "day");
+    const future = { entryCreateDate: { $gt: today.endOf("day").toDate() } };
+    const recent = range(from, today.subtract(1, "day"));
+    const [ghF, restF, offF, ghR, restR, offR, sal, restNoPos] = await Promise.all([
+      Entry.find(future, { date: 1 }).lean(),
+      RestEntry.find(future, { createDate: 1 }).lean(),
+      OfficeBook.find(future, { createDate: 1 }).lean(),
+      Entry.find(recent, { entryCreateDate: 1 }).lean(),
+      RestEntry.find(recent, { entryCreateDate: 1 }).lean(),
+      OfficeBook.find(recent, { entryCreateDate: 1 }).lean(),
+      StaffSalary.find({ year: { $gte: today.year() - 1 } }, { month: 1, year: 1, "rows.salaryPaidAmount": 1, "rows.fullname": 1 }).lean(),
+      RestEntry.find({ ...range(today.subtract(60, "day"), today), computerAmount: { $in: [0, null] }, grandTotal: { $gt: 0 } }, { createDate: 1 }).lean(),
+    ]);
+    const alerts = [];
+    const fut = [...ghF.map((d) => ["Guest House", d.date]), ...restF.map((d) => ["Restaurant", d.createDate]), ...offF.map((d) => ["Office", d.createDate])];
+    if (fut.length) {
+      alerts.push({ level: "error", title: "Entries with a future date", text: fut.map(([b, d]) => `${b}: ${d}`).join(", "), hint: "Entries exist for dates after today. If the date is wrong, please correct it." });
+    }
+    const missing = (docs, label, link) => {
+      const have = new Set(docs.map((d) => dayjs(d.entryCreateDate).format(F)));
+      const miss = [];
+      for (let d = from; d.isBefore(today, "day"); d = d.add(1, "day")) if (!have.has(d.format(F))) miss.push(d.format("DD MMM"));
+      if (miss.length) alerts.push({ level: miss.length > 3 ? "error" : "warning", title: `${label}: no entry for ${miss.length} days (last 30 days)`, text: miss.join(", "), link });
+    };
+    missing(ghR, "Guest House", "gh-dashboard");
+    missing(restR, "Restaurant", "res-reports/sales-report");
+    missing(offR, "Office Book", "office-book");
+    const neg = sal.filter((s) => (s.rows || []).some((r) => n(r.salaryPaidAmount) < 0));
+    if (neg.length) {
+      alerts.push({ level: "warning", title: "Negative (−) amount in Staff Salary", text: neg.map((s) => dayjs(`${s.year}-${String(s.month).padStart(2, "0")}-01`).format("MMM YY")).join(", "), hint: "Salary paid amount is negative. Please check whether it is correct.", link: "staff-salary" });
+    }
+    if (restNoPos.length) {
+      alerts.push({ level: "info", title: `Restaurant: computer amount missing for ${restNoPos.length} days (last 60 days)`, text: restNoPos.map((d) => d.createDate).slice(0, 20).join(", "), hint: "If the computer (POS) total is not filled in, the difference is calculated wrongly." });
+    }
+    res.json({ success: true, data: { today: today.format(F), alerts } });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── 5) PROFIT & LOSS (mahina-wise) ─────────────────────────
+// Kamai (accrual): GH saari sales (udhaar bhi) + Restaurant grandTotal + Office In ki doosri kamai
+//                  (Loan, Personal, Pending-vasooli chhod ke)
+// Kharch (jo paisa sach mein diya): Restaurant galle se kharch + upad + Office Out
+//                  (Personal aur Loan chhod ke, wo neeche alag)
+const EXP_GROUPS = [
+  ["Food & beverage supplies (F&B)", /food|beverage|kirana/i],
+  ["Staff / Salary / Advance", /staff|salar|upad|overtime/i],
+  ["Electricity, water, gas (Utility)", /utility|electric|gas|water|wifi/i],
+  ["Maintenance / Repair", /mainten|repair/i],
+  ["Supplies / Equipment", /equipment/i],
+  ["Rent", /rent/i],
+];
+const expGroup = (cat) => (EXP_GROUPS.find(([, re]) => re.test(cat || "")) || ["Other expenses"])[0];
+const bizOf = (cat) => (/^gh\b|^gh /i.test(cat || "") ? "Guest House" : "Restaurant / common");
+
+router.get("/pnl/:from/:to", async (req, res) => {
+  try {
+    const from = dayjs(req.params.from, "YYYY-MM", true);
+    const to = dayjs(req.params.to, "YYYY-MM", true);
+    if (!from.isValid() || !to.isValid() || to.isBefore(from)) {
+      return res.status(400).json({ success: false, message: "Month must be in YYYY-MM format (from <= to)" });
+    }
+    const q = range(from.startOf("month"), to.endOf("month"));
+    const [gh, rest, office, extras] = await Promise.all([
+      Entry.find(q, { entry: 1, entryCreateDate: 1 }).lean(),
+      RestEntry.find(q, { entryCreateDate: 1, grandTotal: 1, totalUpad: 1, expenses: 1 }).lean(),
+      OfficeBook.find(q, { entryCreateDate: 1, officeIn: 1, officeOut: 1 }).lean(),
+      RoomCharge.find({ ...q, kind: "extra" }, { entryCreateDate: 1, amount: 1 }).lean(),
+    ]);
+    const discFrom = await discountFrom();
+    const classify = await loadOfficeClassifier();
+    const bqP = await banquetMoney(from, to);
+    const months = monthList(from, to).map((m) => ({
+      month: m, label: dayjs(m + "-01").format("MMM YY"),
+      ghSales: 0, ghExtra: 0, ghDiscount: 0, restSales: 0, banquetSales: 0, otherIncome: 0, otherByCat: {},
+      exp: {}, expGh: 0, expRest: 0, loanOut: 0, personalOut: 0, refundOut: 0,
+    }));
+    const byM = Object.fromEntries(months.map((m) => [m.month, m]));
+    const addExp = (m, cat, amt) => {
+      inc(m.exp, expGroup(cat), amt);
+      if (bizOf(cat) === "Guest House") m.expGh += n(amt);
+      else m.expRest += n(amt);
+    };
+    gh.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (m) (d.entry || []).forEach((e) => SOLD.includes(e.period) && (m.ghSales += n(e.rate)));
+      // naye niyam ke din: bill par diya discount GH kamai se ghatta hai (alag line)
+      if (m && d.entryCreateDate && new Date(d.entryCreateDate) >= discFrom)
+        (d.entry || []).forEach((e) => SOLD.includes(e.period) && (m.ghDiscount += Math.max(0, n(e.discount))));
+    });
+    // GH extra charges (extra bed, laundry...) — food bill nahi (wo restaurant sales mein pehle se hai)
+    extras.forEach((x) => {
+      const m = byM[ymOf(x.entryCreateDate)];
+      if (m) m.ghExtra += n(x.amount);
+    });
+    rest.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (!m) return;
+      m.restSales += n(d.grandTotal);
+      if (n(d.totalUpad)) addExp(m, "Upad", d.totalUpad);
+      (d.expenses || []).forEach((x) => addExp(m, x.categoryName, x.amount));
+    });
+    office.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      if (!m) return;
+      (d.officeIn || []).forEach((x) => {
+        const c = x.categoryName || "Other";
+        if (classify("in", c, lineName(x)) !== "business") return; // personal / loan / transfer / udhaar-wapas kamai nahi
+        m.otherIncome += n(x.amount);
+        inc(m.otherByCat, c, x.amount);
+      });
+      (d.officeOut || []).forEach((x) => {
+        const c = x.categoryName || "Other";
+        const t = classify("out", c, lineName(x));
+        if (t === "personal") return (m.personalOut += n(x.amount));
+        if (t === "emi") return (m.loanOut += n(x.amount));
+        if (t === "refund") return (m.refundOut = (m.refundOut || 0) + n(x.amount)); // guest ko wapas (advance) — kharch nahi
+        if (t === "transfer" || t === "loan" || t === "recovery") return; // apne account mein ghumaya — kharch nahi
+        addExp(m, c, x.amount);
+      });
+    });
+    const groups = [...EXP_GROUPS.map(([g]) => g), "Other expenses"];
+    // Banquet bill (event ke mahine, GST ke bina)
+    bqP.sales.forEach((x) => byM[x.ym] && (byM[x.ym].banquetSales += x.amount));
+    months.forEach((m) => {
+      m.revenue = m.ghSales + m.ghExtra - m.ghDiscount + m.restSales + m.banquetSales + m.otherIncome;
+      m.expenses = sum(Object.values(m.exp), (v) => v);
+      m.profit = m.revenue - m.expenses;
+      m.margin = m.revenue ? round((100 * m.profit) / m.revenue, 1) : 0;
+      m.afterLoanPersonal = m.profit - m.loanOut - m.personalOut;
+      m.ghProfit = m.ghSales + m.ghExtra - m.ghDiscount - m.expGh;
+      groups.forEach((g) => (m.exp[g] = round(m.exp[g] || 0)));
+      ["ghSales", "ghExtra", "ghDiscount", "restSales", "banquetSales", "otherIncome", "expGh", "expRest", "loanOut", "personalOut", "refundOut", "revenue", "expenses", "profit", "afterLoanPersonal", "ghProfit"].forEach((k) => (m[k] = round(m[k])));
+    });
+    const totals = {};
+    ["ghSales", "ghExtra", "ghDiscount", "restSales", "banquetSales", "otherIncome", "expGh", "expRest", "loanOut", "personalOut", "refundOut", "revenue", "expenses", "profit", "afterLoanPersonal", "ghProfit"].forEach((k) => (totals[k] = round(sum(months, (m) => m[k]))));
+    totals.margin = totals.revenue ? round((100 * totals.profit) / totals.revenue, 1) : 0;
+    totals.exp = Object.fromEntries(groups.map((g) => [g, round(sum(months, (m) => m.exp[g]))]));
+    totals.otherByCat = {};
+    months.forEach((m) => Object.entries(m.otherByCat).forEach(([k, v]) => inc(totals.otherByCat, k, v)));
+    res.json({ success: true, data: { months, totals, groups, discountFrom: dayjs(discFrom).format("DD-MM-YYYY") } });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── MONTHLY BALANCE (payment mode-wise) ─────────────────────────
+// Har mahine Cash / PP / PPS / PPC mein kitna aaya, kitna gaya. Card ka paisa PP mein hi aata hai → Card = PP.
+// Aaya: GH room + purane baaki ki jama (mode se) · Restaurant: Cash (galla + jo kharch/upad galle se diya) , Card+PP → PP · Office In (mode se)
+// Gaya: Restaurant kharch + upad (galle se, Cash) · Office Out (mode se). UnPaid / udhaar ginti mein nahi.
+// GH counter par wasool hue food / extra bill (paidDate ke hisaab se)
+const paidRoomCharges = async (from, to) => {
+  const list = await RoomCharge.find({ isPaid: true, paidDate: { $ne: "" } }, { kind: 1, amount: 1, paidMode: 1, paidDate: 1 }).lean();
+  return list
+    .map((c) => ({ ...c, ym: dayjs(c.paidDate, F, true).format("YYYY-MM") }))
+    .filter((c) => c.ym >= from.format("YYYY-MM") && c.ym <= to.format("YYYY-MM"));
+};
+const MODE_OF = (m) => {
+  const x = String(m || "").trim().toUpperCase();
+  if (x === "CASH") return "Cash";
+  if (x === "CARD" || x === "PP") return "PP";
+  if (x === "PPS") return "PPS";
+  if (x === "PPC") return "PPC";
+  return null; // UnPaid / khaali
+};
+const BAL_MODES = ["Cash", "PP", "PPS", "PPC"];
+router.get("/mode-balance/:from/:to", async (req, res) => {
+  try {
+    const from = dayjs(req.params.from, "YYYY-MM", true);
+    const to = dayjs(req.params.to, "YYYY-MM", true);
+    if (!from.isValid() || !to.isValid() || to.isBefore(from)) return res.status(400).json({ success: false, message: "Month must be in YYYY-MM format (from <= to)" });
+    const q = range(from.startOf("month"), to.endOf("month"));
+    const [gh, rest, office] = await Promise.all([
+      Entry.find(q, { entry: 1, entryCreateDate: 1 }).lean(),
+      RestEntry.find(q, { entryCreateDate: 1, totalCash: 1, totalCard: 1, totalPP: 1, totalExpenses: 1, totalUpad: 1 }).lean(),
+      OfficeBook.find(q, { entryCreateDate: 1, officeIn: 1, officeOut: 1 }).lean(),
+    ]);
+    const classify = await loadOfficeClassifier();
+    const dueReceipts = await RestDueReceipt.find({ ...q, cancelled: { $ne: true }, source: { $ne: "gh" } }, { entryCreateDate: 1, amount: 1, mode: 1 }).lean();
+    const roomPaid = await paidRoomCharges(from, to);
+    const ghOffice = await GhDueReceipt.find({ ...q, cancelled: { $ne: true } }, { entryCreateDate: 1, amount: 1, mode: 1 }).lean();
+    const advMoves = await bookingAdvanceMoves();
+    const bq = await banquetMoney(from, to);
+    const blank = () => Object.fromEntries(BAL_MODES.map((k) => [k, { in: 0, out: 0, src: { gh: 0, rest: 0, office: 0, banquet: 0, officeP: 0, restOut: 0, officeOut: 0, officeOutP: 0 } }]));
+    const months = monthList(from, to).map((m) => ({ month: m, label: dayjs(m + "-01").format("MMM YY"), modes: blank() }));
+    const byM = Object.fromEntries(months.map((m) => [m.month, m]));
+    const add = (m, mode, dir, amt, src) => {
+      if (!m || !mode || !(n(amt) > 0)) return;
+      m.modes[mode][dir] += n(amt);
+      m.modes[mode].src[src] += n(amt);
+    };
+    gh.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      (d.entry || []).forEach((e) => add(m, MODE_OF(e.modeOfPayment), "in", e.rate, "gh"));
+    });
+    rest.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      const galla = n(d.totalCash) + n(d.totalExpenses) + n(d.totalUpad); // kharch/upad galle se diya gaya tha
+      add(m, "Cash", "in", galla, "rest");
+      add(m, "PP", "in", n(d.totalCard) + n(d.totalPP), "rest");
+      add(m, "Cash", "out", n(d.totalExpenses) + n(d.totalUpad), "restOut");
+    });
+    // Restaurant par purana udhaar wasool: Cash → Cash, Card / PP → PP
+    dueReceipts.forEach((x) => add(byM[ymOf(x.entryCreateDate)], MODE_OF(x.mode), "in", x.amount, "rest"));
+    // GH counter par food bill (restaurant ka udhaar) aur extra charges wasool: mode ke hisaab se
+    roomPaid.forEach((c) => add(byM[c.ym], MODE_OF(c.paidMode), "in", c.amount, c.kind === "food" ? "rest" : "gh"));
+    // Banquet payments (Card → PP, kyunki ek hi machine)
+    bq.pays.forEach((x) => add(byM[x.ym], MODE_OF(x.mode), "in", x.amount, "banquet"));
+    // GH ka purana baaki jo Office mein wasool hua
+    ghOffice.forEach((x) => add(byM[ymOf(x.entryCreateDate)], MODE_OF(x.mode), "in", x.amount, "gh"));
+    // Booking advance: mila us din/mode mein +, check-in room ki wasooli wale mode se − (minus bhi ho sakta hai, isliye seedha)
+    advMoves.forEach((x) => {
+      const m = byM[x.ym];
+      const mode = MODE_OF(x.mode);
+      if (!m || !mode || !x.amount) return;
+      m.modes[mode].in += x.amount;
+      m.modes[mode].src.gh += x.amount;
+    });
+    office.forEach((d) => {
+      const m = byM[ymOf(d.entryCreateDate)];
+      // Balance mein har paisa ginta hai (account mein sach mein aaya/gaya), bas business aur personal/loan/transfer alag column mein
+      (d.officeIn || []).forEach((x) => {
+        const t = classify("in", x.categoryName, lineName(x));
+        add(m, MODE_OF(x.modeOfPayment), "in", x.amount, t === "business" || t === "recovery" ? "office" : "officeP");
+      });
+      (d.officeOut || []).forEach((x) => add(m, MODE_OF(x.modeOfPayment), "out", x.amount, classify("out", x.categoryName, lineName(x)) === "business" ? "officeOut" : "officeOutP"));
+    });
+    const totals = blank();
+    months.forEach((m) => {
+      BAL_MODES.forEach((k) => {
+        const v = m.modes[k];
+        v.in = round(v.in);
+        v.out = round(v.out);
+        v.net = round(v.in - v.out);
+        Object.keys(v.src).forEach((s2) => (v.src[s2] = round(v.src[s2])));
+        totals[k].in += v.in;
+        totals[k].out += v.out;
+        Object.keys(v.src).forEach((s2) => (totals[k].src[s2] += v.src[s2]));
+      });
+      m.totalIn = round(sum(BAL_MODES, (k) => m.modes[k].in));
+      m.totalOut = round(sum(BAL_MODES, (k) => m.modes[k].out));
+      m.net = round(m.totalIn - m.totalOut);
+    });
+    BAL_MODES.forEach((k) => {
+      totals[k].in = round(totals[k].in);
+      totals[k].out = round(totals[k].out);
+      totals[k].net = round(totals[k].in - totals[k].out);
+    });
+    res.json({ success: true, data: { modes: BAL_MODES, months, totals, totalIn: round(sum(months, (m) => m.totalIn)), totalOut: round(sum(months, (m) => m.totalOut)) } });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+// ───────────────────────── RESTAURANT RECEIVABLES (kiska kitna baaki) ─────────────────────────
+// Hisaab server/utils/restReceivables.js mein (Restaurant entry screen bhi wahi use karti hai)
+router.get("/rest-receivables", async (req, res) => {
+  try {
+    const upto = req.query.to && dayjs(req.query.to, F, true).isValid() ? dayjs(req.query.to, F, true) : null;
+    res.json({ success: true, data: await computeRestReceivables({ upto }) });
+  } catch (e) {
+    fail(res, e);
+  }
+});
+
+export default router;

@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
+import DashLockGate from "./components/DashLockGate.jsx";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
+import { HomeGate, LegacyGate } from "./routes/StaffGate.jsx";
 import { loadUser } from "./redux/actions/userAction.js";
 import { Toaster } from "react-hot-toast";
 import { loadAdmin } from "./redux/actions/adminAction.js";
@@ -10,6 +12,7 @@ import "./App.css";
 import ModernLoader from "./utils/util.jsx";
 import { useAppDispatch, useAppSelector } from "./redux/hooks/index.js";
 import NotFound from "./pages/NotFound.jsx";
+import SecretGate from "./components/SecretGate.jsx";
 
 const EntryPage = lazy(() => import("./pages/EntryPage"));
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
@@ -19,20 +22,23 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage.jsx"));
 const AdminSignupPage = lazy(() => import("./pages/AdminSignupPage.jsx"));
 const AdminResetPasswordPage = lazy(
-  () => import("./pages/AdminResetPasswordPage.jsx"),
+  () => import("./pages/AdminResetPasswordPage.jsx")
 );
 const UserResetPasswordPage = lazy(
-  () => import("./pages/UserResetPasswordPage.jsx"),
+  () => import("./pages/UserResetPasswordPage.jsx")
 );
 const Home = lazy(() => import("./pages/Home.jsx"));
 const RestEntryPage = lazy(
-  () => import("./pages/restaurant/RestEntryPage.jsx"),
+  () => import("./pages/restaurant/RestEntryPage.jsx")
 );
 const OfficeEntryPage = lazy(
-  () => import("./pages/office/OfficeEntryPage.jsx"),
+  () => import("./pages/office/OfficeEntryPage.jsx")
 );
+const QuickEntryPage = lazy(() => import("./pages/quick/QuickEntryPage.jsx"));
+const MyReportsPage = lazy(() => import("./pages/quick/MyReportsPage.jsx"));
+const InvoicePage = lazy(() => import("./pages/invoice/InvoicePage.jsx"));
 const StaffSalaryEntryPage = lazy(
-  () => import("./pages/staffSalary/StaffSalaryEntryPage.jsx"),
+  () => import("./pages/staffSalary/StaffSalaryEntryPage.jsx")
 );
 
 const App = () => {
@@ -53,18 +59,25 @@ const App = () => {
           <Route
             path="/"
             element={
-              <>
+              <HomeGate>
                 <Navbar />
                 <Home />
-              </>
+              </HomeGate>
             }
           />
+          {/* Nayi PC + mobile entry (staff ya admin, login khud check karta hai) */}
+          <Route path="/entry" element={<QuickEntryPage />} />
+          <Route path="/my-reports" element={<MyReportsPage />} />
+          {/* Invoice dekho / PDF (login API khud check karta hai) */}
+          <Route path="/invoice/:id" element={<InvoicePage />} />
           <Route
             path="/hotel"
             element={
               <ProtectedRoute>
-                <Navbar />
-                <EntryPage />
+                <LegacyGate>
+                  <Navbar />
+                  <EntryPage />
+                </LegacyGate>
               </ProtectedRoute>
             }
           />
@@ -72,8 +85,10 @@ const App = () => {
             path="/restaurant"
             element={
               <ProtectedRoute>
-                <Navbar />
-                <RestEntryPage />
+                <LegacyGate>
+                  <Navbar />
+                  <RestEntryPage />
+                </LegacyGate>
               </ProtectedRoute>
             }
           />
@@ -81,8 +96,10 @@ const App = () => {
             path="/office"
             element={
               <ProtectedRoute>
-                <Navbar />
-                <OfficeEntryPage />
+                <LegacyGate>
+                  <Navbar />
+                  <OfficeEntryPage />
+                </LegacyGate>
               </ProtectedRoute>
             }
           />
@@ -90,8 +107,10 @@ const App = () => {
             path="/staff-salary"
             element={
               <ProtectedRoute>
-                <Navbar />
-                <StaffSalaryEntryPage />
+                <LegacyGate>
+                  <Navbar />
+                  <StaffSalaryEntryPage />
+                </LegacyGate>
               </ProtectedRoute>
             }
           />
@@ -136,7 +155,9 @@ const App = () => {
               path="/dashboard/*"
               element={
                 <ProtectedAdminRoute>
-                  <DashboardPage />
+                  <DashLockGate>
+                    <DashboardPage />
+                  </DashLockGate>
                 </ProtectedAdminRoute>
               }
             />
@@ -144,56 +165,50 @@ const App = () => {
           <Route
             path="/signup"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <SignupPage />
-              </>
+              </SecretGate>
             }
           />
           <Route
             path="/login"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <LoginPage />
-              </>
+              </SecretGate>
             }
           />
           <Route
             path="/reset-password"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <UserResetPasswordPage />
-              </>
+              </SecretGate>
             }
           />
           {/* Admin */}
           <Route
             path="/admin-login"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <AdminLoginPage />
-              </>
+              </SecretGate>
             }
           />
           <Route
             path="/admin-signup"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <AdminSignupPage />
-              </>
+              </SecretGate>
             }
           />
           <Route
             path="/admin-reset-password"
             element={
-              <>
-                <Navbar />
+              <SecretGate>
                 <AdminResetPasswordPage />
-              </>
+              </SecretGate>
             }
           />
           <Route

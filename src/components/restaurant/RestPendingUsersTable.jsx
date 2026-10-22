@@ -74,7 +74,11 @@ const RestPendingUsersTable = ({
           "categoryName",
           value ? value?.categoryName : ""
         );
-        handleUpdateRow(index, "categoryDescription", value ? value?.categoryDescription : "");
+        handleUpdateRow(
+          index,
+          "categoryDescription",
+          value ? value?.categoryDescription : ""
+        );
       }}
       renderInput={(params) => (
         <TextField {...params} variant="outlined" size="small" fullWidth />
