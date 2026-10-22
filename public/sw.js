@@ -1,7 +1,7 @@
 // Ashirvad service worker: app ko "install" hone layak banata hai.
 // Sirf app ki files (HTML/JS/CSS/icons) cache hoti hain taaki jaldi khule.
 // API/data KABHI cache nahi hota, hamesha server se taaza aata hai.
-const CACHE = "ashirvad-shell-v1";
+const CACHE = "app-shell-v2"; // naya icon / naam aane par number badhao
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icons/icon-192.png"])).then(() => self.skipWaiting()));

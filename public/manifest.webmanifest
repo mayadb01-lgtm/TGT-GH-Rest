@@ -1,13 +1,13 @@
 {
-  "name": "UHU Entry",
-  "short_name": "UHU",
+  "name": "The Grand Tapi",
+  "short_name": "TGT",
   "description": "Guest House, Restaurant aur Office ki roz ki entry",
   "start_url": "/entry",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F1F5F9",
-  "theme_color": "#0F766E",
+  "theme_color": "#5B1F1F",
   "icons": [
     {
       "src": "/icons/icon-192.png",
