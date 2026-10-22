@@ -12,6 +12,7 @@ export const BUSINESS = {
   state: "Gujarat",
   stateCode: "24",
   logo: "/tgt-logo.png",
+  logoHeight: 90, // invoice par logo ki unchai (px)
   website: "www.thegrandtapi.com",
   // Invoice ke neeche "Bank details" (khaali ho to nahi chhapta)
   bank: { name: "ICICI Bank", account: "045905010108", ifsc: "ICIC0000459" },
