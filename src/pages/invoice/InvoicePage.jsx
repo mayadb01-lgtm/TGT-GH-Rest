@@ -16,6 +16,7 @@ const css = `
 .inv-paper{background:#fff;max-width:794px;margin:0 auto;padding:28px 30px;box-shadow:0 4px 18px rgba(0,0,0,.12);position:relative}
 .inv-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-bottom:3px solid ${BROWN};padding-bottom:12px}
 .inv-head img{height:64px}
+.inv-bank{margin-top:6px;color:#1F2937}
 .inv-addr{text-align:right;font-size:11.5px;line-height:1.5;max-width:330px}
 .inv-tag{font-weight:700;color:${BROWN};font-size:12.5px;letter-spacing:.3px}
 .inv-title{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px}
@@ -59,6 +60,7 @@ export const InvoiceDocument = ({ inv }) => {
           {HOTEL.tagline && <div className="inv-tag">{HOTEL.tagline}</div>}
           {HOTEL.address && <div>{HOTEL.address}</div>}
           {HOTEL.phones && <div>📞 {HOTEL.phones}</div>}
+          {HOTEL.website && <div>🌐 {HOTEL.website}</div>}
           {gst && (HOTEL.gstin || HOTEL.state) && (
             <div>
               {HOTEL.gstin && <b>GSTIN: {HOTEL.gstin}</b>}{HOTEL.gstin && HOTEL.state ? " · " : ""}{HOTEL.state && `State: ${HOTEL.state}${HOTEL.stateCode ? ` (${HOTEL.stateCode})` : ""}`}
@@ -194,6 +196,14 @@ export const InvoiceDocument = ({ inv }) => {
           {gst ? "Tax is not payable on reverse charge basis." : "This is not a GST tax invoice."}
           <br />
           Computer generated invoice.
+          {HOTEL.bank?.account && (
+            <div className="inv-bank">
+              <b>Bank details:</b> {HOTEL.bank.name}
+              <br />
+              A/c No. {HOTEL.bank.account}
+              {HOTEL.bank.ifsc ? ` · IFSC ${HOTEL.bank.ifsc}` : ""}
+            </div>
+          )}
         </div>
         <div className="inv-sign">
           For {HOTEL.name}
