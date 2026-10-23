@@ -307,3 +307,8 @@ Server rules ki jaanch (bina database) ke liye: 19 alag cases chalaye gaye, sab 
 
 ## Rollback (sirf look)
 `src/main.jsx` se `<ThemeProvider>` aur `<CssBaseline />` hata do → purana look. Menu: `DashboardPage.jsx` purana version.
+
+## Manager (kitchen board) — Ashirvad se sync karte waqt
+- `server/rasoi/board.html` mein Ashirvad ka business-data NAHI aata: `DATA` ke `mon, wf, hist, baseMonth, spp, takeout`, dish `q` aur `PARCEL` khaali rakhe gaye hain; naam `{{BIZ}}` (server `VITE_REACT_APP_BUSINESS_NAME` se bharta hai).
+- Dish mix is hotel ke apne POS data (14+ din) se banta hai (`dishMixFromPos`).
+- Ashirvad se naya board laate waqt ye scripts dobara chalao (port/neutral*.py jaisa) — Ashirvad ke aankde kabhi copy na hon.
