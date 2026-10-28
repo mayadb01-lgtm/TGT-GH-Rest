@@ -537,6 +537,8 @@ const RestQuickEntry = ({ date, canEdit = true }) => {
                 ["Cash", num(draft.cash), dues.byMode.Cash + dues.fromGh],
                 // Card aur PP dono ek hi account (PP) mein aate hain — isliye ek line
                 ["Card + PP", num(draft.card) + num(draft.pp), dues.byMode.Card + dues.byMode.PP],
+                // PPS: sirf udhaar wasooli (alag account)
+                ...(dues.byMode.PPS ? [["PPS", 0, dues.byMode.PPS]] : []),
               ];
               const tc = rows.reduce((a, r) => a + r[1], 0);
               const tl = rows.reduce((a, r) => a + r[2], 0);
@@ -565,8 +567,8 @@ const RestQuickEntry = ({ date, canEdit = true }) => {
                   {rows.map(([l, c, d]) => (
                     <Stack key={l} direction="row" sx={{ py: 0.4 }}>
                       <Typography fontWeight={l === "Cash" ? 800 : 600} sx={{ flex: 1 }}>
-                        {l === "Cash" ? "Total cash" : "Total Card + PP"}
-                        {l !== "Cash" && (
+                        {l === "Cash" ? "Total cash" : l === "PPS" ? "Total PPS" : "Total Card + PP"}
+                        {l === "Card + PP" && (
                           <Typography component="span" variant="caption" color={Q.muted} sx={{ display: "block", fontWeight: 400 }}>
                             same PP account · Card {inr(num(draft.card) + dues.byMode.Card)} + PP {inr(num(draft.pp) + dues.byMode.PP)}
                           </Typography>

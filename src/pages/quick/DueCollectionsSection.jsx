@@ -8,13 +8,14 @@ import { Box, Button, ButtonBase, Collapse, Stack, TextField, Typography } from 
 import AddIcon from "@mui/icons-material/Add";
 import { API, ChipChoice, EditorDialog, MoneyField, PickField, Q, Section, SplitPay, StatusPill, apiError, inr, num } from "./shared";
 import { chargeModeText, chargeParts, fillSplit, splitProblem } from "../../utils/payParts";
-const RAW_MODES = ["Cash", "Card", "PP"];
+const RAW_MODES = ["Cash", "Card", "PP", "PPS"];
 
 const COLOR = "#0E7490";
 const MODES = [
   ["Cash", "Cash"],
   ["Card", "Card"],
   ["PP", "PP (UPI)"],
+  ["PPS", "PPS"],
 ];
 const modeLabel = (m) => (m === "PP" ? "PP (UPI)" : m);
 
@@ -57,12 +58,12 @@ export const useDueReceipts = (date) => {
   const live = receipts.filter((r) => !r.cancelled && r.source !== "gh");
   const fromGh = receipts.filter((r) => !r.cancelled && r.source === "gh").reduce((t, r) => t + num(r.amount), 0);
   const byMode = useMemo(() => {
-    const o = { Cash: 0, Card: 0, PP: 0 };
+    const o = { Cash: 0, Card: 0, PP: 0, PPS: 0 };
     live.forEach((r) => (o[r.mode] = (o[r.mode] || 0) + num(r.amount)));
     roomBills.paidToday.forEach((c) => chargeParts(c).forEach((p) => (o[p.mode] = (o[p.mode] || 0) + num(p.amount))));
     return o;
   }, [live, roomBills]);
-  return { receipts, live, due, byMode, fromGh, ghCash, roomBills, toOffice, ghCard, total: byMode.Cash + byMode.Card + byMode.PP, reload: load };
+  return { receipts, live, due, byMode, fromGh, ghCash, roomBills, toOffice, ghCard, total: byMode.Cash + byMode.Card + byMode.PP + byMode.PPS, reload: load };
 };
 
 const DueCollectionsSection = ({ date, dues }) => {

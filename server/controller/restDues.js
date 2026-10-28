@@ -59,7 +59,7 @@ router.post("/", async (req, res) => {
     if (isRoomBill(name)) return bad(res, "Room bills are collected with the guest's room bill");
     if (!(amount > 0)) return bad(res, "Enter the amount received");
     const at = b.at === "office" ? "office" : "rest";
-    const modes = at === "office" ? ["Cash", "PP", "PPS", "PPC"] : ["Cash", "Card", "PP"];
+    const modes = at === "office" ? ["Cash", "PP", "PPS", "PPC"] : ["Cash", "Card", "PP", "PPS"];
     // Split: ek hi wasooli do mode mein (jaise Cash 300 + PP 500) → do receipt
     let parts = null;
     if (Array.isArray(b.split) && b.split.length) {
@@ -206,14 +206,14 @@ router.get("/room-bills/:date", async (req, res) => {
 });
 
 // POST /room-bills/:id/receive { date, mode, at: "rest" | "office" } → GH / Restaurant dono jagah "paid" dikhega
-//   Restaurant: Cash / Card / PP · Office: Cash / PP / PPS / PPC
+//   Restaurant: Cash / Card / PP / PPS · Office: Cash / PP / PPS / PPC
 router.post("/room-bills/:id([a-f0-9]{24})/receive", async (req, res) => {
   try {
     const b = req.body || {};
     if (!validDate(b.date)) return bad(res, "Invalid date");
     if (!dateOk(req, b.date)) return bad(res, "Only today's collection can be added", 403);
     const at = b.at === "office" ? "office" : "rest";
-    const modes = at === "office" ? ["Cash", "PP", "PPS", "PPC"] : ["Cash", "Card", "PP"];
+    const modes = at === "office" ? ["Cash", "PP", "PPS", "PPC"] : ["Cash", "Card", "PP", "PPS"];
     const doc = await RoomCharge.findById(req.params.id);
     if (!doc || doc.kind !== "food") return bad(res, "Bill not found", 404);
     if (doc.isPaid) return bad(res, "This room bill is already paid");
