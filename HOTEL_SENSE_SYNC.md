@@ -19,6 +19,27 @@ without login). Their apply logic is kept as functions (`applyPosReports` in `co
 4. Optional: `HOTEL_SENSE_SYNC_FROM=DD-MM-YYYY` in `server/.env` = no POS day before this is ever written.
    Without it, the first day of the first import is the start date (kept in `hotel_pc_pulls` `_id: "state"`).
 
+### How The Grand Tapi is wired (done 13 Nov 2026)
+
+The cashier PC has no public address, so it keeps one outgoing SSH connection to the VPS and lends it two doors,
+both inside the VPS only (`127.0.0.1`, never public):
+
+| door | goes to | used for |
+| --- | --- | --- |
+| `18081` | cashier PC port 3000 | the import (`HOTEL_PC_PULL_URL=http://127.0.0.1:18081/shop/api/radshiva/pull`) |
+| `22022` | cashier PC port 22 | reaching that PC from the office without Tailscale |
+
+Ashirvad's cashier PC uses `18080` the same way. On the PC the connection is a scheduled task, "TGT POS tunnel",
+that starts at every logon and reconnects by itself every 15 seconds; it is made by `tgt-pc-tunnel-setup.ps1`.
+
+Two things that are easy to get wrong:
+
+- The VPS decides which doors may be opened. Besides the key's own `permitlisten`, `PermitListen` in
+  `/etc/ssh/sshd_config.d/hotel-ashirvad-tunnel.conf` must list the port, or the connection is refused.
+  Ask for the door by its full name (`-R 127.0.0.1:18081:...`), not just the number, or it will not match.
+- On a Windows cashier PC the POS runs from `Gemfile.windows`, not `Gemfile`. Any `bundle` command there needs
+  `BUNDLE_GEMFILE` pointing at it, otherwise it reads the Mac Gemfile and fails for missing gems.
+
 ## What the import does
 
 `POST /api/v1/hotel-pc/pull { from, to }` (Super Admin only, not view-only, behind the dashboard password; at most
