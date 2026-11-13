@@ -70,6 +70,8 @@ import ProfitLossDashboard from "../components/insights/ProfitLossDashboard";
 import RoomRatesDashboard from "../components/owner/RoomRatesDashboard";
 import GuestRegisterDashboard from "../components/owner/GuestRegisterDashboard";
 import RoomActivityDashboard from "../components/owner/RoomActivityDashboard";
+import FootfallDashboard from "../components/owner/FootfallDashboard";
+import HotelPcImport from "../components/owner/HotelPcImport";
 import InvoicesDashboard from "../components/owner/InvoicesDashboard";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -144,6 +146,7 @@ const FLAT_NAV = [
   { segment: "owner-report", title: "Owner Monthly Report", icon: <InsightsIcon /> },
   { segment: "forecast", title: "Forecast & key dates", icon: <TrendingUpIcon /> },
   { segment: "performance", title: "Performance: year vs year", icon: <AssessmentIcon /> },
+  { segment: "footfall", title: "Footfall (restaurant, GH, banquet)", icon: <InsightsIcon /> },
   { segment: "group", title: "Group: all hotels", icon: <InsightsIcon /> },
   { segment: "guest-dues", title: "Guest Dues & Reminders", icon: <WhatsAppIcon /> },
   { kind: "header", title: "Business Growth" },
@@ -237,6 +240,7 @@ const FLAT_NAV = [
   { segment: "guest-register", title: "Guest Register (Govt)", icon: <AssignmentIndIcon /> },
   { segment: "room-activity", title: "Room Activity (footprint)", icon: <FingerprintIcon /> },
   { segment: "data-import", title: "Import Excel / CSV", icon: <UploadFileIcon /> },
+  { segment: "cashier-pc-import", title: "Import from cashier PC", icon: <UploadFileIcon /> },
   { kind: "header", title: "Old" },
   { segment: "home-classic", title: "Home (old)", icon: <DashboardIcon /> },
 ];
@@ -455,6 +459,8 @@ const DashboardPage = () => {
     { path: "room-rates", element: <RoomRatesDashboard /> },
     { path: "guest-register", element: <GuestRegisterDashboard /> },
     { path: "room-activity", element: <RoomActivityDashboard /> },
+    { path: "footfall", element: <FootfallDashboard /> },
+    { path: "cashier-pc-import", element: <HotelPcImport /> },
     { path: "invoices", element: <InvoicesDashboard /> },
     { path: "gh-growth", element: <GhGrowthDashboard /> },
     { path: "forecast", element: <ForecastDashboard /> },
