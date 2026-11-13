@@ -126,7 +126,7 @@ All dates are `DD-MM-YYYY`. Amounts are whole rupees.
 ## Reply of the import
 
 ```json
-{ "success": true, "from": "01-11-2026", "to": "13-11-2026", "pc": "Hotel Ashirvad POS",
+{ "success": true, "from": "01-11-2026", "to": "13-11-2026", "pc": "The Grand Tapi POS",
   "collections": { "restentries": { "added": 1, "same": 0, "different": 1, "replaced": 0, "skipped": 0 } },
   "different": [ { "tag": "restentries:<hotel id>", "key": "10-11-2026", "fields": ["grandTotal"], ... } ],
   "skipped": [ { "coll": "guestregisters", "id": "...", "why": "not valid here: roomNo, period" } ],
