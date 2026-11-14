@@ -1,6 +1,6 @@
 // AI bill reader: purchase bill photo(s) -> vendor, bill no, date, items, extra, total (Claude reads the photo).
 // Staff still check every line and press Save - this only fills the form. ⚠️ Writes nothing to the database.
-// Needs ANTHROPIC_API_KEY in /etc/ashirvad.env; without it the screen falls back to the free phone reader.
+// Needs ANTHROPIC_API_KEY in /etc/tgt.env; without it the screen falls back to the free phone reader.
 import PurchaseItem from "../model/purchaseItem.js";
 import { catalogItems } from "./rasoi.js";
 import { readSmart, takeRead, toImage } from "../utils/claude.js";
@@ -42,7 +42,7 @@ const SCHEMA = {
   },
 };
 
-const SYSTEM = `You read purchase bills for Hotel Ashirvad's restaurant and office in Gujarat, India: vegetable, grocery, dairy, meat, gas, cleaning and similar supplier bills. Bills may be printed, handwritten or faded thermal slips, and item names may be in English, Hindi or Gujarati (or a mix). Amounts are in rupees.
+const SYSTEM = `You read purchase bills for The Grand Tapi hotel's restaurant and office near Surat, Gujarat, India: vegetable, grocery, dairy, meat, gas, cleaning and similar supplier bills. Bills may be printed, handwritten or faded thermal slips, and item names may be in English, Hindi or Gujarati (or a mix). Amounts are in rupees.
 
 Copy the numbers that are on the bill; never invent or "fix" one. Read every item line, in bill order. For each line:
 - qty, unit, rate (price per one unit) and amount (line total) as written. If only two of qty / rate / amount are written, work out the third. If a number cannot be read, give your best reading and set unsure = true.

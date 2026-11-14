@@ -1,5 +1,5 @@
 // Shared Claude (Anthropic) client for the AI readers (purchase bills, guest IDs).
-// Needs ANTHROPIC_API_KEY in /etc/ashirvad.env; without it every reader answers "not set up" and screens fall back.
+// Needs ANTHROPIC_API_KEY in /etc/tgt.env; without it every reader answers "not set up" and screens fall back.
 import Anthropic from "@anthropic-ai/sdk";
 
 // quick (cheap) reads first; a doubtful result is read again by the best model automatically
